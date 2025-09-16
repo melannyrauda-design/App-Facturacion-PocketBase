@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sistema de Facturación - PocketBase</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://unpkg.com/pocketbase/dist/pocketbase.umd.js"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'blue-custom': '#2563eb',
+              'orange-custom': '#ea580c',
+              'yellow-custom': '#eab308'
+            }
+          }
+        }
+      }
+    </script>
+
+    <style>
+      @media print {
+        body {
+          background: white !important;
+          margin: 0;
+          padding: 0;
+        }
+        .no-print {
+          display: none !important;
+        }
+        #invoicePreview, #receiptPreview {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          border: none !important;
+          box-shadow: none !important;
+          padding: 20px;
+        }
+      }
+    </style>
+</head>
+<body class="bg-white min-h-screen text-gray-800">
+
+<div id="loginScreen" class="flex items-center justify-center min-h-screen bg-gray-50">
+  <div class="flex flex-col md:flex-row w-full max-w-4xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden">
+    <div class="w-full md:w-1/2 p-8 flex flex-col justify-center items-center bg-gradient-to-br from-blue-custom to-blue-600 text-white">
+      <div class="text-center">
+        <svg class="w-24 h-24 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C6.34 4.01 5.5 4.973 5.5 6.108V18.25a2.25 2.25 0 002.25 2.25h5.379a2.25 2.25 0 002.25-2.25V9.75a2.25 2.25 0 00-2.25-2.25h-4.5a2.25 2.25 0 00-2.25 2.25z" />
+        </svg>
+        <h1 class="text-3xl font-bold mb-2">Sistema de Facturación</h1>
+        <p class="text-blue-100">Gestión de facturas y recibos de forma simple y eficiente.</p>
+      </div>
+    </div>
+    <div class="w-full md:w-1/2 p-8 md:p-12">
+      <h2 class="text-3xl font-bold text-gray-800 mb-4">Iniciar Sesión</h2>
+      <p class="text-gray-600 mb-8">Bienvenido de nuevo. Por favor, ingresa tus credenciales.</p>
+      <div class="space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email</label>
+          <input id="loginEmail" type="email" placeholder="usuario@ejemplo.com" class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-custom focus:border-transparent" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+          <input id="loginPassword" type="password" placeholder="••••••••" class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-custom focus:border-transparent" />
+        </div>
+        <button onclick="login()" class="w-full bg-blue-custom text-white py-3 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors duration-300 shadow-lg hover:shadow-blue-custom/40">
+          Iniciar sesión
+        </button>
+        <p id="loginError" class="text-red-500 text-sm mt-4 hidden text-center">Credenciales inválidas o error de conexión.</p>
+        <div class="mt-6 text-sm text-center text-gray-500">
+          <p>Nota: Necesitas un usuario creado en PocketBase (colección `users`).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="appScreen" class="hidden">
+
+  <div class="container mx-auto p-4 max-w-7xl">
+
+    <div class="bg-gray-50 shadow-md rounded-xl p-4 sm:p-6 mb-6 no-print">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-gray-200">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800">Sistema de Facturación</h1>
+          <p class="text-sm text-gray-500 mt-1">🇭🇳 Honduras - Moneda: Lempira (L)</p>
+        </div>
+        <div class="flex items-center gap-4 mt-4 sm:mt-0">
+          <div class="flex items-center gap-3 bg-gray-100 px-3 py-1.5 rounded-full">
+            <img id="userAvatar" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0idy0xMCBoLTEwIHRleHQtZ3JheS00MDAiPgogIDxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTE4LjY4NSAxOS4xMjZDNjcuNzU1IDIxLjU4NSA5LjEyNiAyMS41ODUgNC4zMTUgMTkuMTI2Yy0uOTgwLS40ODgtMS4zNzgtMS4xODYtMS4zOTgtMS45NDlBLjczNS43MzUgMCAwMTEgMTcuNzVWMTNjMC0uMzgxLjMyNS0uNjg2LjczNC0uNjkzQTYwLjQ4MSA2MC40ODEgMCAwMTkgMTIuMjVjLjg3MiAwIDEuNzMzLjAyIDEuNTkuMDQzLjMyOS4wMDQuNjM5LjE3OC44NDIuNDQ1bDIuMDIgMi43YS43NS43NSAwIDAwMS4xMiAwTDE3LjYyIDExLjdjLjIwMy0uMjY3LjUxMy0uNDQxLjg0Mi0uNDQ1YTYwLjQ3OCA2MC40NzggMCAwMTEuNTkuMDQzYy40MS4wMDcuNzM0LjMxMi43MzQuNjkzdjQuNzVjMCAuMzIxLjMyNS42MjYuNzM0LjY0NmEuNzM1LjcMNSAwIDAxLS4wMjEuNTg2Yy0uMDIuNzYzLS40MTggMS40NjEtMS4zOTggMS45NDlaTTkuMzMgOC40NDljLS44MjcgMC0xLjUxLS42NjMtMS41MS0xLjQ3N1M4LjUgNS41IDkuMzMgNS41YzEuNDEyIDAgMi4yNzYgMS41MjkgMS44MDcgMi43MzItLjU1NiAxLjQyMy0xLjQ0MyAyLjcxNC0xLjgwNyAyLjcxNFptNS4zNC0uMTg4Yy0uNTU2IDEuNDIzLTEuNDQzIDIuNzE0LTEuODA3IDIuNzE0LS44MjUgMC0xLjUwOS0uNjYzLTEuNTA5LTEuNDc0UzEzLjY2IDUuNSAxNC40OCA1..NWMxLjQxMyAwIDIuMjc3IDEuNTI5IDEuODA4IDIuNzMxWiIgY2xpcC1ydWxlPSJldmVub2RkIiAvPgo8L3N2Zz4K" alt="User Avatar" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm">
+            <div id="currentUser" class="text-sm font-medium text-gray-700"></div>
+          </div>
+          <button onclick="logout()" class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-lg transition-colors duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+            <span>Cerrar Sesión</span>
+          </button>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-4 mt-4">
+        <button onclick="showSection('invoice')" class="flex items-center justify-center gap-2 p-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>FACTURA</span></button>
+        <button onclick="showSection('receipt')" class="flex items-center justify-center gap-2 p-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>RECIBO</span></button>
+        <button onclick="showSection('history')" class="flex items-center justify-center gap-2 p-3 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Historial</span></button>
+        <button onclick="showSection('reports')" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Reportes</span></button>
+        <button onclick="showCompanyManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Empresas</span></button>
+        <button onclick="showAuthManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Autorizaciones</span></button>
+        <button onclick="showProductManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Productos</span></button>
+        <button onclick="showClientManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Clientes</span></button>
+      </div>
+    </div>
+
+    <div id="companyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-gray-800">Gestión de Empresas</h3>
+            <button onclick="hideCompanyManager()" class="text-gray-500 hover:text-gray-700">✕</button>
+          </div>
+          <div class="mb-6">
+            <h4 class="font-semibold text-gray-700 mb-3">Empresa (Agregar/Editar)</h4>
+            <form id="companyForm" onsubmit="handleCompanyFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input type="hidden" id="companyId" />
+              <input type="text" id="newCompanyName" placeholder="Nombre de la empresa" class="border rounded-lg px-3 py-2" required>
+              <input type="text" id="newCompanyRTN" placeholder="RTN" class="border rounded-lg px-3 py-2">
+              <input type="text" id="newCompanyAddress" placeholder="Dirección" class="border rounded-lg px-3 py-2 md:col-span-2">
+              <input type="text" id="newCompanyPhone" placeholder="Teléfono" class="border rounded-lg px-3 py-2">
+              <input type="text" id="newCompanyEmail" placeholder="Email" class="border rounded-lg px-3 py-2">
+              <label for="newCompanyLogo" class="block mt-2 font-semibold md:col-span-2">Logo:</label>
+              <input type="file" id="newCompanyLogo" name="logo" accept="image/*" class="border p-2 rounded w-full md:col-span-2"/>
+              <div id="logoPreviewContainer" class="col-span-2 hidden">
+                  <p class="text-gray-700">Logo actual:</p>
+                  <img id="currentLogoPreview" src="" alt="Logo actual" class="h-20 w-auto mt-2 object-contain" />
+              </div>
+              <button type="submit" class="mt-4 md:col-span-2 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Empresa</button>
+            </form>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-700 mb-3">Empresas Registradas</h4>
+            <div id="companiesList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="authModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-gray-800">Gestión de Autorizaciones Fiscales</h3>
+            <button onclick="hideAuthManager()" class="text-gray-500 hover:text-gray-700">✕</button>
+          </div>
+          <div class="mb-6">
+            <h4 class="font-semibold text-gray-700 mb-3">Autorización (Agregar/Editar)</h4>
+            <form id="authForm" onsubmit="handleAuthFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <input type="hidden" id="authId" />
+              <div class="md:col-span-3"><label for="authCompany" class="block text-sm font-medium text-gray-700">Empresa*</label><select id="authCompany" class="w-full border rounded-lg px-3 py-2 mt-1" required></select></div>
+              <div class="md:col-span-2"><label for="authCAI" class="block text-sm font-medium text-gray-700">CAI*</label><input type="text" id="authCAI" placeholder="3BE298-..." class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+              <div><label for="authFechaLimite" class="block text-sm font-medium text-gray-700">Fecha Límite*</label><input type="date" id="authFechaLimite" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+              <div><label for="authRangoInicio" class="block text-sm font-medium text-gray-700">Rango Inicio*</label><input type="number" id="authRangoInicio" placeholder="1" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+              <div><label for="authRangoFin" class="block text-sm font-medium text-gray-700">Rango Fin*</label><input type="number" id="authRangoFin" placeholder="10000" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+              <div><label for="authNumeroActual" class="block text-sm font-medium text-gray-700">Número Actual*</label><input type="number" id="authNumeroActual" placeholder="1" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+              <div><label for="authCodSucursal" class="block text-sm font-medium text-gray-700">Cod. Sucursal*</label><input type="text" id="authCodSucursal" placeholder="000" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+              <div><label for="authCodPuntoEmision" class="block text-sm font-medium text-gray-700">Cod. Punto Emisión*</label><input type="text" id="authCodPuntoEmision" placeholder="001" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+              <div><label for="authCodTipoDoc" class="block text-sm font-medium text-gray-700">Cod. Tipo Doc*</label><input type="text" id="authCodTipoDoc" placeholder="01" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+              <div class="md:col-span-3 flex items-center gap-3 mt-2"><input id="authEstaActiva" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-custom focus:ring-blue-custom"><label for="authEstaActiva" class="text-sm font-medium text-gray-700">Marcar como la autorización activa</label></div>
+              <button type="submit" class="mt-4 md:col-span-3 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Autorización</button>
+            </form>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-700 mb-3">Autorizaciones Registradas</h4>
+            <div id="authList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="productModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-gray-800">Maestro de Productos</h3>
+            <button onclick="hideProductManager()" class="text-gray-500 hover:text-gray-700">✕</button>
+          </div>
+          <div class="mb-6">
+            <h4 class="font-semibold text-gray-700 mb-3">Producto (Agregar/Editar)</h4>
+            <form id="productForm" onsubmit="handleProductFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input type="hidden" id="productId" />
+              <div><label for="productName" class="block text-sm font-medium text-gray-700">Nombre*</label><input type="text" id="productName" placeholder="Nombre del producto o servicio" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+              <div><label for="productCode" class="block text-sm font-medium text-gray-700">Código</label><input type="text" id="productCode" placeholder="Ej: SRV-001" class="w-full border rounded-lg px-3 py-2 mt-1"></div>
+              <div class="md:col-span-2"><label for="productDescription" class="block text-sm font-medium text-gray-700">Descripción</label><textarea id="productDescription" rows="2" placeholder="Descripción detallada" class="w-full border rounded-lg px-3 py-2 mt-1"></textarea></div>
+              <div><label for="productPrice" class="block text-sm font-medium text-gray-700">Precio (L)*</label><input type="number" id="productPrice" step="0.01" placeholder="0.00" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+              <button type="submit" class="mt-4 md:col-span-2 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Producto</button>
+            </form>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-700 mb-3">Productos Registrados</h4>
+            <div id="productsList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <div id="clientModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-gray-800">Maestro de Clientes</h3>
+        <button onclick="hideClientManager()" class="text-gray-500 hover:text-gray-700">✕</button>
+      </div>
+
+      <div class="mb-6">
+        <h4 class="font-semibold text-gray-700 mb-3">Cliente (Agregar/Editar)</h4>
+        <form id="clientForm" onsubmit="handleClientFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input type="hidden" id="clientId" />
+          
+          <div>
+            <label for="clientName" class="block text-sm font-medium text-gray-700">Nombre Completo o Razón Social*</label>
+            <input type="text" id="clientName" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+          </div>
+          <div>
+            <label for="clientCode" class="block text-sm font-medium text-gray-700">Código de Cliente</label>
+            <input type="text" id="clientCode" class="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-100" readonly>
+          </div>
+          <div>
+            <label for="clientRTN" class="block text-sm font-medium text-gray-700">RTN</label>
+            <input type="text" id="clientRTN" class="w-full border rounded-lg px-3 py-2 mt-1">
+          </div>
+          <div>
+            <label for="clientPhone" class="block text-sm font-medium text-gray-700">Teléfono</label>
+            <input type="text" id="clientPhone" class="w-full border rounded-lg px-3 py-2 mt-1">
+          </div>
+          
+          <div>
+            <label for="clientContactPerson" class="block text-sm font-medium text-gray-700">Persona de Contacto</label>
+            <input type="text" id="clientContactPerson" class="w-full border rounded-lg px-3 py-2 mt-1">
+          </div>
+          <div>
+            <label for="clientEmail" class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" id="clientEmail" class="w-full border rounded-lg px-3 py-2 mt-1">
+          </div>
+
+          <div class="md:col-span-2">
+            <label for="clientAddress" class="block text-sm font-medium text-gray-700">Dirección</label>
+            <input type="text" id="clientAddress" class="w-full border rounded-lg px-3 py-2 mt-1">
+          </div>
+
+          <div class="md:col-span-2">
+              <label for="clientNotes" class="block text-sm font-medium text-gray-700">Notas</label>
+              <textarea id="clientNotes" rows="3" class="w-full border rounded-lg px-3 py-2 mt-1"></textarea>
+          </div>
+          <hr class="md:col-span-2 my-2"/>
+
+          <div>
+            <label for="entityType" class="block text-sm font-medium text-gray-700">Tipo</label>
+            <select id="entityType" class="w-full border rounded-lg px-3 py-2 mt-1">
+                <option value="Cliente">Cliente</option>
+                <option value="Proveedor">Proveedor</option>
+                <option value="Ambos">Ambos</option>
+            </select>
+          </div>
+          <div>
+            <label for="clientGroup" class="block text-sm font-medium text-gray-700">Grupo de Cliente</label>
+            <input type="text" id="clientGroup" list="clientGroupList" class="w-full border rounded-lg px-3 py-2 mt-1">
+            <datalist id="clientGroupList"></datalist>
+          </div>
+          <div>
+            <label for="priceList" class="block text-sm font-medium text-gray-700">Lista de Precios</label>
+            <input type="text" id="priceList" list="priceLists" class="w-full border rounded-lg px-3 py-2 mt-1">
+            <datalist id="priceLists"></datalist>
+          </div>
+          
+          <div>
+            <label for="paymentTerms" class="block text-sm font-medium text-gray-700">Forma de Pago</label>
+            <input type="text" id="paymentTerms" list="paymentTermsList" placeholder="Ej: Crédito" class="w-full border rounded-lg px-3 py-2 mt-1">
+            <datalist id="paymentTermsList"></datalist>
+          </div>
+          <div>
+            <label for="creditDays" class="block text-sm font-medium text-gray-700">Días de Crédito</label>
+            <input type="number" id="creditDays" placeholder="0" class="w-full border rounded-lg px-3 py-2 mt-1">
+          </div>
+          <div>
+            <label for="creditLimit" class="block text-sm font-medium text-gray-700">Límite de Crédito (L)</label>
+            <input type="number" step="0.01" id="creditLimit" placeholder="0.00" class="w-full border rounded-lg px-3 py-2 mt-1">
+          </div>
+
+          <div class="md:col-span-3 flex items-center gap-3 mt-2">
+            <input id="clientIsActive" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-custom focus:ring-blue-custom">
+            <label for="clientIsActive" class="text-sm font-medium text-gray-700">Cliente Activo</label>
+          </div>
+          
+          <button type="submit" class="mt-4 md:col-span-3 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Cliente</button>
+        </form>
+      </div>
+
+      <div>
+        <h4 class="font-semibold text-gray-700 mb-3">Clientes Registrados</h4>
+        <div id="clientsList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div id="invoiceSection" class="section">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-blue-custom no-print">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+            <span class="bg-blue-custom text-white p-2 rounded-lg mr-3">📄</span> <span id="invoiceTitle">Nueva Factura</span>
+          </h2>
+          <form id="invoiceForm" class="space-y-4" onsubmit="return false;">
+            <input type="hidden" id="editingInvoiceId">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Número de Factura</label>
+                <input type="text" id="invoiceNumber" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100" readonly>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                <input type="date" id="invoiceDate" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+              </div>
+            </div>
+            <div id="authInfo" class="hidden text-sm text-gray-600 bg-purple-50 p-3 rounded-lg">
+              <p><strong>CAI Activo:</strong> <span id="activeCAI"></span></p>
+              <p><strong>Rango:</strong> <span id="activeRange"></span> | <strong>Fecha Límite:</strong> <span id="activeDate"></span></p>
+            </div>
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <h3 class="text-lg font-semibold text-gray-800 mb-3">Datos de la Empresa</h3>
+              <select id="companySelect" onchange="updateCompanyData()" class="w-full border border-gray-300 rounded-lg px-3 py-2"><option value="">Seleccionar empresa...</option></select>
+            </div>
+            <div class="bg-orange-50 p-4 rounded-lg">
+              <h3 class="text-lg font-semibold text-gray-800 mb-3">Cliente</h3>
+              
+              <label for="invoiceClientSelect" class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Cliente Existente</label>
+              <select id="invoiceClientSelect" onchange="clientSelected('invoice')" class="w-full border rounded px-3 py-2 mb-3"></select>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" id="clientName" placeholder="Nombre del cliente" class="border rounded px-3 py-2">
+                <input type="text" id="clientRTN" placeholder="RTN del cliente" class="border rounded px-3 py-2">
+                <input type="text" id="clientAddress" placeholder="Dirección" class="md:col-span-2 border rounded px-3 py-2">
+              </div>
+            </div>
+            <div class="bg-yellow-50 p-4 rounded-lg">
+              <h3 class="text-lg font-semibold text-gray-800 mb-3">Productos/Servicios</h3>
+              <div id="invoiceItems" class="space-y-2">                
+              </div>
+              <button type="button" onclick="addInvoiceItem()" class="mt-2 bg-yellow-custom hover:bg-yellow-600 text-white px-4 py-2 rounded-lg">+ Agregar</button>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h3 class="text-lg font-semibold text-gray-800 mb-3">Detalles del Pago</h3>              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Método de Pago</label>
+                  <select id="paymentMethod" class="w-full border rounded px-3 py-2">
+                    <option value="Contado">Contado</option>
+                    <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+                    <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+                    <option value="Tarjeta de Débito">Tarjeta de Débito</option>
+                    <option value="Cheque">Cheque</option>
+                    <option value="Depósito Bancario">Depósito Bancario</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">ISV (%)</label>
+                  <select id="taxRate" onchange="handleTaxChange()" class="w-full border rounded px-3 py-2">
+                    <option value="15">15% - ISV estándar</option>
+                    <option value="18">18% - ISV especial</option>
+                    <option value="0">0% - Exento</option>
+                    <option value="exonerado">Exonerado</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="exoneradoFields" class="hidden mt-4 space-y-4 border-t pt-4">
+                <h4 class="text-md font-semibold text-gray-700">Detalles de Exoneración</h4>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700"># Correlativo de Orden de Compra Exenta</label>
+                  <input type="text" id="ordenCompraExenta" class="w-full border rounded px-3 py-2 mt-1">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700"># Correlativo de Constancia de Registro Exonerado</label>
+                  <input type="text" id="constanciaRegistroExonerado" class="w-full border rounded px-3 py-2 mt-1">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700"># Identificativo del Registro de la SAG</label>
+                  <input type="text" id="registroSAG" class="w-full border rounded px-3 py-2 mt-1">
+                </div>
+              </div>
+              </div>
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <div class="space-y-3 text-right">
+                  <div class="flex justify-between items-center">
+                    <span>Subtotal:</span> 
+                    <span id="subtotal">L 0.00</span>
+                  </div>
+                  
+                  <div class="flex justify-between items-center gap-4">
+                    <label for="discountAmount" class="text-sm font-medium text-gray-700">Descuento (L):</label>
+                    <input type="number" step="0.01" id="discountAmount" placeholder="0.00" 
+                          class="w-32 border rounded-lg px-3 py-1 text-right" 
+                          oninput="calculateTotals()">
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span>ISV:</span> 
+                    <span id="taxAmount">L 0.00</span>
+                  </div>
+                  <div class="flex justify-between font-bold text-lg border-t pt-2">
+                    <span>TOTAL:</span> 
+                    <span id="total">L 0.00</span>
+                  </div>
+                </div>
+              </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+              <textarea id="observations" rows="3" class="w-full border rounded px-3 py-2"></textarea>
+            </div>
+            <div class="flex gap-4">
+                <button type="button" onclick="handleInvoiceSubmit()" class="w-full bg-gradient-to-r from-blue-custom to-blue-600 text-white py-3 rounded-lg text-lg font-semibold">💾 Guardar Factura</button>
+                <button type="button" onclick="resetInvoiceForm()" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-lg text-lg font-semibold">✨ Nueva</button>
+            </div>
+          </form>
+        </div>
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <div class="flex justify-between items-center mb-4 no-print">
+            <h3 class="text-xl font-bold">Vista Previa</h3>
+            <button onclick="printDocument()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">🖨️ Imprimir</button>
+          </div>
+          <div id="invoicePreview" class="border rounded-lg p-4 min-h-96">
+            <p class="text-gray-500 text-center mt-20">La vista previa aparecerá aquí</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="receiptSection" class="section hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-orange-custom no-print">
+          <h2 class="text-2xl font-bold mb-6 flex items-center"><span class="bg-orange-custom text-white p-2 rounded-lg mr-3">🧾</span> <span id="receiptTitle">Nuevo Recibo</span></h2>
+          <form id="receiptForm" class="space-y-4" onsubmit="return false;">
+            <input type="hidden" id="editingReceiptId">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Número de Recibo</label>
+                <input type="text" id="receiptNumber" class="w-full border rounded px-3 py-2 bg-gray-100" readonly>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                <input type="date" id="receiptDate" class="w-full border rounded px-3 py-2">
+              </div>
+            </div>
+            <div class="bg-orange-50 p-4 rounded-lg">
+              <h3 class="text-lg font-semibold text-gray-800 mb-3">Datos de la Empresa</h3>
+              <select id="receiptCompanySelect" onchange="updateReceiptCompanyData()" class="w-full border rounded px-3 py-2"><option value="">Seleccionar empresa...</option></select>
+            </div>
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <h3 class="text-lg font-semibold text-gray-800 mb-3">Cliente</h3>
+
+              <label for="receiptClientSelect" class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Cliente Existente</label>
+              <select id="receiptClientSelect" onchange="clientSelected('receipt')" class="w-full border rounded px-3 py-2 mb-3"></select>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" id="receiptClientName" placeholder="Nombre del cliente" class="border rounded px-3 py-2">
+                <input type="text" id="receiptClientPhone" placeholder="Teléfono" class="border rounded px-3 py-2">
+                <input type="text" id="receiptClientAddress" placeholder="Dirección" class="md:col-span-2 border rounded px-3 py-2">
+              </div>
+            </div>
+            <div class="bg-yellow-50 p-4 rounded-lg">
+              <h3 class="text-lg font-semibold text-gray-800 mb-3">Detalles del Pago</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Monto (L) *</label><input type="number" step="0.01" id="receiptAmount" placeholder="0.00" class="w-full border rounded px-3 py-2" required></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Método de Pago</label><select id="receiptPaymentMethod" class="w-full border rounded px-3 py-2"><option value="Efectivo">Efectivo</option><option value="Transferencia Bancaria">Transferencia Bancaria</option><option value="Tarjeta de Crédito">Tarjeta de Crédito</option><option value="Tarjeta de Débito">Tarjeta de Débito</option><option value="Cheque">Cheque</option><option value="Depósito Bancario">Depósito Bancario</option></select></div>
+              </div>
+            </div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Concepto/Descripción</label><textarea id="receiptConcept" rows="3" placeholder="Descripción del pago..." class="w-full border rounded px-3 py-2"></textarea></div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label><textarea id="receiptObservations" rows="2" class="w-full border rounded px-3 py-2"></textarea></div>
+            <div class="flex gap-4">
+                <button type="button" onclick="handleReceiptSubmit()" class="w-full bg-gradient-to-r from-orange-custom to-orange-600 text-white py-3 rounded-lg text-lg font-semibold">💾 Guardar Recibo</button>
+                <button type="button" onclick="resetReceiptForm()" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-lg text-lg font-semibold">✨ Nuevo</button>
+            </div>
+          </form>
+        </div>
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <div class="flex justify-between items-center mb-4 no-print">
+            <h3 class="text-xl font-bold">Vista Previa</h3>
+            <button onclick="printDocument()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">🖨️ Imprimir</button>
+          </div>
+          <div id="receiptPreview" class="border rounded-lg p-4 min-h-96">
+            <p class="text-gray-500 text-center mt-20">La vista previa aparecerá aquí</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="historySection" class="section hidden">
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-6 flex items-center"><span class="bg-yellow-custom text-white p-2 rounded-lg mr-3">📋</span> Historial de Documentos</h2>
+        <div class="flex flex-wrap gap-4 mb-6 no-print">
+          <select id="typeFilter" onchange="filterHistory()" class="border rounded px-3 py-2"><option value="">Todos</option><option value="factura">Facturas</option><option value="recibo">Recibos</option></select>
+          <select id="companyFilter" onchange="filterHistory()" class="border rounded px-3 py-2"><option value="">Todas las empresas</option></select>
+          <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">📊 Exportar a Excel</button>
+          <button onclick="clearAllData()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">🗑️ Limpiar Todo</button>
+        </div>
+        <div id="historyList" class="space-y-4"></div>
+      </div>
+    </div>
+
+    <div id="reportsSection" class="section hidden">
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-6 flex items-center"><span class="bg-gray-600 text-white p-2 rounded-lg mr-3">📊</span> Panel de Reportes</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div class="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-custom"><h3 class="text-lg font-semibold">Total Documentos</h3><p id="totalDocs" class="text-3xl font-bold text-blue-custom">0</p></div>
+          <div class="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-custom"><h3 class="text-lg font-semibold">Facturas</h3><p id="totalInvoices" class="text-3xl font-bold text-orange-custom">0</p></div>
+          <div class="bg-yellow-50 p-6 rounded-lg border-l-4 border-yellow-custom"><h3 class="text-lg font-semibold">Recibos</h3><p id="totalReceipts" class="text-3xl font-bold text-yellow-custom">0</p></div>
+          <div class="bg-green-50 p-6 rounded-lg border-l-4 border-green-500"><h3 class="text-lg font-semibold">Ingresos Totales</h3><p id="totalRevenue" class="text-3xl font-bold text-green-600">L 0</p></div>
+        </div>
+        <div class="bg-gray-50 p-6 rounded-lg"><h3 class="text-xl font-bold mb-4">Resumen por Empresa</h3><div id="companyBreakdown"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* App JS integrado con PocketBase - Usa la SDK UMD: PocketBase disponible en window.PocketBase - Ajusta la URL si tu PocketBase no corre en localhost */
+const pb = new PocketBase("https://db-conexion-hn.pockethost.io/");
+let companies = []; // lista de registros companies (objetos PocketBase)
+let documents = []; // lista de registros documents (objetos PocketBase)
+let currentCompany = null; // Empresa seleccionada para facturas/recibos
+let currentCompanyId = null; // ID de la empresa seleccionada para editar
+let authorizations = []; // lista de registros autorizaciones
+let products = []; // lista de registros products
+let clients = []; // lista de registros clients
+
+
+// --- Auth: Login / Logout ---
+async function login() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    document.getElementById('loginError').classList.add('hidden');
+    try {
+        // --- CAMBIO AQUÍ: Añadimos 'expand' para traer los datos del rol ---
+        await pb.collection('users').authWithPassword(email, password, {
+            expand: 'role' 
+        });
+
+        // PASO 1: Cargar todos los datos primero, incluyendo los productos.
+        await loadData();
+        
+        // PASO 2: Ahora que los datos están listos, actualizamos la UI y la mostramos.
+        updateUserInfo();
+        setDefaultDates();
+        initializeInvoiceForm();
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('appScreen').classList.remove('hidden');
+        applyPermissions();
+    } catch (err) {
+        console.error("Login error:", err);
+        document.getElementById('loginError').classList.remove('hidden');
+    }
+}
+
+function logout() {
+    pb.authStore.clear();
+    document.getElementById('appScreen').classList.add('hidden');
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('currentUser').textContent = '';
+}
+
+// --- Inicialización y utilidades ---
+document.addEventListener('DOMContentLoaded', function() {
+    // Si ya hay sesión válida en authStore, usarla
+    if (pb.authStore.isValid) {
+        // Ejecutamos una función anónima asíncrona para poder usar 'await'
+        (async () => {
+            try {
+
+                // PASO 1: Refrescamos la sesión para traer el rol ---
+                await pb.collection('users').authRefresh({
+                    expand: 'role'
+                });
+
+                // PASO 2: Cargar todos los datos primero.
+                await loadData();
+
+                // PASO 3: Ahora que los datos están, mostramos la app.
+                updateUserInfo();
+                setDefaultDates();
+                initializeInvoiceForm();
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appScreen').classList.remove('hidden');
+                // Aplicamos los permisos
+                applyPermissions();
+            } catch (err) {
+                console.error("Error al cargar datos en el inicio:", err);
+                logout(); // Si falla la carga, cerramos sesión para evitar problemas
+            }
+        })();
+    } else {
+        document.getElementById('loginScreen').classList.remove('hidden');
+    }
+});
+
+function setDefaultDates() {
+    const today = new Date().toISOString().split('T')[0];
+    const iDate = document.getElementById('invoiceDate');
+    const rDate = document.getElementById('receiptDate');
+    if (iDate && !iDate.value) iDate.value = today;
+    if (rDate && !rDate.value) rDate.value = today;
+}
+
+async function loadData() {
+    try {
+        console.log("Iniciando carga de datos...");
+
+        // Cargar las otras colecciones
+        const companiesList = await pb.collection('companies').getFullList({ sort: '-created' });
+        companies = companiesList || [];
+        const documentsList = await pb.collection('documents').getFullList({ sort: '-created', expand: 'company' });
+        documents = documentsList || [];
+        const authList = await pb.collection('autorizaciones_factura').getFullList({ sort: '-created', expand: 'empresa' });
+        authorizations = authList || [];
+        const clientsList = await pb.collection('clients').getFullList({ sort: 'name' });
+        clients = clientsList || [];
+        // Para simplificar, las guardamos en un solo objeto
+        window.catalogs = {};
+        const [groups, prices, terms] = await Promise.all([
+            pb.collection('client_groups').getFullList({ sort: 'name' }),
+            pb.collection('price_lists').getFullList({ sort: 'name' }),
+            pb.collection('payment_terms').getFullList({ sort: 'name' })
+        ]);
+        window.catalogs.client_groups = groups;
+        window.catalogs.price_lists = prices;
+        window.catalogs.payment_terms = terms;
+
+        // --- BLOQUE DE DIAGNÓSTICO PARA PRODUCTOS ---
+        console.log("Paso 1: Intentando cargar la colección 'products'...");
+        try {
+            const productsList = await pb.collection('products').getFullList({ sort: '-created' });
+            products = productsList || [];
+            
+            // Este console.log es la prueba definitiva.
+            console.log("Paso 2: ¡ÉXITO AL CARGAR PRODUCTOS! La lista de productos contiene:", products);
+            
+            if (products.length === 0) {
+                alert("Diagnóstico: La lista de productos se cargó correctamente desde la base de datos, pero está vacía. Por favor, asegúrate de haber creado al menos un producto en el panel de PocketBase.");
+            }
+        } catch (productError) {
+            console.error("--- ¡ERROR CRÍTICO AL CARGAR PRODUCTOS! ---");
+            console.error("La llamada a pb.collection('products').getFullList() ha fallado. Razón:", productError);
+            alert("ERROR DE DIAGNÓSTICO: No se pudo cargar la lista de productos. Revisa la consola (F12) para ver el error específico. Es muy probable que sea un error de permisos (403 Forbidden).");
+        }
+        // --- FIN DEL BLOQUE DE DIAGNÓSTICO ---
+
+    } catch (generalError) {
+        console.error("Error en la carga general de datos (compañías, documentos, etc.):", generalError);
+        alert("Ocurrió un error al cargar los datos iniciales. Revisa la consola.");
+    }
+
+    // Actualizar la interfaz de usuario
+    console.log("Paso 3: Actualizando la interfaz de usuario con los datos cargados...");
+    updateCompanySelects();
+    updateCompanyFilter();
+    updateReports();
+    loadHistory();
+    populateClientSelects();
+    populateDatalists();
+    console.log("Carga de datos y actualización de UI completada.");
+}
+
+function updateUserInfo() {
+    const user = pb.authStore.model;
+    const currentUserDiv = document.getElementById('currentUser');
+    const avatarImg = document.getElementById('userAvatar');
+
+    if (user) {
+        // Muestra el email del usuario
+        currentUserDiv.textContent = user.email;
+
+        // Si el usuario tiene un avatar, muestra la imagen
+        if (user.avatar) {
+            const avatarUrl = pb.files.getURL(user, user.avatar);
+            avatarImg.src = avatarUrl;
+        }
+        // Si no tiene avatar, se usará la imagen SVG por defecto del HTML.
+        
+    } else {
+        currentUserDiv.textContent = '';
+    }
+}
+
+// FUNCIÓN de permisos de usuario
+function applyPermissions() {
+    const user = pb.authStore.model;
+    
+    // El 'expand' nos da el objeto completo del rol, incluyendo su nombre.
+    const userRole = user?.expand?.role?.name; 
+    
+    console.log(`Aplicando permisos para el rol: ${userRole}`);
+
+    // Si el usuario es un administrador, no hacemos nada (puede ver todo).
+    if (userRole === 'admin') {
+        // Hacemos visibles todos los elementos restringidos por si estaban ocultos.
+        document.querySelectorAll('[data-role]').forEach(el => el.style.display = 'flex');
+        return; 
+    }
+
+    // Si no es admin (o no tiene rol), ocultamos los elementos restringidos.
+    document.querySelectorAll('[data-role="admin"]').forEach(el => {
+        el.style.display = 'none';
+    });
+}
+
+// --- Gestión de Empresas ---
+async function addCompany(formData) {
+    try {
+        await pb.collection('companies').create(formData);
+        alert('¡Empresa agregada con éxito!');
+        clearForm();
+        hideCompanyManager();
+        await loadData();
+    } catch (err) {
+        console.error("Error al agregar empresa:", err);
+        alert('Ocurrió un error al agregar la empresa.');
+    }
+}
+
+async function updateCompany(companyId, formData) {
+  try {
+    await pb.collection('companies').update(companyId, formData);
+    alert('¡Registro de empresa actualizado con éxito!');
+    clearForm();
+    hideCompanyManager();
+    await loadData();
+  } catch (error) {
+    console.error('Error al actualizar el registro:', error);
+    alert('Ocurrió un error al actualizar la empresa.');
+  }
+}
+
+async function deleteCompany(id) {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta empresa?')) return;
+    try {
+        await pb.collection('companies').delete(id);
+        alert('Empresa eliminada con éxito.');
+        loadData();
+    } catch (err) {
+        console.error("Error al eliminar empresa:", err);
+        alert('Error al eliminar empresa. Verifica si hay documentos relacionados.');
+    }
+}
+
+// --- Lógica de la Interfaz ---
+function showCompanyManager() {
+    document.getElementById('companyModal').classList.remove('hidden');
+    renderCompaniesList();
+    clearForm();
+}
+
+function hideCompanyManager() {
+    document.getElementById('companyModal').classList.add('hidden');
+}
+
+function renderCompaniesList() {
+    const listContainer = document.getElementById('companiesList');
+    listContainer.innerHTML = '';
+    companies.forEach(c => {
+        const companyDiv = document.createElement('div');
+        companyDiv.className = 'flex justify-between items-center bg-gray-100 p-3 rounded-lg shadow-sm';
+        companyDiv.innerHTML = `
+            <span class="font-medium">${escapeHtml(c.name)}</span>
+            <div class="flex gap-2">
+                <button onclick="selectCompanyForEdit('${c.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm">Editar</button>
+                <button onclick="deleteCompany('${c.id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm">Eliminar</button>
+            </div>
+        `;
+        listContainer.appendChild(companyDiv);
+    });
+}
+
+function clearForm() {
+    document.getElementById('companyForm').reset();
+    currentCompanyId = null;
+    document.getElementById('logoPreviewContainer').classList.add('hidden');
+    document.getElementById('currentLogoPreview').src = '';
+}
+
+async function handleCompanyFormSubmit(e) {
+  e.preventDefault();
+  const formData = new FormData();
+  const companyId = document.getElementById('companyId').value;
+  
+  // Recolectar datos del formulario (esto no cambia)
+  formData.append('name', document.getElementById('newCompanyName').value);
+  formData.append('rtn', document.getElementById('newCompanyRTN').value);
+  formData.append('address', document.getElementById('newCompanyAddress').value);
+  formData.append('phone', document.getElementById('newCompanyPhone').value);
+  formData.append('email', document.getElementById('newCompanyEmail').value);
+  const logoInput = document.getElementById('newCompanyLogo');
+  if (logoInput.files.length > 0) {
+    formData.append('logo', logoInput.files[0]);
+  }
+
+  try {
+      if (companyId) {
+          // La lógica de ACTUALIZACIÓN no necesita cambios.
+          await pb.collection('companies').update(companyId, formData);
+          alert('¡Empresa actualizada con éxito!');
+      } else {
+          // --- INICIO DE LA MODIFICACIÓN ---
+          // Al CREAR una nueva empresa, añadimos el valor por defecto para el contador.
+          formData.append('siguiente_numero_recibo', 1);
+          // --- FIN DE LA MODIFICACIÓN ---
+
+          await pb.collection('companies').create(formData);
+          alert('¡Empresa agregada con éxito!');
+      }
+      hideCompanyManager();
+      await loadData();
+  } catch(err) {
+      console.error("Error al guardar empresa:", err);
+      alert("Error al guardar empresa. Revisa la consola.");
+  }
+}
+
+function selectCompanyForEdit(id) {
+    const c = companies.find(x => x.id === id);
+    if (!c) return;
+    document.getElementById('companyId').value = c.id;
+    document.getElementById('newCompanyName').value = c.name || '';
+    document.getElementById('newCompanyRTN').value = c.rtn || '';
+    document.getElementById('newCompanyAddress').value = c.address || '';
+    document.getElementById('newCompanyPhone').value = c.phone || '';
+    document.getElementById('newCompanyEmail').value = c.email || '';
+    if (c.logo) {
+        const logoUrl = pb.getFileUrl(c, c.logo, { 'thumb': '100x100' });
+        document.getElementById('currentLogoPreview').src = logoUrl;
+        document.getElementById('logoPreviewContainer').classList.remove('hidden');
+    } else {
+        document.getElementById('logoPreviewContainer').classList.add('hidden');
+    }
+    alert('Datos cargados en el formulario para editar.');
+}
+
+function updateCompanySelects() {
+    const invoiceSelect = document.getElementById('companySelect');
+    const receiptSelect = document.getElementById('receiptCompanySelect');
+    invoiceSelect.innerHTML = '<option value="">Seleccionar empresa...</option>';
+    receiptSelect.innerHTML = '<option value="">Seleccionar empresa...</option>';
+    companies.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c.id; option.textContent = c.name;
+        invoiceSelect.appendChild(option.cloneNode(true));
+        receiptSelect.appendChild(option);
+    });
+    if (currentCompany) {
+        invoiceSelect.value = currentCompany.id;
+        receiptSelect.value = currentCompany.id;
+    }
+}
+
+// REEMPLAZA tu función updateCompanyData con esta
+async function updateCompanyData() {
+    const select = document.getElementById('companySelect');
+    const companyId = select.value;
+    currentCompany = findCompanyById(companyId);
+
+    const invoiceNumberInput = document.getElementById('invoiceNumber');
+    const authInfoDiv = document.getElementById('authInfo');
+
+    // Limpiar campos antes de buscar
+    invoiceNumberInput.value = '';
+    authInfoDiv.classList.add('hidden');
+
+    if (!companyId) {
+        return; // No hacer nada si no hay empresa seleccionada
+    }
+
+    // Buscar la autorización activa para la empresa seleccionada
+    const activeAuth = authorizations.find(auth => auth.empresa === companyId && auth.esta_activa);
+
+    if (activeAuth) {
+        // Validar si la autorización sigue vigente
+        const hoy = new Date();
+        const fechaLimite = new Date(activeAuth.fecha_limite);
+
+        if (activeAuth.numero_actual > activeAuth.rango_fin) {
+            alert('¡Atención! El rango de facturación para esta empresa ha llegado a su fin.');
+            return;
+        }
+        if (hoy > fechaLimite) {
+            alert('¡Atención! La fecha límite de emisión para esta empresa ha expirado.');
+            return;
+        }
+
+        // Formatear el número de factura
+        const sucursal = String(activeAuth.cod_sucursal).padStart(3, '0');
+        const puntoEmision = String(activeAuth.cod_punto_emision).padStart(3, '0');
+        const tipoDoc = String(activeAuth.cod_tipo_doc).padStart(2, '0');
+        const correlativo = String(activeAuth.numero_actual).padStart(8, '0');
+        
+        const numeroFactura = `${sucursal}-${puntoEmision}-${tipoDoc}-${correlativo}`;
+        invoiceNumberInput.value = numeroFactura;
+
+        // Mostrar información de la autorización
+        document.getElementById('activeCAI').textContent = activeAuth.cai;
+        document.getElementById('activeRange').textContent = `${activeAuth.rango_inicio} - ${activeAuth.rango_fin}`;
+        document.getElementById('activeDate').textContent = fechaLimite.toLocaleDateString();
+        authInfoDiv.classList.remove('hidden');
+
+    } else {
+        alert('No se encontró una autorización de facturación activa para la empresa seleccionada. Por favor, configure una en "Gestionar Autorizaciones".');
+    }
+}
+
+// FUNCIÓN SOLO PARA RECIBOS
+function updateReceiptCompanyData() {
+    const select = document.getElementById('receiptCompanySelect');
+    const companyId = select.value;
+    currentCompany = findCompanyById(companyId);
+    
+    const receiptNumberInput = document.getElementById('receiptNumber');
+
+    if (currentCompany) {
+        // Verifica si el campo del contador existe y es un número
+        if (typeof currentCompany.siguiente_numero_recibo === 'number') {
+            receiptNumberInput.value = currentCompany.siguiente_numero_recibo;
+        } else {
+            // Si el campo no existe o es nulo, avisa al usuario
+            receiptNumberInput.value = '';
+            alert('Esta empresa no tiene configurado un contador de recibos. Por favor, edite la empresa y guarde para iniciar el contador en 1.');
+        }
+    } else {
+        receiptNumberInput.value = '';
+    }
+}
+
+
+function findCompanyById(id) {
+    return id ? companies.find(c => c.id === id) || null : null;
+}
+
+function showSection(section) {
+    document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+    document.getElementById(section + 'Section').classList.remove('hidden');
+    if (section === 'history') loadHistory();
+    if (section === 'reports') updateReports();
+}
+
+function printDocument() { window.print(); }
+function escapeHtml(unsafe) {
+  if (unsafe === undefined || unsafe === null) return '';
+  return String(unsafe).replace(/[&<>\"'`=\\/]/g, s => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', "'": '&#39;', '/': '&#x2F;', '`': '&#x60;', '=': '&#x3D;'
+  })[s]);
+}
+
+function escapeCsv(val) {
+  if (val === undefined || val === null) return '';
+  let str = String(val);
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    str = '"' + str.replace(/"/g, '""') + '"';
+  }
+  return str;
+}
+
+function handleInvoiceSubmit() {
+    const editingId = document.getElementById('editingInvoiceId').value;
+    generateInvoice(editingId || null);
+}
+
+// --- Gestión de Autorizaciones ---
+function showAuthManager() {
+    document.getElementById('authForm').reset(); // Limpiar formulario
+    document.getElementById('authId').value = ''; // Limpiar ID de edición
+    
+    // Poblar el dropdown de empresas
+    const companySelect = document.getElementById('authCompany');
+    companySelect.innerHTML = '<option value="">Seleccione una empresa...</option>';
+    companies.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c.id;
+        option.textContent = c.name;
+        companySelect.appendChild(option);
+    });
+
+    renderAuthList(); // Dibujar la lista de autorizaciones existentes
+    document.getElementById('authModal').classList.remove('hidden');
+}
+
+function hideAuthManager() {
+    document.getElementById('authModal').classList.add('hidden');
+}
+
+function renderAuthList() {
+    const listContainer = document.getElementById('authList');
+    listContainer.innerHTML = '';
+    authorizations.forEach(auth => {
+        const authDiv = document.createElement('div');
+        const companyName = auth.expand && auth.expand.empresa ? auth.expand.empresa.name : 'Empresa Desconocida';
+        authDiv.className = 'flex justify-between items-center bg-gray-100 p-3 rounded-lg shadow-sm';
+        authDiv.innerHTML = `
+            <div>
+                <span class="font-medium text-sm">CAI: ${escapeHtml(auth.cai)}</span>
+                <p class="text-xs text-gray-600">Empresa: ${escapeHtml(companyName)} | Rango: ${auth.rango_inicio}-${auth.rango_fin} ${auth.esta_activa ? '<span class="text-green-600 font-bold">(Activa)</span>' : ''}</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="selectAuthForEdit('${auth.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm">Editar</button>
+                <button onclick="deleteAuth('${auth.id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm">Eliminar</button>
+            </div>
+        `;
+        listContainer.appendChild(authDiv);
+    });
+}
+
+async function handleAuthFormSubmit(event) {
+    event.preventDefault();
+    const authId = document.getElementById('authId').value;
+
+    const data = {
+        empresa: document.getElementById('authCompany').value,
+        cai: document.getElementById('authCAI').value,
+        fecha_limite: document.getElementById('authFechaLimite').value,
+        rango_inicio: parseInt(document.getElementById('authRangoInicio').value),
+        rango_fin: parseInt(document.getElementById('authRangoFin').value),
+        numero_actual: parseInt(document.getElementById('authNumeroActual').value),
+        cod_sucursal: document.getElementById('authCodSucursal').value,
+        cod_punto_emision: document.getElementById('authCodPuntoEmision').value,
+        cod_tipo_doc: document.getElementById('authCodTipoDoc').value,
+        esta_activa: document.getElementById('authEstaActiva').checked,
+    };
+
+    try {
+        if (authId) {
+            // Actualizar registro existente
+            await pb.collection('autorizaciones_factura').update(authId, data);
+            alert('¡Autorización actualizada con éxito!');
+        } else {
+            // Crear nuevo registro
+            await pb.collection('autorizaciones_factura').create(data);
+            alert('¡Autorización creada con éxito!');
+        }
+        hideAuthManager();
+        await loadData(); // Recargar todos los datos para reflejar los cambios
+    } catch (err) {
+        console.error("Error al guardar la autorización:", err);
+        alert('Ocurrió un error al guardar la autorización. Revisa la consola.');
+    }
+}
+
+function selectAuthForEdit(id) {
+    const auth = authorizations.find(a => a.id === id);
+    if (!auth) return;
+
+    // Llenar el formulario con los datos existentes
+    document.getElementById('authId').value = auth.id;
+    document.getElementById('authCompany').value = auth.empresa;
+    document.getElementById('authCAI').value = auth.cai;
+    // Formatear la fecha para el input type="date"
+    document.getElementById('authFechaLimite').value = new Date(auth.fecha_limite).toISOString().split('T')[0];
+    document.getElementById('authRangoInicio').value = auth.rango_inicio;
+    document.getElementById('authRangoFin').value = auth.rango_fin;
+    document.getElementById('authNumeroActual').value = auth.numero_actual;
+    document.getElementById('authCodSucursal').value = auth.cod_sucursal;
+    document.getElementById('authCodPuntoEmision').value = auth.cod_punto_emision;
+    document.getElementById('authCodTipoDoc').value = auth.cod_tipo_doc;
+    document.getElementById('authEstaActiva').checked = auth.esta_activa;
+}
+
+async function deleteAuth(id) {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta autorización?')) return;
+    try {
+        await pb.collection('autorizaciones_factura').delete(id);
+        alert('Autorización eliminada con éxito.');
+        await loadData();
+    } catch (err) {
+        console.error("Error al eliminar la autorización:", err);
+        alert('Error al eliminar. Verifica si hay facturas relacionadas con esta autorización.');
+    }
+}
+
+
+
+// --- Lógica Principal de Facturas ---
+async function generateInvoice(editingId = null) {
+    if (editingId) {
+        alert("La edición de facturas con numeración automática aún no está implementada en esta versión.");
+        return; // Prevenir edición por ahora para simplificar la lógica
+    }
+
+    // 1. Buscar la autorización activa de nuevo para asegurar que todo esté en orden
+    if (!currentCompany) {
+        alert("Por favor, seleccione una empresa.");
+        return;
+    }
+    const activeAuth = authorizations.find(auth => auth.empresa === currentCompany.id && auth.esta_activa);
+
+    if (!activeAuth) {
+        alert("No se puede generar la factura: no hay una autorización activa para esta empresa.");
+        return;
+    }
+
+    // 2. Recolectar datos del formulario (la mayoría ya está en tu código)
+    const invoiceNumber = document.getElementById('invoiceNumber').value;
+    const invoiceDate = document.getElementById('invoiceDate').value;
+    // ... (recolecta el resto de los datos: cliente, items, etc.)
+    const clientName = document.getElementById('clientName').value;
+    const clientRTN = document.getElementById('clientRTN').value;
+    const clientAddress = document.getElementById('clientAddress').value;
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const taxRateSelect = document.getElementById('taxRate');
+    const taxRateValue = taxRateSelect.value;
+    const observations = document.getElementById('observations').value;
+    const itemsFromForm = []; // Asegúrate de que esta línea esté antes del bucle
+    document.querySelectorAll('.invoice-item').forEach(itemDiv => {
+        const quantity = parseFloat(itemDiv.querySelector('.quantity').value);
+        const price = parseFloat(itemDiv.querySelector('.price').value);
+        
+        // --- CAMBIO AQUÍ ---
+        // Obtenemos el texto del producto seleccionado en lugar del valor de un input
+        const productSelect = itemDiv.querySelector('.description');
+        let description = '';
+        if (productSelect.value) { // Asegurarse de que algo está seleccionado
+            description = productSelect.options[productSelect.selectedIndex].text;
+        }
+        // --- FIN DEL CAMBIO ---
+
+        if (quantity && description && price) {
+            // Guardamos los datos del item. 'description' ahora es el nombre del producto
+            itemsFromForm.push({ quantity, description, price });
+        }
+    });
+
+    if (!invoiceNumber || itemsFromForm.length === 0) {
+        alert("El número de factura no se pudo generar o no hay artículos en la factura.");
+        return;
+    }
+    
+    // --- INICIO DE LA CORRECCIÓN ---
+    const subtotal = itemsFromForm.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+    const discount = parseFloat(document.getElementById('discountAmount').value) || 0; // <-- Obtener descuento
+    const subtotalAfterDiscount = subtotal - discount;
+
+    // Se calcula la tasa y el impuesto de forma segura
+    let taxRateForCalc = 0;
+    if (taxRateValue !== 'exonerado') {
+        taxRateForCalc = parseFloat(taxRateValue) || 0;
+    }
+
+    const taxAmount = subtotalAfterDiscount * (taxRateForCalc / 100);
+    const total = subtotalAfterDiscount + taxAmount;
+    // --- FIN DE LA CORRECCIÓN ---
+
+    // 3. Preparar los datos para guardar, incluyendo el enlace a la autorización
+    const documentData = {
+        autorizacion: activeAuth.id, // <-- ¡NUEVO Y MUY IMPORTANTE!
+        number: invoiceNumber,
+        type: 'Factura',
+        company: currentCompany.id,
+        date: invoiceDate,
+        clientName, clientRTN, clientAddress,
+        subtotal, discount_amount: discount, taxRate: taxRateValue, // Guardamos el valor original ('exonerado' o el número)
+        taxAmount, total,
+        paymentMethod, observations,
+        created_by: pb.authStore.model.id,
+    };
+
+    // Si la factura es exonerada, añadimos los campos adicionales a los datos
+    if (taxRateValue === 'exonerado') {
+        documentData.orden_compra_exenta = document.getElementById('ordenCompraExenta').value;
+        documentData.constancia_registro_exonerado = document.getElementById('constanciaRegistroExonerado').value;
+        documentData.registro_sag = document.getElementById('registroSAG').value;
+    }
+
+    let operationSuccessful = false;
+    let newInvoice = null;
+
+    try {
+        // PASO 1: Crear la factura
+        newInvoice = await pb.collection('documents').create(documentData);
+        
+        // PASO 2: Crear los artículos de la factura
+        for (const item of itemsFromForm) {
+            const itemData = {
+                invoice: newInvoice.id,
+                description: item.description,
+                quantity: item.quantity,
+                price: item.price,
+            };
+            await pb.collection('invoice_items').create(itemData);
+        }
+
+        // PASO 3: Incrementar el contador de la autorización
+        await pb.collection('autorizaciones_factura').update(activeAuth.id, {
+            'numero_actual+': 1 // Incrementa el valor en 1
+        });
+        
+        alert('¡Factura guardada y numeración actualizada con éxito!');
+        operationSuccessful = true;
+        updateInvoicePreview(documentData, itemsFromForm, activeAuth);
+
+    } catch (err) {
+        // Lógica de "rollback" manual si algo falla
+        if (newInvoice) {
+            // Si la factura se creó pero algo más falló, bórrala para evitar inconsistencias.
+            await pb.collection('documents').delete(newInvoice.id);
+            alert('Ocurrió un error en un paso intermedio. La factura ha sido revertida para evitar inconsistencias. Revisa la consola.');
+        } else {
+             alert('Ocurrió un error al guardar la factura. Revisa la consola.');
+        }
+        console.error("Error al guardar la factura:", err);
+    }
+
+    if (operationSuccessful) {
+        // Recargar todos los datos para que el próximo número de factura sea el correcto
+        await loadData();
+    }
+}
+
+// AGREGA ESTA NUEVA FUNCIÓN a tu script
+function handleTaxChange() {
+    const taxRateSelect = document.getElementById('taxRate');
+    const exoneradoFieldsDiv = document.getElementById('exoneradoFields');
+
+    // Si se selecciona "Exonerado", muestra los campos. Si no, ocúltalos.
+    if (taxRateSelect.value === 'exonerado') {
+        exoneradoFieldsDiv.classList.remove('hidden');
+    } else {
+        exoneradoFieldsDiv.classList.add('hidden');
+    }
+
+    // Llama a la función existente para recalcular los totales
+    calculateTotals();
+}
+
+function resetInvoiceForm() {
+    document.getElementById('invoiceForm').reset();
+    document.getElementById('editingInvoiceId').value = '';
+    document.getElementById('invoiceTitle').textContent = 'Nueva Factura';
+    document.getElementById('invoiceItems').innerHTML = '';
+    document.getElementById('authInfo').classList.add('hidden');
+    document.getElementById('exoneradoFields').classList.add('hidden');
+    document.getElementById('discountAmount').value = '';
+    addInvoiceItem();
+    calculateTotals();
+    setDefaultDates();
+    document.getElementById('invoicePreview').innerHTML = '<p class="text-gray-500 text-center mt-20">La vista previa aparecerá aquí</p>';
+}
+
+// REEMPLAZA tu función updateInvoicePreview con esta
+function updateInvoicePreview(docData, items, authData) {
+    const preview = document.getElementById('invoicePreview');
+    const company = findCompanyById(docData.company);
+    const logoUrl = company && company.logo ? pb.files.getURL(company, company.logo) : '';
+    const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="Logo" class="h-16 mb-4 object-contain">` : '';
+    
+    // --- NUEVO: Desglose de importes ---
+    let importeExonerado = 0, importeExento = 0, importeGravado15 = 0, importeGravado18 = 0;
+    let isv15 = 0, isv18 = 0;
+    const taxRateValue = docData.taxRate; // Usamos el dato guardado
+
+    if (taxRateValue === 'exonerado') {
+        importeExonerado = docData.subtotal;
+    } else if (taxRateValue === '0') {
+        importeExento = docData.subtotal;
+    } else if (taxRateValue === '15') {
+        importeGravado15 = docData.subtotal;
+        isv15 = docData.taxAmount;
+    } else if (taxRateValue === '18') {
+        importeGravado18 = docData.subtotal;
+        isv18 = docData.taxAmount;
+    }
+    // --- FIN Desglose de importes ---
+
+    const itemsHtml = items.map(item => `
+        <tr>
+            <td class="border px-4 py-2 text-center">${escapeHtml(item.quantity)}</td>
+            <td class="border px-4 py-2">${escapeHtml(item.description)}</td>
+            <td class="border px-4 py-2 text-right">L ${item.price.toFixed(2)}</td>
+            <td class="border px-4 py-2 text-right">L ${(item.quantity * item.price).toFixed(2)}</td>
+        </tr>`).join('');
+
+    preview.innerHTML = `<div>
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                ${logoHtml}
+                <h2 class="text-xl font-bold">${escapeHtml(company ? company.name : 'N/A')}</h2>
+                <p class="text-sm">RTN: ${escapeHtml(company ? company.rtn : 'N/A')}</p>
+                <p class="text-sm">${escapeHtml(company ? company.address : '')}</p>
+                <p class="text-sm">Tel: ${escapeHtml(company ? company.phone : '')}</p>
+                <p class="text-sm">${escapeHtml(company ? company.email : '')}</p>
+            </div>
+            <div class="text-right border-2 border-gray-700 p-2 text-sm">
+                <h1 class="text-2xl font-bold text-blue-custom">FACTURA</h1>
+                <p class="text-lg font-bold"># ${escapeHtml(docData.number)}</p>
+                <p><strong>CAI:</strong> ${escapeHtml(authData ? authData.cai : 'N/A')}</p>
+                <p><strong>Rango Autorizado:</strong> ${escapeHtml(authData ? `${authData.rango_inicio} al ${authData.rango_fin}` : 'N/A')}</p>
+                <p><strong>Fecha Límite de Emisión:</strong> ${escapeHtml(authData ? new Date(authData.fecha_limite).toLocaleDateString() : 'N/A')}</p>
+            </div>
+        </div>
+        <hr class="mb-4">
+        <div class="mb-4">
+            <h3 class="font-bold">Datos del Cliente:</h3>
+            <p><strong>Fecha:</strong> ${escapeHtml(new Date(docData.date).toLocaleDateString())}</p>
+            <p><strong>Nombre:</strong> ${escapeHtml(docData.clientName)}</p>
+            <p><strong>RTN:</strong> ${escapeHtml(docData.clientRTN)}</p>
+        </div>
+        <table class="w-full border-collapse mb-4 text-sm">
+            <thead><tr class="bg-gray-100"><th class="border px-4 py-2">Cant.</th><th class="border px-4 py-2">Descripción</th><th class="border px-4 py-2">Precio Unit.</th><th class="border px-4 py-2">Total</th></tr></thead>
+            <tbody>${itemsHtml}</tbody>
+        </table>
+        
+        <div class="border-t border-b py-2 my-2 text-sm">
+            <strong>SON:</strong> ${numeroALetras(docData.total)}
+        </div>
+        
+        <div class="text-right text-xs mt-2 w-1/2 ml-auto">
+            <div class="grid grid-cols-2 gap-1">
+                <span>Importe Exonerado L.:</span> <span class="font-semibold">L ${importeExonerado.toFixed(2)}</span>
+                <span>Importe Exento L.:</span> <span class="font-semibold">L ${importeExento.toFixed(2)}</span>
+                <span>Importe Gravado 15% L.:</span> <span class="font-semibold">L ${importeGravado15.toFixed(2)}</span>
+                <span>Importe Gravado 18% L.:</span> <span class="font-semibold">L ${importeGravado18.toFixed(2)}</span>
+                <span class="col-span-2 border-t mt-1 pt-1"></span>
+                <span>Sub-Total L.:</span> <span class="font-semibold">L ${docData.subtotal.toFixed(2)}</span>
+                <span>Descuentos y Rebajas Otorgados L.:</span> <span class="font-semibold text-red-500">- L ${(docData.discount_amount || 0).toFixed(2)}</span>
+                <span>ISV 15% L.:</span> <span class="font-semibold">L ${isv15.toFixed(2)}</span>
+                <span>ISV 18% L.:</span> <span class="font-semibold">L ${isv18.toFixed(2)}</span>
+                <span class="col-span-2 border-t mt-1 pt-1"></span>
+                <span class="font-bold text-lg">TOTAL A PAGAR L.:</span> <span class="font-bold text-lg">L ${docData.total.toFixed(2)}</span>
+            </div>
+        </div>
+        
+        <div class="border-t mt-4 pt-2 text-xs">
+            <h4 class="font-bold mb-1">Información de Factura Exonerada</h4>
+            <p><strong>Orden de Compra Exenta:</strong> ${escapeHtml(docData.orden_compra_exenta)}</p>
+            <p><strong>Constancia de Registro Exonerado:</strong> ${escapeHtml(docData.constancia_registro_exonerado)}</p>
+            <p><strong>Registro de la SAG:</strong> ${escapeHtml(docData.registro_sag)}</p>
+        </div>
+
+
+        <div class="text-center mt-8"><p class="text-xs">La Factura es beneficio de todos, "Exijala".</p></div>
+    </div>`;
+}
+
+function initializeInvoiceForm() {
+    // Limpia cualquier item que pudiera existir
+    document.getElementById('invoiceItems').innerHTML = '';
+    // Llama a la función para agregar la primera fila, que ya sabe cómo poblar el menú de productos
+    addInvoiceItem();
+}
+
+
+
+// función addInvoiceItem
+function addInvoiceItem() {
+    const itemsContainer = document.getElementById('invoiceItems');
+    const newItem = document.createElement('div');
+    newItem.className = 'invoice-item grid grid-cols-12 gap-2 items-center';
+
+    newItem.innerHTML = `
+        <input type="number" placeholder="Cant." class="col-span-2 border rounded px-2 py-1 quantity" oninput="calculateTotals()">
+        <select class="col-span-6 border rounded px-2 py-1 description" onchange="productSelected(this)">
+            <option value="">Seleccione un producto...</option>
+        </select>
+        <input type="number" step="0.01" placeholder="Precio Unit." class="col-span-3 border rounded px-2 py-1 price" oninput="calculateTotals()">
+        <button type="button" onclick="removeItem(this)" class="col-span-1 bg-red-500 text-white rounded px-2 py-1">✕</button>
+    `;
+
+    // Poblar el menú desplegable con los productos del maestro
+    const productSelect = newItem.querySelector('.description');
+    if (products && products.length > 0) {
+        products.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.id;
+            option.textContent = `${product.name} (${product.product_code || 'S/C'})`;
+            productSelect.appendChild(option);
+        });
+    }
+    
+    itemsContainer.appendChild(newItem);
+}
+
+// función productSelected
+function productSelected(selectElement) {
+    const productId = selectElement.value;
+    const selectedProduct = products.find(p => p.id === productId);
+
+    const parentItem = selectElement.closest('.invoice-item');
+    const priceInput = parentItem.querySelector('.price');
+
+    if (selectedProduct) {
+        priceInput.value = selectedProduct.default_price.toFixed(2);
+    } else {
+        priceInput.value = '';
+    }
+    
+    calculateTotals();
+}
+
+function removeItem(button) {
+    button.closest('.invoice-item').remove();
+    calculateTotals();
+}
+
+// REEMPLAZA tu función calculateTotals con esta
+function calculateTotals() {
+    let subtotal = 0;
+    document.querySelectorAll('.invoice-item').forEach(itemDiv => {
+        const quantity = parseFloat(itemDiv.querySelector('.quantity').value) || 0;
+        const price = parseFloat(itemDiv.querySelector('.price').value) || 0;
+        subtotal += quantity * price;
+    });
+
+    // --- LÓGICA DE DESCUENTO AÑADIDA ---
+    const discount = parseFloat(document.getElementById('discountAmount').value) || 0;
+    const subtotalAfterDiscount = subtotal - discount;
+    // --- FIN DE LA LÓGICA ---
+
+    const taxRateSelect = document.getElementById('taxRate');
+    // Si es 'exonerado', la tasa es 0. Si no, es el valor numérico.
+    const taxRate = taxRateSelect.value === 'exonerado' ? 0 : parseFloat(taxRateSelect.value) || 0;
+
+    // El impuesto se calcula sobre el subtotal después del descuento
+    const taxAmount = subtotalAfterDiscount * (taxRate / 100);
+    const total = subtotalAfterDiscount + taxAmount;
+
+    document.getElementById('subtotal').textContent = `L ${subtotal.toFixed(2)}`;
+    document.getElementById('taxAmount').textContent = `L ${taxAmount.toFixed(2)}`;
+    document.getElementById('total').textContent = `L ${total.toFixed(2)}`;
+}
+
+// Funcion de numeros
+function numeroALetras(num) {
+    const unidades = ['', 'UNO', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE'];
+    const decenas = ['', 'DIEZ', 'VEINTE', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA'];
+    const centenas = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS'];
+    const especiales = ['DIEZ', 'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECISÉIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE'];
+
+    const getDecenas = n =>
+        n < 10 ? unidades[n] :
+        n < 20 ? especiales[n - 10] :
+        (decenas[Math.floor(n / 10)]) + (n % 10 ? ' Y ' + unidades[n % 10] : '');
+
+    const getCentenas = n =>
+        n > 99 ? (centenas[Math.floor(n / 100)]) + ' ' + (n % 100 ? getDecenas(n % 100) : '') : getDecenas(n);
+        
+    const getMiles = n =>
+        Math.floor(n / 1000) > 1 ? getCentenas(Math.floor(n / 1000)) + ' MIL ' + (n % 1000 ? getCentenas(n % 1000) : '') :
+        Math.floor(n / 1000) === 1 ? 'MIL ' + (n % 1000 ? getCentenas(n % 1000) : '') : getCentenas(n);
+
+    const getMillones = n =>
+        Math.floor(n / 1000000) > 1 ? getCentenas(Math.floor(n / 1000000)) + ' MILLONES ' + (n % 1000000 ? getMiles(n % 1000000) : '') :
+        Math.floor(n / 1000000) === 1 ? 'UN MILLON ' + (n % 1000000 ? getMiles(n % 1000000) : '') : getMiles(n);
+    
+    let literal = getMillones(Math.floor(num));
+    if (Math.floor(num) === 0) literal = "CERO";
+    if (Math.floor(num) === 1 && num > 1) literal = "UN"; // Ajuste para "UN LEMPIRA" vs "UNO"
+    
+    const decimal = Math.round((num - Math.floor(num)) * 100);
+    const textoFinal = `${literal} LEMPIRAS ${String(decimal).padStart(2, '0')}/100`;
+    
+    return textoFinal.trim();
+}
+
+// --- Lógica de Recibos ---
+function handleReceiptSubmit() {
+    const editingId = document.getElementById('editingReceiptId').value;
+    generateReceipt(editingId || null);
+}
+
+// REEMPLAZA tu función generateReceipt con esta versión que sigue la lógica de las facturas
+async function generateReceipt(editingId = null) {
+    if (editingId) {
+        alert("La edición de recibos con numeración automática aún no está implementada.");
+        return;
+    }
+    
+    if (!currentCompany) {
+        alert("Por favor, seleccione una empresa.");
+        return;
+    }
+
+    const receiptNumber = document.getElementById('receiptNumber').value;
+    const receiptDate = document.getElementById('receiptDate').value;
+    const clientName = document.getElementById('receiptClientName').value;
+    const clientPhone = document.getElementById('receiptClientPhone').value;
+    const clientAddress = document.getElementById('receiptClientAddress').value;
+    const receiptAmount = parseFloat(document.getElementById('receiptAmount').value);
+    const paymentMethod = document.getElementById('receiptPaymentMethod').value;
+    const receiptConcept = document.getElementById('receiptConcept').value;
+    const receiptObservations = document.getElementById('receiptObservations').value;
+
+    if (!receiptNumber || isNaN(receiptAmount)) {
+        alert('No se pudo generar el número de recibo o falta el monto.');
+        return;
+    }
+    
+    const documentData = {
+        type: 'Recibo',
+        number: receiptNumber,
+        company: currentCompany.id,
+        date: receiptDate,
+        clientName, clientPhone, clientAddress,
+        amount: receiptAmount, paymentMethod,
+        concept: receiptConcept, observations: receiptObservations,
+        created_by: pb.authStore.model.id,
+    };
+
+    let operationSuccessful = false; // <-- Se introduce la bandera, igual que en las facturas
+
+    try {
+        // PASO 1: Crear el registro del recibo
+        await pb.collection('documents').create(documentData);
+        
+        // PASO 2: Incrementar el contador en el registro de la compañía
+        await pb.collection('companies').update(currentCompany.id, {
+            'siguiente_numero_recibo+': 1
+        });
+        
+        alert('Recibo guardado y numeración actualizada con éxito!');
+        operationSuccessful = true; // <-- Se marca como exitoso
+        updateReceiptPreview(documentData); // <-- Se actualiza la vista previa
+        
+    } catch (err) {
+        console.error("Error al guardar recibo:", err);
+        alert('Error al guardar el recibo. Revisa la consola.');
+    }
+
+    // --- LA LÓGICA CORRECTA ---
+    // Recargar los datos solo si la operación de guardado fue exitosa.
+    // Esto se ejecuta FUERA del bloque try...catch para evitar conflictos.
+    if (operationSuccessful) {
+        await loadData();
+    }
+}
+
+function resetReceiptForm() {
+    document.getElementById('receiptForm').reset();
+    document.getElementById('editingReceiptId').value = '';
+    document.getElementById('receiptTitle').textContent = 'Nuevo Recibo';
+    setDefaultDates();
+    document.getElementById('receiptPreview').innerHTML = '<p class="text-gray-500 text-center mt-20">La vista previa aparecerá aquí</p>';
+}
+
+function updateReceiptPreview(docData) {
+    const preview = document.getElementById('receiptPreview');
+    const company = findCompanyById(docData.company);
+    const logoUrl = company && company.logo ? pb.files.getURL(company, company.logo) : '';
+    const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="Logo" class="h-16 mb-4 object-contain">` : '';
+
+    // --- CAMBIO AQUÍ ---
+    // Se ha eliminado 'class="print-only"' del siguiente div para que sea visible en pantalla.
+    preview.innerHTML = `<div>
+        <div class="flex justify-between items-start mb-6">
+            <div>${logoHtml}<h2 class="text-xl font-bold">${escapeHtml(company ? company.name : 'N/A')}</h2>
+            <p class="text-sm">RTN: ${escapeHtml(company ? company.rtn : 'N/A')}</p>
+            <p class="text-sm">Teléfono: ${escapeHtml(company ? company.phone : 'N/A')}</p>
+            <p class="text-sm">Email: ${escapeHtml(company ? company.email : 'N/A')}</p></div>
+            <div class="text-right"><h1 class="text-2xl font-bold text-orange-custom">RECIBO</h1>
+            <p class="text-lg"># ${escapeHtml(docData.number)}</p><p>Fecha: ${escapeHtml(docData.date)}</p></div>
+        </div><hr class="mb-4"><div class="mb-4 text-sm">
+        <p>Recibido de: <span class="font-bold">${escapeHtml(docData.clientName)}</span></p>
+        <p>Por la cantidad de: <span class="font-bold">L ${docData.amount.toFixed(2)}</span></p>
+        <p>Concepto: <span class="font-bold">${escapeHtml(docData.concept)}</span></p></div>
+        <hr class="my-4"><div class="text-sm"><p>Método de Pago: ${escapeHtml(docData.paymentMethod)}</p></div>
+        <div class="text-center mt-8"><p class="text-xs">Observaciones: ${escapeHtml(docData.observations)}</p>
+        <p class="mt-4">_________________________</p><p>Firma y Sello</p></div></div>`;
+}
+
+// --- Historial y Edición ---
+function loadHistory() {
+    const listContainer = document.getElementById('historyList');
+    listContainer.innerHTML = '';
+    const typeFilter = document.getElementById('typeFilter').value;
+    const companyFilter = document.getElementById('companyFilter').value;
+    const filteredDocs = documents.filter(doc => {
+        const typeMatch = !typeFilter || doc.type.toLowerCase() === typeFilter;
+        const companyMatch = !companyFilter || doc.company === companyFilter;
+        return typeMatch && companyMatch;
+    });
+    if (filteredDocs.length === 0) {
+        listContainer.innerHTML = '<p class="text-gray-500 text-center mt-10">No hay documentos.</p>';
+        return;
+    }
+    filteredDocs.forEach(doc => {
+        const docCompany = doc.expand && doc.expand.company;
+        const docDiv = document.createElement('div');
+        docDiv.className = 'bg-gray-50 p-4 rounded-lg shadow-sm';
+        const totalAmount = doc.total ? doc.total.toFixed(2) : (doc.amount || 0).toFixed(2);
+        docDiv.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+                <div class="md:col-span-2">
+                    <span class="font-bold uppercase">${escapeHtml(doc.type)} #${escapeHtml(doc.number)}</span>
+                    <p class="text-sm text-gray-600">Empresa: ${escapeHtml(docCompany ? docCompany.name : 'N/A')}</p>
+                    <p class="text-sm text-gray-600">Cliente: ${escapeHtml(doc.clientName)}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-lg font-bold text-green-600">L ${totalAmount}</p>
+                    <p class="text-xs text-gray-500">${new Date(doc.date).toLocaleDateString()}</p>
+                </div>
+                <div class="text-right">
+                    <button onclick="editDocument('${doc.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">✏️ Editar</button>
+                </div>
+            </div>`;
+        listContainer.appendChild(docDiv);
+    });
+}
+
+async function editDocument(id) {
+    const doc = documents.find(d => d.id === id);
+    if (!doc) { alert('Documento no encontrado.'); return; }
+    const docType = doc.type ? doc.type.toLowerCase() : '';
+    if (docType === 'Factura') {
+        try {
+            const items = await pb.collection('invoice_items').getFullList({ filter: `invoice = "${doc.id}"`, sort: 'created' });
+            populateInvoiceForm(doc, items);
+        } catch (err) {
+            console.error("Error al buscar los artículos:", err);
+            alert("No se pudieron cargar los artículos de esta factura.");
+        }
+    } else if (docType === 'Recibo') {
+        populateReceiptForm(doc);
+    } else {
+        alert(`No se puede editar este tipo de documento: '${doc.type}'`);
+    }
+}
+
+function populateReceiptForm(doc) {
+    resetReceiptForm();
+    document.getElementById('editingReceiptId').value = doc.id;
+    document.getElementById('receiptTitle').textContent = `Editando Recibo #${doc.number}`;
+    document.getElementById('receiptCompanySelect').value = doc.company;
+    updateReceiptCompanyData();
+    document.getElementById('receiptNumber').value = doc.number;
+    document.getElementById('receiptDate').value = doc.date.split(' ')[0];
+    document.getElementById('receiptClientName').value = doc.clientName;
+    document.getElementById('receiptClientPhone').value = doc.clientPhone;
+    document.getElementById('receiptClientAddress').value = doc.clientAddress;
+    document.getElementById('receiptAmount').value = doc.amount;
+    document.getElementById('receiptPaymentMethod').value = doc.paymentMethod;
+    document.getElementById('receiptConcept').value = doc.concept;
+    document.getElementById('receiptObservations').value = doc.observations;
+    updateReceiptPreview(doc);
+    showSection('receipt');
+    window.scrollTo(0, 0);
+}
+
+// --- Maestro de Productos ---
+function showProductManager() {
+    document.getElementById('productForm').reset(); // Limpiar formulario
+    document.getElementById('productId').value = ''; // Limpiar ID de edición
+    renderProductsList(); // Dibujar la lista de productos existentes
+    document.getElementById('productModal').classList.remove('hidden');
+}
+
+function hideProductManager() {
+    document.getElementById('productModal').classList.add('hidden');
+}
+
+function renderProductsList() {
+    console.log("--- Iniciando renderProductsList ---");
+    const listContainer = document.getElementById('productsList');
+    
+    if (!listContainer) {
+        console.error("Error Crítico: No se encontró el contenedor '#productsList' en el HTML.");
+        return;
+    }
+    listContainer.innerHTML = '';
+
+    // Este es el log más importante para esta función
+    console.log("Datos de 'products' al momento de renderizar la lista:", products);
+
+    if (!products || products.length === 0) {
+        console.warn("La lista de productos está vacía o es indefinida. No se mostrará nada.");
+        listContainer.innerHTML = '<p class="text-gray-500 text-center">No hay productos creados.</p>';
+        return;
+    }
+
+    products.forEach((product, index) => {
+        console.log(`Renderizando producto en la lista #${index + 1}: ${product.name}`);
+        const productDiv = document.createElement('div');
+        productDiv.className = 'grid grid-cols-6 gap-4 items-center bg-gray-100 p-3 rounded-lg shadow-sm';
+        productDiv.innerHTML = `
+            <span class="col-span-2 font-medium text-sm">${escapeHtml(product.name)}</span>
+            <span class="col-span-2 text-xs text-gray-600">Código: ${escapeHtml(product.product_code || 'N/A')}</span>
+            <span class="font-semibold text-sm text-right">L ${product.default_price.toFixed(2)}</span>
+            <div class="flex gap-2 justify-end">
+                <button onclick="selectProductForEdit('${product.id}')" class="bg-blue-500 hover-bg-blue-600 text-white px-3 py-1 rounded-lg text-sm">Editar</button>
+                <button onclick="deleteProduct('${product.id}')" class="bg-red-500 hover-bg-red-600 text-white px-3 py-1 rounded-lg text-sm">Eliminar</button>
+            </div>
+        `;
+        listContainer.appendChild(productDiv);
+    });
+    console.log("--- Finalizado renderProductsList ---");
+}
+
+async function handleProductFormSubmit(event) {
+    event.preventDefault();
+    const productId = document.getElementById('productId').value;
+
+    const data = {
+        name: document.getElementById('productName').value,
+        product_code: document.getElementById('productCode').value,
+        description: document.getElementById('productDescription').value,
+        default_price: parseFloat(document.getElementById('productPrice').value),
+    };
+
+    try {
+        if (productId) {
+            // Actualizar producto existente
+            await pb.collection('products').update(productId, data);
+            alert('¡Producto actualizado con éxito!');
+        } else {
+            // Crear nuevo producto
+            await pb.collection('products').create(data);
+            alert('¡Producto creado con éxito!');
+        }
+        hideProductManager();
+        await loadData(); // Recargar todos los datos para reflejar los cambios
+    } catch (err) {
+        console.error("Error al guardar el producto:", err);
+        alert('Ocurrió un error al guardar el producto. Revisa la consola.');
+    }
+}
+
+function selectProductForEdit(id) {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+
+    // Llenar el formulario con los datos del producto
+    document.getElementById('productId').value = product.id;
+    document.getElementById('productName').value = product.name;
+    document.getElementById('productCode').value = product.product_code || '';
+    document.getElementById('productDescription').value = product.description || '';
+    document.getElementById('productPrice').value = product.default_price;
+    
+    // Enfocar en el primer campo para una mejor experiencia de usuario
+    document.getElementById('productName').focus();
+}
+
+async function deleteProduct(id) {
+    if (!confirm('¿Estás seguro de que deseas eliminar este producto?')) return;
+    try {
+        await pb.collection('products').delete(id);
+        alert('Producto eliminado con éxito.');
+        await loadData();
+    } catch (err) {
+        console.error("Error al eliminar el producto:", err);
+        alert('Error al eliminar el producto. Revisa la consola.');
+    }
+}
+
+// --- Maestro de Clientes ---
+function showClientManager() {
+    document.getElementById('clientForm').reset();
+    document.getElementById('clientId').value = '';
+    document.getElementById('clientIsActive').checked = true; // Activo por defecto
+    renderClientsList();
+    document.getElementById('clientModal').classList.remove('hidden');
+}
+
+function hideClientManager() {
+    document.getElementById('clientModal').classList.add('hidden');
+}
+
+function renderClientsList() {
+    const listContainer = document.getElementById('clientsList');
+    listContainer.innerHTML = '';
+    clients.forEach(client => {
+        const clientDiv = document.createElement('div');
+        clientDiv.className = 'flex justify-between items-center bg-gray-100 p-3 rounded-lg shadow-sm';
+        clientDiv.innerHTML = `
+            <div>
+                <span class="font-medium text-sm">${escapeHtml(client.name)} ${client.is_active ? '' : '<span class="text-red-500 text-xs">(Inactivo)</span>'}</span>
+                <p class="text-xs text-gray-600">RTN: ${escapeHtml(client.rtn || 'N/A')}</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="selectClientForEdit('${client.id}')" class="bg-blue-500 text-white px-3 py-1 rounded-lg text-sm">Editar</button>
+                <button onclick="deleteClient('${client.id}')" class="bg-red-500 text-white px-3 py-1 rounded-lg text-sm">Eliminar</button>
+            </div>
+        `;
+        listContainer.appendChild(clientDiv);
+    });
+}
+
+async function handleClientFormSubmit(event) {
+    event.preventDefault();
+    const clientId = document.getElementById('clientId').value;
+
+    try {
+        // --- PASO 1: RECOLECTAR TODOS LOS DATOS DEL FORMULARIO ---
+        // Se incluyen los campos que ya tenías y los nuevos de los catálogos
+        const data = {
+            name: document.getElementById('clientName').value,
+            rtn: document.getElementById('clientRTN').value,
+            phone_number: document.getElementById('clientPhone').value,
+            address: document.getElementById('clientAddress').value,
+            email: document.getElementById('clientEmail').value,
+            contact_person: document.getElementById('clientContactPerson').value, // <-- CAMPO AÑADIDO
+            notes: document.getElementById('clientNotes').value, // <-- CAMPO AÑADIDO
+            entity_type: document.getElementById('entityType').value,
+            client_group: document.getElementById('clientGroup').value.trim(),
+            price_list: document.getElementById('priceList').value.trim(),
+            payment_terms: document.getElementById('paymentTerms').value.trim(),
+            credit_days: parseInt(document.getElementById('creditDays').value) || 0,
+            credit_limit: parseFloat(document.getElementById('creditLimit').value) || 0,
+            is_active: document.getElementById('clientIsActive').checked,
+        };
+
+        // --- PASO 2: LÓGICA DE "SELECCIONAR O CREAR" PARA CATÁLOGOS ---
+        // Esta función auxiliar revisa si un valor existe y lo crea si es nuevo.
+        const createIfNeeded = async (collectionName, value) => {
+            if (!value) return; // No hacer nada si el campo está vacío
+            const exists = window.catalogs[collectionName].some(item => item.name.toLowerCase() === value.toLowerCase());
+            if (!exists) {
+                console.log(`Creando nuevo item '${value}' en '${collectionName}'...`);
+                const newItem = await pb.collection(collectionName).create({ name: value });
+                // Actualizamos nuestra lista local para futuros usos en la misma sesión
+                window.catalogs[collectionName].push(newItem);
+            }
+        };
+
+        // Ejecutamos la verificación para cada campo. Esto se hace tanto al crear como al actualizar.
+        await createIfNeeded('client_groups', data.client_group);
+        await createIfNeeded('price_lists', data.price_list);
+        await createIfNeeded('payment_terms', data.payment_terms);
+        // --- FIN DE LA LÓGICA DE CATÁLOGOS ---
+
+
+        // --- PASO 3: LÓGICA PRINCIPAL PARA GUARDAR EL CLIENTE ---
+        if (clientId) {
+            // La lógica de ACTUALIZACIÓN no cambia.
+            await pb.collection('clients').update(clientId, data);
+            alert('¡Cliente actualizado con éxito!');
+        } else {
+            // La lógica de CREACIÓN ahora se ejecuta después de la verificación de catálogos.
+            const entityType = data.entity_type;
+            let counterName = '';
+            if (entityType === 'Cliente') counterName = 'clientes';
+            else if (entityType === 'Proveedor') counterName = 'proveedores';
+            else if (entityType === 'Ambos') counterName = 'ambos';
+            else {
+                alert('Tipo de entidad no válido.');
+                return;
+            }
+
+            const counterRecord = await pb.collection('counters').getFirstListItem(`name = "${counterName}"`);
+            const newNumber = counterRecord.last_value + 1;
+            const newCode = `${counterRecord.prefix}${String(newNumber).padStart(7, '0')}`;
+            
+            data.client_code = newCode; // Añadimos el código automático a los datos
+
+            await pb.collection('clients').create(data);
+            
+            await pb.collection('counters').update(counterRecord.id, {
+                'last_value+': 1
+            });
+            
+            alert(`¡Cliente creado con éxito! Código asignado: ${newCode}`);
+        }
+        
+        hideClientManager();
+        await loadData(); // Recargamos todo para que las nuevas opciones aparezcan en las listas la próxima vez
+    } catch (err) {
+        console.error("Error al guardar el cliente:", err);
+        alert('Ocurrió un error al guardar el cliente. Revisa la consola.');
+    }
+}
+
+// REEMPLAZA tu función selectClientForEdit con esta
+function selectClientForEdit(id) {
+    const client = clients.find(c => c.id === id);
+    if (!client) return;
+    document.getElementById('clientId').value = client.id;
+    document.getElementById('clientName').value = client.name;
+    document.getElementById('clientCode').value = client.client_code || '';
+    document.getElementById('clientRTN').value = client.rtn || '';
+    document.getElementById('clientPhone').value = client.phone_number || '';
+    document.getElementById('clientAddress').value = client.address || '';
+    document.getElementById('clientEmail').value = client.email || '';
+    document.getElementById('contact_person').value = client.contact_person || ''; // <-- CAMPO AÑADIDO
+    document.getElementById('clientNotes').value = client.notes || '';               // <-- CAMPO AÑADIDO
+    document.getElementById('entityType').value = client.entity_type || 'Cliente';
+    document.getElementById('clientGroup').value = client.client_group;
+    document.getElementById('priceList').value = client.price_list;
+    document.getElementById('paymentTerms').value = client.payment_terms;
+    document.getElementById('creditDays').value = client.credit_days;
+    document.getElementById('creditLimit').value = client.credit_limit;
+    document.getElementById('clientIsActive').checked = client.is_active;
+}
+
+async function deleteClient(id) {
+    if (!confirm('¿Estás seguro de que deseas eliminar este cliente?')) return;
+    try {
+        await pb.collection('clients').delete(id);
+        alert('Cliente eliminado con éxito.');
+        await loadData();
+    } catch (err) {
+        console.error("Error al eliminar el cliente:", err);
+        alert('Error al eliminar el cliente.');
+    }
+}
+
+function populateClientSelects() {
+    const invoiceSelect = document.getElementById('invoiceClientSelect');
+    const receiptSelect = document.getElementById('receiptClientSelect');
+    
+    // Limpiar selects
+    invoiceSelect.innerHTML = '<option value="">-- Seleccionar o escribir un nuevo cliente --</option>';
+    receiptSelect.innerHTML = '<option value="">-- Seleccionar o escribir un nuevo cliente --</option>';
+
+    // Poblar con clientes activos
+    clients.filter(c => c.is_active).forEach(client => {
+        const option = document.createElement('option');
+        option.value = client.id;
+        option.textContent = `${client.name} (${client.rtn || 'S/RTN'})`;
+        invoiceSelect.appendChild(option.cloneNode(true));
+        receiptSelect.appendChild(option);
+    });
+}
+
+// AGREGA ESTA NUEVA FUNCIÓN a tu script
+function populateDatalists() {
+    const clientGroupList = document.getElementById('clientGroupList');
+    const priceLists = document.getElementById('priceLists');
+    const paymentTermsList = document.getElementById('paymentTermsList');
+
+    clientGroupList.innerHTML = '';
+    priceLists.innerHTML = '';
+    paymentTermsList.innerHTML = '';
+
+    window.catalogs.client_groups.forEach(item => {
+        clientGroupList.innerHTML += `<option value="${escapeHtml(item.name)}">`;
+    });
+    window.catalogs.price_lists.forEach(item => {
+        priceLists.innerHTML += `<option value="${escapeHtml(item.name)}">`;
+    });
+    window.catalogs.payment_terms.forEach(item => {
+        paymentTermsList.innerHTML += `<option value="${escapeHtml(item.name)}">`;
+    });
+}
+
+function clientSelected(formType) {
+    const selectId = formType === 'invoice' ? 'invoiceClientSelect' : 'receiptClientSelect';
+    const clientId = document.getElementById(selectId).value;
+    
+    const selectedClient = clients.find(c => c.id === clientId);
+
+    if (selectedClient) {
+        if (formType === 'invoice') {
+            document.getElementById('clientName').value = selectedClient.name;
+            document.getElementById('clientRTN').value = selectedClient.rtn || '';
+            document.getElementById('clientAddress').value = selectedClient.address || '';
+        } else {
+            document.getElementById('receiptClientName').value = selectedClient.name;
+            document.getElementById('receiptClientPhone').value = selectedClient.phone_number || '';
+            document.getElementById('receiptClientAddress').value = selectedClient.address || '';
+        }
+    }
+}
+
+
+// --- Reportes y Exportación ---
+function filterHistory() { loadHistory(); }
+function updateCompanyFilter() {
+  const select = document.getElementById('companyFilter');
+  select.innerHTML = '<option value="">Todas las empresas</option>';
+  companies.forEach(c => {
+    const option = document.createElement('option');
+    option.value = c.id; option.textContent = c.name;
+    select.appendChild(option);
+  });
+}
+
+function exportToExcel() {
+  if (documents.length === 0) { alert('No hay datos para exportar.'); return; }
+  let csvContent = "data:text/csv;charset=utf-8,";
+  const headers = ["ID", "Tipo", "Numero", "Fecha", "Empresa", "RTN Empresa", "Cliente", "Monto", "ISV", "Total", "Metodo de Pago", "Observaciones"];
+  csvContent += headers.map(escapeCsv).join(",") + "\n";
+  documents.forEach(doc => {
+    const docCompany = doc.expand && doc.expand.company;
+    const row = [
+      doc.id, doc.type, doc.number, doc.date,
+      docCompany ? docCompany.name : 'N/A',
+      docCompany ? docCompany.rtn : 'N/A',
+      doc.clientName,
+      doc.amount ? doc.amount.toFixed(2) : doc.subtotal ? doc.subtotal.toFixed(2) : '0.00',
+      doc.taxAmount ? doc.taxAmount.toFixed(2) : '0.00',
+      doc.total ? doc.total.toFixed(2) : doc.amount ? doc.amount.toFixed(2) : '0.00',
+      doc.paymentMethod, doc.observations
+    ].map(escapeCsv).join(",");
+    csvContent += row + "\n";
+  });
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "reporte_documentos.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+async function clearAllData() {
+    if (!confirm('¿Estás seguro de que deseas eliminar TODOS los documentos? Esta acción es irreversible.')) return;
+    try {
+        const records = await pb.collection('documents').getFullList({
+            filter: `created_by = "${pb.authStore.model.id}"`
+        });
+        for (const record of records) {
+            await pb.collection('documents').delete(record.id);
+        }
+        alert('Todos los documentos han sido eliminados.');
+        loadData();
+    } catch (error) {
+        console.error('Error al limpiar los datos:', error);
+        alert('Hubo un error al intentar eliminar los documentos.');
+    }
+}
+
+function updateReports() {
+    const totalDocsEl = document.getElementById('totalDocs');
+    const totalInvoicesEl = document.getElementById('totalInvoices');
+    const totalReceiptsEl = document.getElementById('totalReceipts');
+    const totalRevenueEl = document.getElementById('totalRevenue');
+    const breakdownEl = document.getElementById('companyBreakdown');
+    if (documents.length === 0) {
+        totalDocsEl.textContent = '0';
+        totalInvoicesEl.textContent = '0';
+        totalReceiptsEl.textContent = '0';
+        totalRevenueEl.textContent = 'L 0';
+        breakdownEl.innerHTML = '<p class="text-center text-gray-500">No hay datos.</p>';
+        return;
+    }
+    const totalDocs = documents.length;
+    const totalInvoices = documents.filter(doc => doc.type.toLowerCase() === 'Factura').length;
+    const totalReceipts = documents.filter(doc => doc.type.toLowerCase() === 'Recibo').length;
+    const totalRevenue = documents.reduce((sum, doc) => sum + (doc.total || doc.amount || 0), 0);
+    totalDocsEl.textContent = totalDocs;
+    totalInvoicesEl.textContent = totalInvoices;
+    totalReceiptsEl.textContent = totalReceipts;
+    totalRevenueEl.textContent = `L ${totalRevenue.toFixed(2)}`;
+    const companyData = {};
+    companies.forEach(c => {
+        companyData[c.id] = { name: c.name, revenue: 0, docs: 0 };
+    });
+    documents.forEach(doc => {
+        if (doc.company && companyData[doc.company]) {
+            companyData[doc.company].revenue += (doc.total || doc.amount || 0);
+            companyData[doc.company].docs++;
+        }
+    });
+    breakdownEl.innerHTML = '';
+    const companyBreakdownList = Object.values(companyData);
+    if (companyBreakdownList.length > 0) {
+        const ul = document.createElement('ul');
+        ul.className = 'space-y-2';
+        companyBreakdownList.forEach(data => {
+            if (data.docs > 0) {
+                const li = document.createElement('li');
+                li.className = 'flex justify-between items-center p-3 bg-white rounded-lg shadow-sm';
+                li.innerHTML = `<span>${escapeHtml(data.name)} (${data.docs} docs)</span>
+                    <span class="font-bold text-green-600">L ${data.revenue.toFixed(2)}</span>`;
+                ul.appendChild(li);
+            }
+        });
+        breakdownEl.appendChild(ul);
+    } else {
+        breakdownEl.innerHTML = '<p class="text-center text-gray-500">No hay datos de empresas.</p>';
+    }
+}
+</script>
+</body>
+</html>
