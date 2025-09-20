@@ -638,8 +638,7 @@
         <div class="flex flex-wrap gap-4 mb-6 no-print">
           <select id="typeFilter" onchange="filterHistory()" class="border rounded px-3 py-2"><option value="">Todos</option><option value="factura">Facturas</option><option value="recibo">Recibos</option></select>
           <select id="companyFilter" onchange="filterHistory()" class="border rounded px-3 py-2"><option value="">Todas las empresas</option></select>
-          <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">📊 Exportar a Excel</button>
-          <button onclick="clearAllData()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">🗑️ Limpiar Todo</button>
+          <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">📊 Exportar a Excel</button>          
         </div>
         <div id="historyList" class="space-y-4"></div>
       </div>
@@ -2565,7 +2564,7 @@ function exportToExcel() {
   document.body.removeChild(link);
 }
 
-async function clearAllData() {
+/*async function clearAllData() {
     if (!confirm('¿Estás seguro de que deseas eliminar TODOS los documentos? Esta acción es irreversible.')) return;
     try {
         const records = await pb.collection('documents').getFullList({
@@ -2580,7 +2579,7 @@ async function clearAllData() {
         console.error('Error al limpiar los datos:', error);
         alert('Hubo un error al intentar eliminar los documentos.');
     }
-}
+}*/
 
 function updateReports() {
     const totalDocsEl = document.getElementById('totalDocs');
