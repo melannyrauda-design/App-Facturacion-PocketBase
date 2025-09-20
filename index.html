@@ -25,24 +25,57 @@
 
     <style>
       @media print {
-        body {
-          background: white !important;
-          margin: 0;
-          padding: 0;
-        }
+        /* Oculta todo lo que no se debe imprimir (botones, formularios, etc.) */
         .no-print {
           display: none !important;
         }
+
+        /* Prepara el cuerpo de la página para una impresión limpia */
+        body {
+          background: white !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+        
+        /* 1. Reduce los márgenes de la hoja de papel */
+        @page {
+          size: letter; /* Puedes usar 'A4' si es tu estándar */
+          margin: 1.0cm;
+        }
+
+        /* --- LA CLAVE DE LA SOLUCIÓN --- */
+        /* Anula todos los estilos visuales del contenedor de la vista previa */
         #invoicePreview, #receiptPreview {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-          height: 100%;
+          position: static !important;
           border: none !important;
           box-shadow: none !important;
-          padding: 20px;
+          padding: 0 !important;
+          min-height: 0 !important;
+          font-size: 10pt; /* Un tamaño de letra más compacto */
         }
+
+        /* 3. Reduce el espaciado entre elementos de texto */
+        #invoicePreview h1, #invoicePreview h2, #invoicePreview h3, #invoicePreview h4, #invoicePreview p {
+          margin: 0 0 0.10rem 0; /* Menos margen inferior */
+          padding: 0;
+        }
+
+        /* 4. Hace que la tabla de artículos sea más densa */
+        #invoicePreview table th, #invoicePreview table td {
+          padding: 4px 6px; /* Reduce el relleno de las celdas */
+          font-size: 9pt;   /* Letra más pequeña para los artículos */
+        }
+
+        /* 5. Compacta las secciones inferiores */
+        #invoicePreview .border-t, #invoicePreview .text-center {
+            margin-top: 0.10rem; /* Reduce el margen superior */
+        }
+        
+        #invoicePreview .text-right.text-xs {
+            line-height: 1.2; /* Reduce el espacio entre líneas en los totales */
+        }
+        /* --- FIN DE LAS REGLAS DE OPTIMIZACIÓN --- */
+
       }
     </style>
 </head>
@@ -105,14 +138,16 @@
         </div>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-4 mt-4">
-        <button onclick="showSection('invoice')" class="flex items-center justify-center gap-2 p-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>FACTURA</span></button>
-        <button onclick="showSection('receipt')" class="flex items-center justify-center gap-2 p-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>RECIBO</span></button>
+        <button onclick="showSection('invoice')" class="flex items-center justify-center gap-2 p-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Facturación</span></button>
+        <button onclick="showSection('receipt')" class="flex items-center justify-center gap-2 p-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Recibos</span></button>
         <button onclick="showSection('history')" class="flex items-center justify-center gap-2 p-3 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Historial</span></button>
         <button onclick="showSection('reports')" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Reportes</span></button>
         <button onclick="showCompanyManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Empresas</span></button>
         <button onclick="showAuthManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Autorizaciones</span></button>
         <button onclick="showProductManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Productos</span></button>
         <button onclick="showClientManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Clientes</span></button>
+        <button onclick="showUserManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-slate-600 hover:bg-slate-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Usuarios</button>
+        <button onclick="showBankAccountManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Cuentas Bancarias</button>
       </div>
     </div>
 
@@ -207,105 +242,206 @@
       </div>
     </div>
 
-  <div id="clientModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
-  <div class="flex items-center justify-center min-h-screen p-4">
-    <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold text-gray-800">Maestro de Clientes</h3>
-        <button onclick="hideClientManager()" class="text-gray-500 hover:text-gray-700">✕</button>
-      </div>
-
-      <div class="mb-6">
-        <h4 class="font-semibold text-gray-700 mb-3">Cliente (Agregar/Editar)</h4>
-        <form id="clientForm" onsubmit="handleClientFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input type="hidden" id="clientId" />
-          
-          <div>
-            <label for="clientName" class="block text-sm font-medium text-gray-700">Nombre Completo o Razón Social*</label>
-            <input type="text" id="clientName" class="w-full border rounded-lg px-3 py-2 mt-1" required>
-          </div>
-          <div>
-            <label for="clientCode" class="block text-sm font-medium text-gray-700">Código de Cliente</label>
-            <input type="text" id="clientCode" class="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-100" readonly>
-          </div>
-          <div>
-            <label for="clientRTN" class="block text-sm font-medium text-gray-700">RTN</label>
-            <input type="text" id="clientRTN" class="w-full border rounded-lg px-3 py-2 mt-1">
-          </div>
-          <div>
-            <label for="clientPhone" class="block text-sm font-medium text-gray-700">Teléfono</label>
-            <input type="text" id="clientPhone" class="w-full border rounded-lg px-3 py-2 mt-1">
-          </div>
-          
-          <div>
-            <label for="clientContactPerson" class="block text-sm font-medium text-gray-700">Persona de Contacto</label>
-            <input type="text" id="clientContactPerson" class="w-full border rounded-lg px-3 py-2 mt-1">
-          </div>
-          <div>
-            <label for="clientEmail" class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" id="clientEmail" class="w-full border rounded-lg px-3 py-2 mt-1">
+    <div id="clientModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-gray-800">Maestro de Clientes</h3>
+            <button onclick="hideClientManager()" class="text-gray-500 hover:text-gray-700">✕</button>
           </div>
 
-          <div class="md:col-span-2">
-            <label for="clientAddress" class="block text-sm font-medium text-gray-700">Dirección</label>
-            <input type="text" id="clientAddress" class="w-full border rounded-lg px-3 py-2 mt-1">
+          <div class="mb-6">
+            <h4 class="font-semibold text-gray-700 mb-3">Cliente (Agregar/Editar)</h4>
+            <form id="clientForm" onsubmit="handleClientFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input type="hidden" id="clientId" />
+              
+              <div>
+                <label for="clientName" class="block text-sm font-medium text-gray-700">Nombre Completo o Razón Social*</label>
+                <input type="text" id="clientName" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+              </div>
+              <div>
+                <label for="clientCode" class="block text-sm font-medium text-gray-700">Código de Cliente</label>
+                <input type="text" id="clientCode" class="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-100" readonly>
+              </div>
+              <div>
+                <label for="clientRTN" class="block text-sm font-medium text-gray-700">RTN</label>
+                <input type="text" id="clientRTN" class="w-full border rounded-lg px-3 py-2 mt-1">
+              </div>
+              <div>
+                <label for="clientPhone" class="block text-sm font-medium text-gray-700">Teléfono</label>
+                <input type="text" id="clientPhone" class="w-full border rounded-lg px-3 py-2 mt-1">
+              </div>
+              
+              <div>
+                <label for="clientContactPerson" class="block text-sm font-medium text-gray-700">Persona de Contacto</label>
+                <input type="text" id="clientContactPerson" class="w-full border rounded-lg px-3 py-2 mt-1">
+              </div>
+              <div>
+                <label for="clientEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" id="clientEmail" class="w-full border rounded-lg px-3 py-2 mt-1">
+              </div>
+
+              <div class="md:col-span-2">
+                <label for="clientAddress" class="block text-sm font-medium text-gray-700">Dirección</label>
+                <input type="text" id="clientAddress" class="w-full border rounded-lg px-3 py-2 mt-1">
+              </div>
+
+              <div class="md:col-span-2">
+                  <label for="clientNotes" class="block text-sm font-medium text-gray-700">Notas</label>
+                  <textarea id="clientNotes" rows="3" class="w-full border rounded-lg px-3 py-2 mt-1"></textarea>
+              </div>
+              <hr class="md:col-span-2 my-2"/>
+
+              <div>
+                <label for="entityType" class="block text-sm font-medium text-gray-700">Tipo</label>
+                <select id="entityType" class="w-full border rounded-lg px-3 py-2 mt-1">
+                    <option value="Cliente">Cliente</option>
+                    <option value="Proveedor">Proveedor</option>
+                    <option value="Ambos">Ambos</option>
+                </select>
+              </div>
+              <div>
+                <label for="clientGroup" class="block text-sm font-medium text-gray-700">Grupo de Cliente</label>
+                <input type="text" id="clientGroup" list="clientGroupList" class="w-full border rounded-lg px-3 py-2 mt-1">
+                <datalist id="clientGroupList"></datalist>
+              </div>
+              <div>
+                <label for="priceList" class="block text-sm font-medium text-gray-700">Lista de Precios</label>
+                <input type="text" id="priceList" list="priceLists" class="w-full border rounded-lg px-3 py-2 mt-1">
+                <datalist id="priceLists"></datalist>
+              </div>
+              
+              <div>
+                <label for="paymentTerms" class="block text-sm font-medium text-gray-700">Forma de Pago</label>
+                <input type="text" id="paymentTerms" list="paymentTermsList" placeholder="Ej: Crédito" class="w-full border rounded-lg px-3 py-2 mt-1">
+                <datalist id="paymentTermsList"></datalist>
+              </div>
+              <div>
+                <label for="creditDays" class="block text-sm font-medium text-gray-700">Días de Crédito</label>
+                <input type="number" id="creditDays" placeholder="0" class="w-full border rounded-lg px-3 py-2 mt-1">
+              </div>
+              <div>
+                <label for="creditLimit" class="block text-sm font-medium text-gray-700">Límite de Crédito (L)</label>
+                <input type="number" step="0.01" id="creditLimit" placeholder="0.00" class="w-full border rounded-lg px-3 py-2 mt-1">
+              </div>
+
+              <div class="md:col-span-3 flex items-center gap-3 mt-2">
+                <input id="clientIsActive" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-custom focus:ring-blue-custom">
+                <label for="clientIsActive" class="text-sm font-medium text-gray-700">Cliente Activo</label>
+              </div>
+              
+              <button type="submit" class="mt-4 md:col-span-3 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Cliente</button>
+            </form>
           </div>
 
-          <div class="md:col-span-2">
-              <label for="clientNotes" class="block text-sm font-medium text-gray-700">Notas</label>
-              <textarea id="clientNotes" rows="3" class="w-full border rounded-lg px-3 py-2 mt-1"></textarea>
+            <div>
+              <h4 class="font-semibold text-gray-700 mb-3">Clientes Registrados</h4>
+              <div id="clientsList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+            </div>
           </div>
-          <hr class="md:col-span-2 my-2"/>
+        </div>
+    </div>
 
-          <div>
-            <label for="entityType" class="block text-sm font-medium text-gray-700">Tipo</label>
-            <select id="entityType" class="w-full border rounded-lg px-3 py-2 mt-1">
-                <option value="Cliente">Cliente</option>
-                <option value="Proveedor">Proveedor</option>
-                <option value="Ambos">Ambos</option>
-            </select>
-          </div>
-          <div>
-            <label for="clientGroup" class="block text-sm font-medium text-gray-700">Grupo de Cliente</label>
-            <input type="text" id="clientGroup" list="clientGroupList" class="w-full border rounded-lg px-3 py-2 mt-1">
-            <datalist id="clientGroupList"></datalist>
-          </div>
-          <div>
-            <label for="priceList" class="block text-sm font-medium text-gray-700">Lista de Precios</label>
-            <input type="text" id="priceList" list="priceLists" class="w-full border rounded-lg px-3 py-2 mt-1">
-            <datalist id="priceLists"></datalist>
-          </div>
-          
-          <div>
-            <label for="paymentTerms" class="block text-sm font-medium text-gray-700">Forma de Pago</label>
-            <input type="text" id="paymentTerms" list="paymentTermsList" placeholder="Ej: Crédito" class="w-full border rounded-lg px-3 py-2 mt-1">
-            <datalist id="paymentTermsList"></datalist>
-          </div>
-          <div>
-            <label for="creditDays" class="block text-sm font-medium text-gray-700">Días de Crédito</label>
-            <input type="number" id="creditDays" placeholder="0" class="w-full border rounded-lg px-3 py-2 mt-1">
-          </div>
-          <div>
-            <label for="creditLimit" class="block text-sm font-medium text-gray-700">Límite de Crédito (L)</label>
-            <input type="number" step="0.01" id="creditLimit" placeholder="0.00" class="w-full border rounded-lg px-3 py-2 mt-1">
+    <div id="userManagerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-gray-800">Gestión de Usuarios</h3>
+            <button onclick="hideUserManager()" class="text-gray-500 hover:text-gray-700">✕</button>
           </div>
 
-          <div class="md:col-span-3 flex items-center gap-3 mt-2">
-            <input id="clientIsActive" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-custom focus:ring-blue-custom">
-            <label for="clientIsActive" class="text-sm font-medium text-gray-700">Cliente Activo</label>
-          </div>
-          
-          <button type="submit" class="mt-4 md:col-span-3 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Cliente</button>
-        </form>
-      </div>
+          <div class="mb-6">
+            <h4 class="font-semibold text-gray-700 mb-3">Usuario (Agregar/Editar)</h4>
+            <form id="userForm" onsubmit="handleUserFormSubmit(event)" class="space-y-4">
+              <input type="hidden" id="userId" />
+              
+              <div>
+                <label for="userNameDisplay" class="block text-sm font-medium text-gray-700">Nombre Usuario*</label>
+                <input type="text" id="userNameDisplay" class="w-full border rounded-lg px-3 py-2 mt-1" required placeholder="Ej: Juan Pérez">
+              </div>
+              <div>
+                <label for="userEmail" class="block text-sm font-medium text-gray-700">Email*</label>
+                <input type="email" id="userEmail" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+              </div>
 
-      <div>
-        <h4 class="font-semibold text-gray-700 mb-3">Clientes Registrados</h4>
-        <div id="clientsList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+              <div>
+                <label for="userRole" class="block text-sm font-medium text-gray-700">Rol*</label>
+                <select id="userRole" class="w-full border rounded-lg px-3 py-2 mt-1" required></select>
+              </div>
+              <div>
+                <label for="userPassword" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                <input type="password" id="userPassword" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Dejar en blanco para no cambiar">
+              </div>
+              <div>
+                <label for="userPasswordConfirm" class="block text-sm font-medium text-gray-700">Confirmar Contraseña</label>
+                <input type="password" id="userPasswordConfirm" class="w-full border rounded-lg px-3 py-2 mt-1">
+              </div>
+              <div>
+                <label for="userAvatarFile" class="block text-sm font-medium text-gray-700">Avatar</label>
+                <input type="file" id="userAvatarFile" class="w-full border rounded-lg p-2 mt-1">
+              </div>
+              
+              <button type="submit" class="w-full mt-4 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Usuario</button>
+            </form>
+          </div>
+
+          <div>
+            <h4 class="font-semibold text-gray-700 mb-3">Usuarios Registrados</h4>
+            <div id="usersList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
+
+    <div id="bankAccountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-gray-800">Cuentas Bancarias por Empresa</h3>
+            <button onclick="hideBankAccountManager()" class="text-gray-500 hover:text-gray-700">✕</button>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="font-semibold text-gray-700 mb-3">Cuenta (Agregar/Editar)</h4>
+            <form id="bankAccountForm" onsubmit="handleBankAccountFormSubmit(event)" class="space-y-4">
+              <input type="hidden" id="accountId" />
+              
+              <div>
+                <label for="accountCompany" class="block text-sm font-medium text-gray-700">Empresa*</label>
+                <select id="accountCompany" class="w-full border rounded-lg px-3 py-2 mt-1" required></select>
+              </div>
+              <div>
+                <label for="accountBankName" class="block text-sm font-medium text-gray-700">Nombre del Banco*</label>
+                <input type="text" id="accountBankName" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+              </div>
+              <div>
+                <label for="accountName" class="block text-sm font-medium text-gray-700">Nombre de la Cuenta*</label>
+                <input type="text" id="accountName" placeholder="Ej: Cuenta Principal" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+              </div>
+              <div>
+                <label for="accountNumber" class="block text-sm font-medium text-gray-700">Número de Cuenta*</label>
+                <input type="text" id="accountNumber" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+              </div>
+              <div>
+                <label for="accountType" class="block text-sm font-medium text-gray-700">Tipo de Cuenta*</label>
+                <select id="accountType" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+                    <option value="Cheques">Cheques</option>
+                    <option value="Ahorros">Ahorros</option>
+                </select>
+              </div>
+              
+              <button type="submit" class="w-full mt-4 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Cuenta</button>
+            </form>
+          </div>
+
+          <div>
+            <h4 class="font-semibold text-gray-700 mb-3">Cuentas Registradas</h4>
+            <div id="bankAccountsList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     <div id="invoiceSection" class="section">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -420,7 +556,7 @@
               <textarea id="observations" rows="3" class="w-full border rounded px-3 py-2"></textarea>
             </div>
             <div class="flex gap-4">
-                <button type="button" onclick="handleInvoiceSubmit()" class="w-full bg-gradient-to-r from-blue-custom to-blue-600 text-white py-3 rounded-lg text-lg font-semibold">💾 Guardar Factura</button>
+                <button type="button" id="saveInvoiceBtn" onclick="handleInvoiceSubmit()" class="w-full bg-gradient-to-r from-blue-custom to-blue-600 text-white py-3 rounded-lg text-lg font-semibold">💾 Guardar Factura</button>
                 <button type="button" onclick="resetInvoiceForm()" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-lg text-lg font-semibold">✨ Nueva</button>
             </div>
           </form>
@@ -479,7 +615,7 @@
             <div><label class="block text-sm font-medium text-gray-700 mb-1">Concepto/Descripción</label><textarea id="receiptConcept" rows="3" placeholder="Descripción del pago..." class="w-full border rounded px-3 py-2"></textarea></div>
             <div><label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label><textarea id="receiptObservations" rows="2" class="w-full border rounded px-3 py-2"></textarea></div>
             <div class="flex gap-4">
-                <button type="button" onclick="handleReceiptSubmit()" class="w-full bg-gradient-to-r from-orange-custom to-orange-600 text-white py-3 rounded-lg text-lg font-semibold">💾 Guardar Recibo</button>
+                <button type="button" id="saveReceiptBtn" onclick="handleReceiptSubmit()" class="w-full bg-gradient-to-r from-orange-custom to-orange-600 text-white py-3 rounded-lg text-lg font-semibold">💾 Guardar Recibo</button>
                 <button type="button" onclick="resetReceiptForm()" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-lg text-lg font-semibold">✨ Nuevo</button>
             </div>
           </form>
@@ -534,6 +670,9 @@ let currentCompanyId = null; // ID de la empresa seleccionada para editar
 let authorizations = []; // lista de registros autorizaciones
 let products = []; // lista de registros products
 let clients = []; // lista de registros clients
+let users = [];
+let roles = [];
+let bankAccounts = [];
 
 
 // --- Auth: Login / Logout ---
@@ -635,6 +774,22 @@ async function loadData() {
         window.catalogs.client_groups = groups;
         window.catalogs.price_lists = prices;
         window.catalogs.payment_terms = terms;
+        // Solo intentamos cargar la lista de usuarios y roles si el usuario es admin
+        const currentUserRole = pb.authStore.model?.expand?.role?.name;
+        if (currentUserRole === 'admin') {
+            const [usersList, rolesList] = await Promise.all([
+                pb.collection('users').getFullList({ expand: 'role' }),
+                pb.collection('roles').getFullList()
+            ]);
+            users = usersList || [];
+            roles = rolesList || [];
+        }
+        // Solo intentamos cargar si el usuario es admin
+        if (currentUserRole === 'admin') {
+            // ... (carga de users y roles)
+            const accountsList = await pb.collection('bank_accounts').getFullList({ sort: '-created', expand: 'company' });
+            bankAccounts = accountsList || [];
+        }
 
         // --- BLOQUE DE DIAGNÓSTICO PARA PRODUCTOS ---
         console.log("Paso 1: Intentando cargar la colección 'products'...");
@@ -1085,28 +1240,19 @@ async function deleteAuth(id) {
 
 
 // --- Lógica Principal de Facturas ---
-async function generateInvoice(editingId = null) {
+/*async function generateInvoice(editingId = null) {
     if (editingId) {
         alert("La edición de facturas con numeración automática aún no está implementada en esta versión.");
         return; // Prevenir edición por ahora para simplificar la lógica
-    }
+    }*/
 
-    // 1. Buscar la autorización activa de nuevo para asegurar que todo esté en orden
-    if (!currentCompany) {
-        alert("Por favor, seleccione una empresa.");
-        return;
-    }
-    const activeAuth = authorizations.find(auth => auth.empresa === currentCompany.id && auth.esta_activa);
+async function generateInvoice(editingId = null) {
+    const saveBtn = document.getElementById('saveInvoiceBtn');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Guardando...';
 
-    if (!activeAuth) {
-        alert("No se puede generar la factura: no hay una autorización activa para esta empresa.");
-        return;
-    }
-
-    // 2. Recolectar datos del formulario (la mayoría ya está en tu código)
-    const invoiceNumber = document.getElementById('invoiceNumber').value;
+    // --- RECOLECCIÓN DE DATOS COMÚN PARA AMBOS CASOS ---
     const invoiceDate = document.getElementById('invoiceDate').value;
-    // ... (recolecta el resto de los datos: cliente, items, etc.)
     const clientName = document.getElementById('clientName').value;
     const clientRTN = document.getElementById('clientRTN').value;
     const clientAddress = document.getElementById('clientAddress').value;
@@ -1114,109 +1260,139 @@ async function generateInvoice(editingId = null) {
     const taxRateSelect = document.getElementById('taxRate');
     const taxRateValue = taxRateSelect.value;
     const observations = document.getElementById('observations').value;
-    const itemsFromForm = []; // Asegúrate de que esta línea esté antes del bucle
+    const itemsFromForm = [];
     document.querySelectorAll('.invoice-item').forEach(itemDiv => {
         const quantity = parseFloat(itemDiv.querySelector('.quantity').value);
         const price = parseFloat(itemDiv.querySelector('.price').value);
-        
-        // --- CAMBIO AQUÍ ---
-        // Obtenemos el texto del producto seleccionado en lugar del valor de un input
         const productSelect = itemDiv.querySelector('.description');
         let description = '';
-        if (productSelect.value) { // Asegurarse de que algo está seleccionado
+        if (productSelect.value) {
             description = productSelect.options[productSelect.selectedIndex].text;
         }
-        // --- FIN DEL CAMBIO ---
-
         if (quantity && description && price) {
-            // Guardamos los datos del item. 'description' ahora es el nombre del producto
             itemsFromForm.push({ quantity, description, price });
         }
     });
 
-    if (!invoiceNumber || itemsFromForm.length === 0) {
-        alert("El número de factura no se pudo generar o no hay artículos en la factura.");
-        return;
-    }
-    
-    // --- INICIO DE LA CORRECCIÓN ---
     const subtotal = itemsFromForm.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-    const discount = parseFloat(document.getElementById('discountAmount').value) || 0; // <-- Obtener descuento
+    const discount = parseFloat(document.getElementById('discountAmount').value) || 0;
     const subtotalAfterDiscount = subtotal - discount;
-
-    // Se calcula la tasa y el impuesto de forma segura
-    let taxRateForCalc = 0;
-    if (taxRateValue !== 'exonerado') {
-        taxRateForCalc = parseFloat(taxRateValue) || 0;
-    }
-
+    let taxRateForCalc = (taxRateValue === 'exonerado') ? 0 : parseFloat(taxRateValue) || 0;
     const taxAmount = subtotalAfterDiscount * (taxRateForCalc / 100);
     const total = subtotalAfterDiscount + taxAmount;
-    // --- FIN DE LA CORRECCIÓN ---
-
-    // 3. Preparar los datos para guardar, incluyendo el enlace a la autorización
-    const documentData = {
-        autorizacion: activeAuth.id, // <-- ¡NUEVO Y MUY IMPORTANTE!
-        number: invoiceNumber,
-        type: 'Factura',
-        company: currentCompany.id,
-        date: invoiceDate,
-        clientName, clientRTN, clientAddress,
-        subtotal, discount_amount: discount, taxRate: taxRateValue, // Guardamos el valor original ('exonerado' o el número)
-        taxAmount, total,
-        paymentMethod, observations,
-        created_by: pb.authStore.model.id,
-    };
-
-    // Si la factura es exonerada, añadimos los campos adicionales a los datos
-    if (taxRateValue === 'exonerado') {
-        documentData.orden_compra_exenta = document.getElementById('ordenCompraExenta').value;
-        documentData.constancia_registro_exonerado = document.getElementById('constanciaRegistroExonerado').value;
-        documentData.registro_sag = document.getElementById('registroSAG').value;
-    }
-
-    let operationSuccessful = false;
-    let newInvoice = null;
 
     try {
-        // PASO 1: Crear la factura
-        newInvoice = await pb.collection('documents').create(documentData);
-        
-        // PASO 2: Crear los artículos de la factura
-        for (const item of itemsFromForm) {
-            const itemData = {
-                invoice: newInvoice.id,
-                description: item.description,
-                quantity: item.quantity,
-                price: item.price,
+        if (editingId) {
+            // --- LÓGICA PARA ACTUALIZAR UNA FACTURA EXISTENTE ---
+            const invoiceNumber = document.getElementById('invoiceNumber').value; // Usamos el número existente
+
+            const documentData = {
+                // No se toca la autorización ni el contador
+                number: invoiceNumber, // Se mantiene el número original
+                type: 'Factura',
+                company: currentCompany.id,
+                date: invoiceDate,
+                clientName, clientRTN, clientAddress,
+                subtotal, discount_amount: discount, taxRate: taxRateValue,
+                taxAmount, total, paymentMethod, observations,
+                created_by: pb.authStore.model.id,
             };
-            await pb.collection('invoice_items').create(itemData);
-        }
+            
+            // Lógica para exonerado
+            if (taxRateValue === 'exonerado') {
+                documentData.orden_compra_exenta = document.getElementById('ordenCompraExenta').value;
+                documentData.constancia_registro_exonerado = document.getElementById('constanciaRegistroExonerado').value;
+                documentData.registro_sag = document.getElementById('registroSAG').value;
+            }
 
-        // PASO 3: Incrementar el contador de la autorización
-        await pb.collection('autorizaciones_factura').update(activeAuth.id, {
-            'numero_actual+': 1 // Incrementa el valor en 1
-        });
-        
-        alert('¡Factura guardada y numeración actualizada con éxito!');
-        operationSuccessful = true;
-        updateInvoicePreview(documentData, itemsFromForm, activeAuth);
+            // 1. Actualizar los datos principales de la factura
+            await pb.collection('documents').update(editingId, documentData);
 
-    } catch (err) {
-        // Lógica de "rollback" manual si algo falla
-        if (newInvoice) {
-            // Si la factura se creó pero algo más falló, bórrala para evitar inconsistencias.
-            await pb.collection('documents').delete(newInvoice.id);
-            alert('Ocurrió un error en un paso intermedio. La factura ha sido revertida para evitar inconsistencias. Revisa la consola.');
+            // 2. Borrar los artículos viejos
+            const oldItems = await pb.collection('invoice_items').getFullList({ filter: `invoice = "${editingId}"` });
+            for (const item of oldItems) {
+                await pb.collection('invoice_items').delete(item.id);
+            }
+
+            // 3. Crear los artículos nuevos
+            for (const item of itemsFromForm) {
+                await pb.collection('invoice_items').create({
+                    invoice: editingId,
+                    description: item.description,
+                    quantity: item.quantity,
+                    price: item.price,
+                });
+            }
+
+            alert('¡Factura actualizada con éxito!');
+            // Buscamos los datos de autorización para pasarlos a la vista previa
+            const originalDoc = documents.find(d => d.id === editingId);
+            const authData = authorizations.find(a => a.id === originalDoc.autorizacion);
+            // Actualizamos la vista previa con los nuevos datos
+            updateInvoicePreview(documentData, itemsFromForm, authData);
+            await loadData();
+
         } else {
-             alert('Ocurrió un error al guardar la factura. Revisa la consola.');
-        }
-        console.error("Error al guardar la factura:", err);
-    }
+            // --- LÓGICA PARA CREAR UNA NUEVA FACTURA (con reintento) ---
+            const createInvoiceRecord = async () => {
+                const activeAuth = authorizations.find(auth => auth.empresa === currentCompany.id && auth.esta_activa);
+                if (!activeAuth) throw new Error("No se encontró una autorización de facturación activa.");
 
-    if (operationSuccessful) {
-        // Recargar todos los datos para que el próximo número de factura sea el correcto
-        await loadData();
+                const correlativo = String(activeAuth.numero_actual).padStart(8, '0');
+                const invoiceNumber = `${String(activeAuth.cod_sucursal).padStart(3, '0')}-${String(activeAuth.cod_punto_emision).padStart(3, '0')}-${String(activeAuth.cod_tipo_doc).padStart(2, '0')}-${correlativo}`;
+
+                const documentData = {
+                    autorizacion: activeAuth.id,
+                    number: invoiceNumber,
+                    type: 'Factura',
+                    company: currentCompany.id,
+                    date: invoiceDate, clientName, clientRTN, clientAddress,
+                    subtotal, discount_amount: discount, taxRate: taxRateValue,
+                    taxAmount, total, paymentMethod, observations,
+                    created_by: pb.authStore.model.id,
+                };
+                 if (taxRateValue === 'exonerado') {
+                    documentData.orden_compra_exenta = document.getElementById('ordenCompraExenta').value;
+                    documentData.constancia_registro_exonerado = document.getElementById('constanciaRegistroExonerado').value;
+                    documentData.registro_sag = document.getElementById('registroSAG').value;
+                }
+
+                const newInvoice = await pb.collection('documents').create(documentData);
+                for (const item of itemsFromForm) {
+                    await pb.collection('invoice_items').create({
+                        invoice: newInvoice.id,
+                        description: item.description,
+                        quantity: item.quantity,
+                        price: item.price,
+                    });
+                }
+                await pb.collection('autorizaciones_factura').update(activeAuth.id, { 'numero_actual+': 1 });
+                return { documentData, itemsFromForm, activeAuth };
+            };
+
+            try {
+                const result = await createInvoiceRecord();
+                alert(`¡Factura ${result.documentData.number} guardada con éxito!`);
+                updateInvoicePreview(result.documentData, result.itemsFromForm, result.activeAuth);
+                await loadData();
+            } catch (err) {
+                if (err.response?.data?.number?.code === 'validation_not_unique') {
+                    console.warn("Colisión de número. Reintentando...");
+                    await loadData();
+                    const result = await createInvoiceRecord();
+                    alert(`¡Factura ${result.documentData.number} guardada con éxito! (en el segundo intento)`);
+                    updateInvoicePreview(result.documentData, result.itemsFromForm, result.activeAuth);
+                    await loadData();
+                } else {
+                    throw err; // Lanza el error para que el catch exterior lo maneje
+                }
+            }
+        }
+    } catch (err) {
+        alert('Ocurrió un error al guardar. Revisa los datos e inténtalo de nuevo.');
+        console.error("Error en generateInvoice:", err);
+        saveBtn.disabled = false;
+        saveBtn.textContent = editingId ? '💾 Guardar Cambios' : '💾 Guardar Factura';
     }
 }
 
@@ -1244,6 +1420,11 @@ function resetInvoiceForm() {
     document.getElementById('authInfo').classList.add('hidden');
     document.getElementById('exoneradoFields').classList.add('hidden');
     document.getElementById('discountAmount').value = '';
+    // Reactiva el botón de guardar y restaura su texto original
+    const saveBtn = document.getElementById('saveInvoiceBtn');
+    saveBtn.disabled = false;
+    saveBtn.textContent = '💾 Guardar Factura';
+
     addInvoiceItem();
     calculateTotals();
     setDefaultDates();
@@ -1255,25 +1436,24 @@ function updateInvoicePreview(docData, items, authData) {
     const preview = document.getElementById('invoicePreview');
     const company = findCompanyById(docData.company);
     const logoUrl = company && company.logo ? pb.files.getURL(company, company.logo) : '';
-    const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="Logo" class="h-16 mb-4 object-contain">` : '';
-    
-    // --- NUEVO: Desglose de importes ---
+    const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="Logo" class="h-24 mb-6 object-contain">` : '';
+
     let importeExonerado = 0, importeExento = 0, importeGravado15 = 0, importeGravado18 = 0;
     let isv15 = 0, isv18 = 0;
-    const taxRateValue = docData.taxRate; // Usamos el dato guardado
+    const taxRateValue = docData.taxRate;
 
-    if (taxRateValue === 'exonerado') {
-        importeExonerado = docData.subtotal;
-    } else if (taxRateValue === '0') {
-        importeExento = docData.subtotal;
-    } else if (taxRateValue === '15') {
-        importeGravado15 = docData.subtotal;
-        isv15 = docData.taxAmount;
-    } else if (taxRateValue === '18') {
-        importeGravado18 = docData.subtotal;
-        isv18 = docData.taxAmount;
+    if (taxRateValue === 'exonerado') { importeExonerado = docData.subtotal; } 
+    else if (taxRateValue == '0') { importeExento = docData.subtotal; } 
+    else if (taxRateValue == '15') { importeGravado15 = docData.subtotal; isv15 = docData.taxAmount; } 
+    else if (taxRateValue == '18') { importeGravado18 = docData.subtotal; isv18 = docData.taxAmount; }
+
+    let formattedRange = 'N/A';
+    if (authData) {
+        const prefix = `${String(authData.cod_sucursal).padStart(3, '0')}-${String(authData.cod_punto_emision).padStart(3, '0')}-${String(authData.cod_tipo_doc).padStart(2, '0')}-`;
+        const start = String(authData.rango_inicio).padStart(8, '0');
+        const end = String(authData.rango_fin).padStart(8, '0');
+        formattedRange = `${prefix}${start} al ${prefix}${end}`;
     }
-    // --- FIN Desglose de importes ---
 
     const itemsHtml = items.map(item => `
         <tr>
@@ -1282,6 +1462,14 @@ function updateInvoicePreview(docData, items, authData) {
             <td class="border px-4 py-2 text-right">L ${item.price.toFixed(2)}</td>
             <td class="border px-4 py-2 text-right">L ${(item.quantity * item.price).toFixed(2)}</td>
         </tr>`).join('');
+
+    let bankAccountsHtml = '';
+    if (company && bankAccounts.length > 0) {
+        const companyBankAccounts = bankAccounts.filter(acc => acc.company === company.id);
+        if (companyBankAccounts.length > 0) {
+            bankAccountsHtml = `<div class="border-t mt-4 pt-2 text-xs"><h4 class="font-bold mb-1">Cuentas Bancarias para Pagos</h4>${companyBankAccounts.map(acc => `<p><strong>${escapeHtml(acc.bank_name)} (${escapeHtml(acc.account_type)}):</strong> <span>${escapeHtml(acc.account_name)}</span> - <strong>#${escapeHtml(acc.account_number)}</strong></p>`).join('')}</div>`;
+        }
+    }
 
     preview.innerHTML = `<div>
         <div class="flex justify-between items-start mb-6">
@@ -1297,7 +1485,7 @@ function updateInvoicePreview(docData, items, authData) {
                 <h1 class="text-2xl font-bold text-blue-custom">FACTURA</h1>
                 <p class="text-lg font-bold"># ${escapeHtml(docData.number)}</p>
                 <p><strong>CAI:</strong> ${escapeHtml(authData ? authData.cai : 'N/A')}</p>
-                <p><strong>Rango Autorizado:</strong> ${escapeHtml(authData ? `${authData.rango_inicio} al ${authData.rango_fin}` : 'N/A')}</p>
+                <p><strong>Rango Autorizado:</strong> ${escapeHtml(formattedRange)}</p>
                 <p><strong>Fecha Límite de Emisión:</strong> ${escapeHtml(authData ? new Date(authData.fecha_limite).toLocaleDateString() : 'N/A')}</p>
             </div>
         </div>
@@ -1313,26 +1501,34 @@ function updateInvoicePreview(docData, items, authData) {
             <tbody>${itemsHtml}</tbody>
         </table>
         
-        <div class="border-t border-b py-2 my-2 text-sm">
-            <strong>SON:</strong> ${numeroALetras(docData.total)}
-        </div>
-        
-        <div class="text-right text-xs mt-2 w-1/2 ml-auto">
-            <div class="grid grid-cols-2 gap-1">
-                <span>Importe Exonerado L.:</span> <span class="font-semibold">L ${importeExonerado.toFixed(2)}</span>
-                <span>Importe Exento L.:</span> <span class="font-semibold">L ${importeExento.toFixed(2)}</span>
-                <span>Importe Gravado 15% L.:</span> <span class="font-semibold">L ${importeGravado15.toFixed(2)}</span>
-                <span>Importe Gravado 18% L.:</span> <span class="font-semibold">L ${importeGravado18.toFixed(2)}</span>
-                <span class="col-span-2 border-t mt-1 pt-1"></span>
-                <span>Sub-Total L.:</span> <span class="font-semibold">L ${docData.subtotal.toFixed(2)}</span>
-                <span>Descuentos y Rebajas Otorgados L.:</span> <span class="font-semibold text-red-500">- L ${(docData.discount_amount || 0).toFixed(2)}</span>
-                <span>ISV 15% L.:</span> <span class="font-semibold">L ${isv15.toFixed(2)}</span>
-                <span>ISV 18% L.:</span> <span class="font-semibold">L ${isv18.toFixed(2)}</span>
-                <span class="col-span-2 border-t mt-1 pt-1"></span>
-                <span class="font-bold text-lg">TOTAL A PAGAR L.:</span> <span class="font-bold text-lg">L ${docData.total.toFixed(2)}</span>
+        <div class="flex justify-between items-start mt-4">
+            <div class="w-1/2 pr-4 text-sm">
+                <div class="border-t border-b py-2">
+                    <strong>SON:</strong> ${numeroALetras(docData.total)}
+                </div>
+                <div class="mt-2 text-xs">
+                    <h4 class="font-bold">Observaciones:</h4>
+                    <p>${escapeHtml(docData.observations)}</p>
+                </div>
+            </div>
+
+            <div class="w-1/2 text-right text-xs">
+                <div class="grid grid-cols-2 gap-1">
+                    <span>Importe Exonerado:</span> <span class="font-semibold">L. ${importeExonerado.toFixed(2)}</span>
+                    <span>Importe Exento:</span> <span class="font-semibold">L. ${importeExento.toFixed(2)}</span>
+                    <span>Importe Gravado 15%:</span> <span class="font-semibold">L. ${importeGravado15.toFixed(2)}</span>
+                    <span>Importe Gravado 18%:</span> <span class="font-semibold">L. ${importeGravado18.toFixed(2)}</span>
+                    <span class="col-span-2 border-t mt-1 pt-1"></span>
+                    <span>Sub-Total:</span> <span class="font-semibold">L. ${docData.subtotal.toFixed(2)}</span>
+                    <span>Descuentos y Rebajas Otorrgados:</span> <span class="font-semibold">L. ${(docData.discount_amount || 0).toFixed(2)}</span>
+                    <span>ISV 15%:</span> <span class="font-semibold">L. ${isv15.toFixed(2)}</span>
+                    <span>ISV 18%:</span> <span class="font-semibold">L. ${isv18.toFixed(2)}</span>
+                    <span class="col-span-2 border-t mt-1 pt-1"></span>
+                    <span class="font-bold text-lg">TOTAL A PAGAR:</span> <span class="font-bold text-lg">L. ${docData.total.toFixed(2)}</span>
+                </div>
             </div>
         </div>
-        
+
         <div class="border-t mt-4 pt-2 text-xs">
             <h4 class="font-bold mb-1">Información de Factura Exonerada</h4>
             <p><strong>Orden de Compra Exenta:</strong> ${escapeHtml(docData.orden_compra_exenta)}</p>
@@ -1340,8 +1536,9 @@ function updateInvoicePreview(docData, items, authData) {
             <p><strong>Registro de la SAG:</strong> ${escapeHtml(docData.registro_sag)}</p>
         </div>
 
+        ${bankAccountsHtml}
 
-        <div class="text-center mt-8"><p class="text-xs">La Factura es beneficio de todos, "Exijala".</p></div>
+        <div class="text-center mt-8"><p class="text-xs">Gracias por su preferencia.</p></div>
     </div>`;
 }
 
@@ -1471,19 +1668,13 @@ function handleReceiptSubmit() {
     generateReceipt(editingId || null);
 }
 
-// REEMPLAZA tu función generateReceipt con esta versión que sigue la lógica de las facturas
+// REEMPLAZA tu función generateReceipt con esta
 async function generateReceipt(editingId = null) {
-    if (editingId) {
-        alert("La edición de recibos con numeración automática aún no está implementada.");
-        return;
-    }
-    
-    if (!currentCompany) {
-        alert("Por favor, seleccione una empresa.");
-        return;
-    }
+    const saveBtn = document.getElementById('saveReceiptBtn');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Guardando...';
 
-    const receiptNumber = document.getElementById('receiptNumber').value;
+    // Recolectar datos del formulario
     const receiptDate = document.getElementById('receiptDate').value;
     const clientName = document.getElementById('receiptClientName').value;
     const clientPhone = document.getElementById('receiptClientPhone').value;
@@ -1493,47 +1684,71 @@ async function generateReceipt(editingId = null) {
     const receiptConcept = document.getElementById('receiptConcept').value;
     const receiptObservations = document.getElementById('receiptObservations').value;
 
-    if (!receiptNumber || isNaN(receiptAmount)) {
-        alert('No se pudo generar el número de recibo o falta el monto.');
-        return;
-    }
-    
-    const documentData = {
-        type: 'Recibo',
-        number: receiptNumber,
-        company: currentCompany.id,
-        date: receiptDate,
-        clientName, clientPhone, clientAddress,
-        amount: receiptAmount, paymentMethod,
-        concept: receiptConcept, observations: receiptObservations,
-        created_by: pb.authStore.model.id,
-    };
-
-    let operationSuccessful = false; // <-- Se introduce la bandera, igual que en las facturas
-
     try {
-        // PASO 1: Crear el registro del recibo
-        await pb.collection('documents').create(documentData);
-        
-        // PASO 2: Incrementar el contador en el registro de la compañía
-        await pb.collection('companies').update(currentCompany.id, {
-            'siguiente_numero_recibo+': 1
-        });
-        
-        alert('Recibo guardado y numeración actualizada con éxito!');
-        operationSuccessful = true; // <-- Se marca como exitoso
-        updateReceiptPreview(documentData); // <-- Se actualiza la vista previa
-        
-    } catch (err) {
-        console.error("Error al guardar recibo:", err);
-        alert('Error al guardar el recibo. Revisa la consola.');
-    }
+        if (editingId) {
+            // --- LÓGICA PARA ACTUALIZAR UN RECIBO EXISTENTE ---
+            const receiptNumber = document.getElementById('receiptNumber').value;
+            const documentData = {
+                number: receiptNumber, // Mantenemos el número original
+                type: 'Recibo',
+                company: currentCompany.id,
+                date: receiptDate, clientName, clientPhone, clientAddress,
+                amount: receiptAmount, paymentMethod, concept: receiptConcept,
+                observations: receiptObservations,
+                created_by: pb.authStore.model.id,
+            };
 
-    // --- LA LÓGICA CORRECTA ---
-    // Recargar los datos solo si la operación de guardado fue exitosa.
-    // Esto se ejecuta FUERA del bloque try...catch para evitar conflictos.
-    if (operationSuccessful) {
-        await loadData();
+            const updatedReceipt = await pb.collection('documents').update(editingId, documentData);
+            alert('¡Recibo actualizado con éxito!');
+            updateReceiptPreview(updatedReceipt);
+            await loadData();
+            // El botón permanece deshabilitado hasta hacer clic en 'Nuevo' o editar otro.
+
+        } else {
+            // --- LÓGICA PARA CREAR UN NUEVO RECIBO (con reintento) ---
+            const createReceiptRecord = async () => {
+                const freshCompany = await pb.collection('companies').getOne(currentCompany.id);
+                const receiptNumber = freshCompany.siguiente_numero_recibo;
+
+                const documentData = {
+                    number: receiptNumber.toString(),
+                    type: 'Recibo',
+                    company: currentCompany.id,
+                    date: receiptDate, clientName, clientPhone, clientAddress,
+                    amount: receiptAmount, paymentMethod, concept: receiptConcept,
+                    observations: receiptObservations,
+                    created_by: pb.authStore.model.id,
+                };
+                if (isNaN(documentData.amount)) throw new Error('El monto no es un número válido.');
+
+                await pb.collection('documents').create(documentData);
+                await pb.collection('companies').update(currentCompany.id, { 'siguiente_numero_recibo+': 1 });
+                return documentData;
+            };
+
+            try {
+                const docData = await createReceiptRecord();
+                alert(`¡Recibo #${docData.number} guardado con éxito!`);
+                updateReceiptPreview(docData);
+                await loadData();
+            } catch (err) {
+                if (err.response?.data?.number?.code === 'validation_not_unique') {
+                    console.warn("Colisión de número de recibo. Reintentando...");
+                    await loadData();
+                    const docData = await createReceiptRecord();
+                    alert(`¡Recibo #${docData.number} guardado con éxito! (en el segundo intento)`);
+                    updateReceiptPreview(docData);
+                    await loadData();
+                } else {
+                    throw err; // Lanza el error para que el catch exterior lo maneje
+                }
+            }
+        }
+    } catch (err) {
+        alert('Ocurrió un error al guardar el recibo. ' + err.message);
+        console.error("Error en generateReceipt:", err);
+        saveBtn.disabled = false; // Rehabilita el botón solo si hay un error
+        saveBtn.textContent = editingId ? '💾 Guardar Cambios' : '💾 Guardar Recibo';
     }
 }
 
@@ -1541,6 +1756,10 @@ function resetReceiptForm() {
     document.getElementById('receiptForm').reset();
     document.getElementById('editingReceiptId').value = '';
     document.getElementById('receiptTitle').textContent = 'Nuevo Recibo';
+    // Reactiva el botón de guardar y restaura su texto original
+    const saveBtn = document.getElementById('saveReceiptBtn');
+    saveBtn.disabled = false;
+    saveBtn.textContent = '💾 Guardar Recibo';
     setDefaultDates();
     document.getElementById('receiptPreview').innerHTML = '<p class="text-gray-500 text-center mt-20">La vista previa aparecerá aquí</p>';
 }
@@ -1549,10 +1768,8 @@ function updateReceiptPreview(docData) {
     const preview = document.getElementById('receiptPreview');
     const company = findCompanyById(docData.company);
     const logoUrl = company && company.logo ? pb.files.getURL(company, company.logo) : '';
-    const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="Logo" class="h-16 mb-4 object-contain">` : '';
+    const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="Logo" class="h-24 mb-6 object-contain">` : '';
 
-    // --- CAMBIO AQUÍ ---
-    // Se ha eliminado 'class="print-only"' del siguiente div para que sea visible en pantalla.
     preview.innerHTML = `<div>
         <div class="flex justify-between items-start mb-6">
             <div>${logoHtml}<h2 class="text-xl font-bold">${escapeHtml(company ? company.name : 'N/A')}</h2>
@@ -1566,8 +1783,15 @@ function updateReceiptPreview(docData) {
         <p>Por la cantidad de: <span class="font-bold">L ${docData.amount.toFixed(2)}</span></p>
         <p>Concepto: <span class="font-bold">${escapeHtml(docData.concept)}</span></p></div>
         <hr class="my-4"><div class="text-sm"><p>Método de Pago: ${escapeHtml(docData.paymentMethod)}</p></div>
-        <div class="text-center mt-8"><p class="text-xs">Observaciones: ${escapeHtml(docData.observations)}</p>
-        <p class="mt-4">_________________________</p><p>Firma y Sello</p></div></div>`;
+        
+        <div class="mt-8 text-left text-xs">
+            <p><span class="font-bold">Observaciones:</span> ${escapeHtml(docData.observations)}</p>
+        </div>
+        <div class="text-center mt-16">
+            <p>_________________________</p>
+            <p class="text-sm">Firma y Sello</p>
+        </div>
+        </div>`;
 }
 
 // --- Historial y Edición ---
@@ -1611,12 +1835,29 @@ function loadHistory() {
 
 async function editDocument(id) {
     const doc = documents.find(d => d.id === id);
-    if (!doc) { alert('Documento no encontrado.'); return; }
-    const docType = doc.type ? doc.type.toLowerCase() : '';
+    if (!doc) {
+        alert('Documento no encontrado.');
+        return;
+    }
+
+    // --- INICIO DEL BLOQUE DE DIAGNÓSTICO ---
+    console.log("--- Diagnóstico de EditDocument ---");
+    console.log("1. Valor original de doc.type:", `'${doc.type}'`);
+    
+    // 1. Usamos el tipo original, sin convertirlo a minúsculas
+    const docType = doc.type ? doc.type.trim() : ''; 
+    console.log("2. Valor después de trim() y toLowerCase():", `'${docType}'`);
+
+    console.log("3. Comparando con 'Factura'. ¿Son iguales?:", docType === 'Factura');
+    console.log("4. Comparando con 'Recibo'. ¿Son iguales?:", docType === 'Recibo');
+    console.log("--- Fin del Diagnóstico ---");
+    // --- FIN DEL BLOQUE DE DIAGNÓSTICO ---
+
     if (docType === 'Factura') {
         try {
+            const auth = authorizations.find(a => a.id === doc.autorizacion);
             const items = await pb.collection('invoice_items').getFullList({ filter: `invoice = "${doc.id}"`, sort: 'created' });
-            populateInvoiceForm(doc, items);
+            populateInvoiceForm(doc, items, auth);
         } catch (err) {
             console.error("Error al buscar los artículos:", err);
             alert("No se pudieron cargar los artículos de esta factura.");
@@ -1628,21 +1869,91 @@ async function editDocument(id) {
     }
 }
 
+function populateInvoiceForm(doc, items, authData) {
+    // 1. Limpia y resetea el formulario a su estado inicial.
+    // Esto también se encarga de reactivar el botón de "Guardar".
+    resetInvoiceForm();
+
+    // 2. Establece el modo "Edición"
+    document.getElementById('editingInvoiceId').value = doc.id;
+    document.getElementById('invoiceTitle').textContent = `Editando Factura #${doc.number}`;
+
+    // 3. Rellena los campos principales de la factura
+    document.getElementById('companySelect').value = doc.company;
+    updateCompanyData(); // Actualiza la compañía actual y busca la autorización
+    document.getElementById('invoiceNumber').value = doc.number;
+    document.getElementById('invoiceDate').value = doc.date.split(' ')[0]; // Formatea la fecha
+    document.getElementById('clientName').value = doc.clientName;
+    document.getElementById('clientRTN').value = doc.clientRTN;
+    document.getElementById('clientAddress').value = doc.clientAddress;
+    document.getElementById('paymentMethod').value = doc.paymentMethod;
+    document.getElementById('taxRate').value = doc.taxRate;
+    document.getElementById('observations').value = doc.observations;
+    document.getElementById('discountAmount').value = doc.discount_amount || 0;
+    
+    // 4. Muestra y rellena los campos de exoneración si existen
+    if (doc.taxRate === 'exonerado') {
+        document.getElementById('exoneradoFields').classList.remove('hidden');
+        document.getElementById('ordenCompraExenta').value = doc.orden_compra_exenta || '';
+        document.getElementById('constanciaRegistroExonerado').value = doc.constancia_registro_exonerado || '';
+        document.getElementById('registroSAG').value = doc.registro_sag || '';
+    }
+
+    // 5. Reconstruye dinámicamente la lista de artículos
+    const itemsContainer = document.getElementById('invoiceItems');
+    itemsContainer.innerHTML = ''; // Limpia el contenedor
+    items.forEach(item => {
+        addInvoiceItem(); // Crea una nueva fila con el menú de productos poblado
+        const lastItemRow = itemsContainer.lastElementChild; // Obtiene la fila que acabamos de crear
+        
+        // Selecciona el producto correcto en el menú desplegable
+        const productSelect = lastItemRow.querySelector('.description');
+        const foundProduct = Array.from(productSelect.options).find(opt => opt.text === item.description);
+        if (foundProduct) {
+            productSelect.value = foundProduct.value;
+        }
+
+        // Rellena la cantidad y el precio
+        lastItemRow.querySelector('.quantity').value = item.quantity;
+        lastItemRow.querySelector('.price').value = item.price;
+    });
+
+    // 6. Actualiza el estado del botón a "Guardar Cambios"
+    const saveBtn = document.getElementById('saveInvoiceBtn');
+    saveBtn.disabled = false;
+    saveBtn.textContent = '💾 Guardar Cambios';
+
+    // 7. Actualiza los cálculos y la vista previa
+    calculateTotals();
+    updateInvoicePreview(doc, items, authData);
+    showSection('invoice');
+    window.scrollTo(0, 0); // Desplaza la vista hacia arriba
+}
+
+
+// REEMPLAZA tu función populateReceiptForm con esta
 function populateReceiptForm(doc) {
-    resetReceiptForm();
+    resetReceiptForm(); // Limpia y reactiva el botón
+    
     document.getElementById('editingReceiptId').value = doc.id;
     document.getElementById('receiptTitle').textContent = `Editando Recibo #${doc.number}`;
+    
+    // Rellena los campos
     document.getElementById('receiptCompanySelect').value = doc.company;
-    updateReceiptCompanyData();
+    updateReceiptCompanyData(); // Actualiza la compañía y el número
     document.getElementById('receiptNumber').value = doc.number;
     document.getElementById('receiptDate').value = doc.date.split(' ')[0];
     document.getElementById('receiptClientName').value = doc.clientName;
-    document.getElementById('receiptClientPhone').value = doc.clientPhone;
-    document.getElementById('receiptClientAddress').value = doc.clientAddress;
+    document.getElementById('receiptClientPhone').value = doc.clientPhone || '';
+    document.getElementById('receiptClientAddress').value = doc.clientAddress || '';
     document.getElementById('receiptAmount').value = doc.amount;
     document.getElementById('receiptPaymentMethod').value = doc.paymentMethod;
-    document.getElementById('receiptConcept').value = doc.concept;
-    document.getElementById('receiptObservations').value = doc.observations;
+    document.getElementById('receiptConcept').value = doc.concept || '';
+    document.getElementById('receiptObservations').value = doc.observations || '';
+    
+    // Cambia el texto del botón a "Guardar Cambios"
+    document.getElementById('saveReceiptBtn').textContent = '💾 Guardar Cambios';
+
     updateReceiptPreview(doc);
     showSection('receipt');
     window.scrollTo(0, 0);
@@ -1962,6 +2273,257 @@ function clientSelected(formType) {
     }
 }
 
+// --- Gestión de Usuarios (Solo Admin) ---
+function showUserManager() {
+    document.getElementById('userForm').reset();
+    document.getElementById('userId').value = '';
+    populateRolesDropdown();
+    renderUsersList();
+    document.getElementById('userManagerModal').classList.remove('hidden');
+}
+
+function hideUserManager() {
+    document.getElementById('userManagerModal').classList.add('hidden');
+}
+
+function populateRolesDropdown() {
+    const roleSelect = document.getElementById('userRole');
+    roleSelect.innerHTML = '<option value="">Seleccione un rol...</option>';
+    roles.forEach(role => {
+        const option = document.createElement('option');
+        option.value = role.id;
+        option.textContent = role.name;
+        roleSelect.appendChild(option);
+    });
+}
+
+// REEMPLAZA tu función renderUsersList con esta
+function renderUsersList() {
+    const listContainer = document.getElementById('usersList');
+    listContainer.innerHTML = '';
+    users.forEach(user => {
+        const userDiv = document.createElement('div');
+        userDiv.className = 'flex justify-between items-center bg-gray-100 p-2 rounded-lg';
+        const roleName = user.expand?.role?.name || 'Sin rol';
+        userDiv.innerHTML = `
+            <div class="flex items-center gap-3">
+                <img src="${user.avatar ? pb.files.getURL(user, user.avatar, {'thumb':'50x50'}) : 'data:image/svg+xml;...'}" class="w-8 h-8 rounded-full object-cover">
+                <div>
+                    <p class="text-sm font-medium">${escapeHtml(user.name)}</p>
+                    <p class="text-xs text-gray-500 capitalize">${escapeHtml(roleName)}</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="selectUserForEdit('${user.id}')" class="bg-blue-500 text-white px-3 py-1 rounded-lg text-sm">Editar</button>
+            </div>`;
+        listContainer.appendChild(userDiv);
+    });
+}
+
+async function handleUserFormSubmit(event) {
+    event.preventDefault();
+    const userId = document.getElementById('userId').value;
+    const saveBtn = document.querySelector('#userForm button[type="submit"]');
+    saveBtn.disabled = true;
+
+    try {
+        let dataToSend;
+
+        // Obtenemos los nuevos valores del formulario, incluyendo 'name' y 'username'
+        const newName = document.getElementById('userNameDisplay').value;
+        const newEmail = document.getElementById('userEmail').value;
+        const newRole = document.getElementById('userRole').value;
+        const newPassword = document.getElementById('userPassword').value;
+        const passwordConfirm = document.getElementById('userPasswordConfirm').value;
+        const avatarFile = document.getElementById('userAvatarFile').files[0];
+
+        if (userId) {
+            // --- MODO ACTUALIZACIÓN ---
+            const originalUser = users.find(u => u.id === userId);
+            const dataChanges = {};
+
+            // Comparamos cada campo y lo añadimos solo si ha cambiado
+            if (newName !== originalUser.name) {
+                dataChanges.name = newName;
+            }
+            if (newEmail !== originalUser.email) {
+                dataChanges.email = newEmail;
+            }
+            if (newRole !== originalUser.role) {
+                dataChanges.role = newRole;
+            }
+            if (newPassword) {
+                if (newPassword !== passwordConfirm) {
+                    alert('Las contraseñas no coinciden.');
+                    saveBtn.disabled = false;
+                    return;
+                }
+                dataChanges.password = newPassword;
+                dataChanges.passwordConfirm = passwordConfirm;
+            }
+
+            // Decidimos el formato de envío
+            if (avatarFile) {
+                const formData = new FormData();
+                for (const key in dataChanges) {
+                    formData.append(key, dataChanges[key]);
+                }
+                formData.append('avatar', avatarFile);
+                dataToSend = formData;
+            } else {
+                dataToSend = dataChanges;
+            }
+
+            if (Object.keys(dataToSend).length === 0 && !avatarFile) {
+                alert("No se ha realizado ningún cambio.");
+                hideUserManager();
+                return;
+            }
+
+            await pb.collection('users').update(userId, dataToSend);
+            alert('¡Usuario actualizado con éxito!');
+
+        } else {
+            // --- MODO CREACIÓN ---
+            if (!newPassword || newPassword !== passwordConfirm) {
+                alert('Para un usuario nuevo, las contraseñas son obligatorias y deben coincidir.');
+                saveBtn.disabled = false;
+                return;
+            }
+            const formData = new FormData();
+            formData.append('name', newName); // <-- CAMPO AÑADIDO            
+            formData.append('email', newEmail);
+            formData.append('role', newRole);
+            formData.append('password', newPassword);
+            formData.append('passwordConfirm', passwordConfirm);
+            if (avatarFile) {
+                formData.append('avatar', avatarFile);
+            }
+            dataToSend = formData;
+            
+            await pb.collection('users').create(dataToSend);
+            alert('¡Usuario creado con éxito!');
+        }
+
+        hideUserManager();
+        await pb.collection('users').authRefresh({ expand: 'role' }); 
+        await loadData();
+
+    } catch (err) {
+        console.error("Error al guardar el usuario:", err);
+        const errorDetails = err.response?.data ? JSON.stringify(err.response.data) : err.message;
+        alert(`Ocurrió un error al guardar el usuario: ${errorDetails}`);
+    } finally {
+        saveBtn.disabled = false;
+    }
+}
+
+// REEMPLAZA tu función selectUserForEdit con esta
+function selectUserForEdit(id) {
+    const user = users.find(u => u.id === id);
+    if (!user) return;
+
+    document.getElementById('userForm').reset();
+    document.getElementById('userId').value = user.id;
+    document.getElementById('userNameDisplay').value = user.name || ''; // <-- CAMPO AÑADIDO
+    document.getElementById('userEmail').value = user.email;
+    document.getElementById('userRole').value = user.role;
+}
+
+// --- Gestión de Cuentas Bancarias (Solo Admin) ---
+
+function showBankAccountManager() {
+    document.getElementById('bankAccountForm').reset();
+    document.getElementById('accountId').value = '';
+    
+    // Poblar el dropdown de empresas
+    const companySelect = document.getElementById('accountCompany');
+    companySelect.innerHTML = '<option value="">Seleccione una empresa...</option>';
+    companies.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c.id;
+        option.textContent = c.name;
+        companySelect.appendChild(option);
+    });
+
+    renderBankAccountsList();
+    document.getElementById('bankAccountModal').classList.remove('hidden');
+}
+
+function hideBankAccountManager() {
+    document.getElementById('bankAccountModal').classList.add('hidden');
+}
+
+function renderBankAccountsList() {
+    const listContainer = document.getElementById('bankAccountsList');
+    listContainer.innerHTML = '';
+    bankAccounts.forEach(account => {
+        const accountDiv = document.createElement('div');
+        accountDiv.className = 'flex justify-between items-center bg-gray-100 p-2 rounded-lg';
+        const companyName = account.expand?.company?.name || 'N/A';
+        accountDiv.innerHTML = `
+            <div>
+                <p class="text-sm font-medium">${escapeHtml(account.bank_name)} - ${escapeHtml(account.account_name)}</p>
+                <p class="text-xs text-gray-500">${escapeHtml(companyName)} | #${escapeHtml(account.account_number)}</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="selectBankAccountForEdit('${account.id}')" class="bg-blue-500 text-white px-3 py-1 rounded-lg text-sm">Editar</button>
+                <button onclick="deleteBankAccount('${account.id}')" class="bg-red-500 text-white px-3 py-1 rounded-lg text-sm">Eliminar</button>
+            </div>`;
+        listContainer.appendChild(accountDiv);
+    });
+}
+
+async function handleBankAccountFormSubmit(event) {
+    event.preventDefault();
+    const accountId = document.getElementById('accountId').value;
+    const data = {
+        company: document.getElementById('accountCompany').value,
+        bank_name: document.getElementById('accountBankName').value,
+        account_name: document.getElementById('accountName').value,
+        account_number: document.getElementById('accountNumber').value,
+        account_type: document.getElementById('accountType').value,
+    };
+
+    try {
+        if (accountId) {
+            await pb.collection('bank_accounts').update(accountId, data);
+            alert('¡Cuenta actualizada con éxito!');
+        } else {
+            await pb.collection('bank_accounts').create(data);
+            alert('¡Cuenta creada con éxito!');
+        }
+        hideBankAccountManager();
+        await loadData();
+    } catch (err) {
+        console.error("Error al guardar la cuenta bancaria:", err);
+        alert('Ocurrió un error al guardar la cuenta. Revisa la consola.');
+    }
+}
+
+function selectBankAccountForEdit(id) {
+    const account = bankAccounts.find(acc => acc.id === id);
+    if (!account) return;
+
+    document.getElementById('accountId').value = account.id;
+    document.getElementById('accountCompany').value = account.company;
+    document.getElementById('accountBankName').value = account.bank_name;
+    document.getElementById('accountName').value = account.account_name;
+    document.getElementById('accountNumber').value = account.account_number;
+    document.getElementById('accountType').value = account.account_type;
+}
+
+async function deleteBankAccount(id) {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta cuenta bancaria?')) return;
+    try {
+        await pb.collection('bank_accounts').delete(id);
+        alert('Cuenta bancaria eliminada con éxito.');
+        await loadData();
+    } catch (err) {
+        console.error("Error al eliminar la cuenta:", err);
+        alert('Error al eliminar la cuenta bancaria.');
+    }
+}
 
 // --- Reportes y Exportación ---
 function filterHistory() { loadHistory(); }
@@ -2035,8 +2597,8 @@ function updateReports() {
         return;
     }
     const totalDocs = documents.length;
-    const totalInvoices = documents.filter(doc => doc.type.toLowerCase() === 'Factura').length;
-    const totalReceipts = documents.filter(doc => doc.type.toLowerCase() === 'Recibo').length;
+    const totalInvoices = documents.filter(doc => doc.type === 'Factura').length;
+    const totalReceipts = documents.filter(doc => doc.type === 'Recibo').length;
     const totalRevenue = documents.reduce((sum, doc) => sum + (doc.total || doc.amount || 0), 0);
     totalDocsEl.textContent = totalDocs;
     totalInvoicesEl.textContent = totalInvoices;
