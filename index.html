@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <script src="https://unpkg.com/pocketbase/dist/pocketbase.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <script>
       tailwind.config = {
@@ -672,6 +673,7 @@ let clients = []; // lista de registros clients
 let users = [];
 let roles = [];
 let bankAccounts = [];
+let invoice_items = [];
 
 
 // --- Auth: Login / Logout ---
@@ -765,7 +767,7 @@ async function loadData() {
         clients = clientsList || [];
         // Para simplificar, las guardamos en un solo objeto
         window.catalogs = {};
-        const [groups, prices, terms] = await Promise.all([
+        const [groups, prices, terms] = await Promise.all([   
             pb.collection('client_groups').getFullList({ sort: 'name' }),
             pb.collection('price_lists').getFullList({ sort: 'name' }),
             pb.collection('payment_terms').getFullList({ sort: 'name' })
@@ -773,6 +775,7 @@ async function loadData() {
         window.catalogs.client_groups = groups;
         window.catalogs.price_lists = prices;
         window.catalogs.payment_terms = terms;
+        
         // Solo intentamos cargar la lista de usuarios y roles si el usuario es admin
         const currentUserRole = pb.authStore.model?.expand?.role?.name;
         if (currentUserRole === 'admin') {
@@ -2537,31 +2540,70 @@ function updateCompanyFilter() {
 }
 
 function exportToExcel() {
-  if (documents.length === 0) { alert('No hay datos para exportar.'); return; }
-  let csvContent = "data:text/csv;charset=utf-8,";
-  const headers = ["ID", "Tipo", "Numero", "Fecha", "Empresa", "RTN Empresa", "Cliente", "Monto", "ISV", "Total", "Metodo de Pago", "Observaciones"];
-  csvContent += headers.map(escapeCsv).join(",") + "\n";
-  documents.forEach(doc => {
-    const docCompany = doc.expand && doc.expand.company;
-    const row = [
-      doc.id, doc.type, doc.number, doc.date,
-      docCompany ? docCompany.name : 'N/A',
-      docCompany ? docCompany.rtn : 'N/A',
-      doc.clientName,
-      doc.amount ? doc.amount.toFixed(2) : doc.subtotal ? doc.subtotal.toFixed(2) : '0.00',
-      doc.taxAmount ? doc.taxAmount.toFixed(2) : '0.00',
-      doc.total ? doc.total.toFixed(2) : doc.amount ? doc.amount.toFixed(2) : '0.00',
-      doc.paymentMethod, doc.observations
-    ].map(escapeCsv).join(",");
-    csvContent += row + "\n";
-  });
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", "reporte_documentos.csv");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+    if (documents.length === 0) {
+        alert('No hay datos para exportar.');
+        return;
+    }
+
+    // 1. Preparar los datos para la hoja de cálculo
+    const headers = [
+        "ID", "Tipo", "Numero", "Fecha", "Empresa", "RTN Empresa", 
+        "Cliente", "Subtotal", "Descuento", "ISV", "Total", 
+        "Metodo de Pago", "Observaciones", "Artículos"
+    ];
+
+    const data = documents.map(doc => {
+        const docCompany = doc.expand && doc.expand.company;
+        
+        // Formatear la lista de artículos para una sola celda
+        let itemsString = '';
+        if (doc.type?.toLowerCase() === 'factura') {
+            // Buscamos los items relacionados que ya cargamos
+            const relatedItems = invoice_items.filter(item => item.invoice === doc.id);
+            itemsString = relatedItems.map(item => `${item.quantity}x ${item.description} @ L${item.price}`).join('; ');
+        } else {
+            itemsString = doc.concept || '';
+        }
+
+        return [
+            doc.id,
+            doc.type,
+            doc.number,
+            new Date(doc.date).toLocaleDateString(),
+            docCompany ? docCompany.name : 'N/A',
+            docCompany ? docCompany.rtn : 'N/A',
+            doc.clientName,
+            doc.subtotal || doc.amount || 0,
+            doc.discount_amount || 0,
+            doc.taxAmount || 0,
+            doc.total || doc.amount || 0,
+            doc.paymentMethod,
+            doc.observations,
+            itemsString
+        ];
+    });
+
+    // 2. Crear la hoja de cálculo (worksheet) a partir de los datos
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+
+    // 3. (Opcional, pero recomendado) Ajustar el ancho de las columnas
+    const colWidths = headers.map(header => ({ wch: header.length + 5 })); // Ancho inicial
+    data.forEach(row => {
+        row.forEach((cell, i) => {
+            const len = cell ? String(cell).length : 10;
+            if (colWidths[i].wch < len) {
+                colWidths[i].wch = len;
+            }
+        });
+    });
+    ws['!cols'] = colWidths;
+
+    // 4. Crear el libro de trabajo (workbook) y añadir la hoja
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Reporte de Documentos");
+
+    // 5. Generar y descargar el archivo XLSX
+    XLSX.writeFile(wb, "reporte_documentos.xlsx");
 }
 
 /*async function clearAllData() {
