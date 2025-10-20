@@ -141,7 +141,7 @@
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-4 mt-4">
         <button onclick="showSection('invoice')" class="flex items-center justify-center gap-2 p-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Facturación</span></button>
         <button onclick="showSection('receipt')" class="flex items-center justify-center gap-2 p-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Recibos</span></button>
-        <button onclick="showSection('history')" class="flex items-center justify-center gap-2 p-3 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Historial</span></button>
+        <button onclick="showHistory()" class="flex items-center justify-center gap-2 p-3 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Historial</span></button>
         <button onclick="showSection('reports')" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Reportes</span></button>
         <button onclick="showCompanyManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Empresas</span></button>
         <button onclick="showAuthManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Autorizaciones</span></button>
@@ -217,30 +217,50 @@
       </div>
     </div>
 
-    <div id="productModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
-      <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-bold text-gray-800">Maestro de Productos</h3>
-            <button onclick="hideProductManager()" class="text-gray-500 hover:text-gray-700">✕</button>
-          </div>
-          <div class="mb-6">
-            <h4 class="font-semibold text-gray-700 mb-3">Producto (Agregar/Editar)</h4>
-            <form id="productForm" onsubmit="handleProductFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input type="hidden" id="productId" />
-              <div><label for="productName" class="block text-sm font-medium text-gray-700">Nombre*</label><input type="text" id="productName" placeholder="Nombre del producto o servicio" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
-              <div><label for="productCode" class="block text-sm font-medium text-gray-700">Código</label><input type="text" id="productCode" placeholder="Ej: SRV-001" class="w-full border rounded-lg px-3 py-2 mt-1"></div>
-              <div class="md:col-span-2"><label for="productDescription" class="block text-sm font-medium text-gray-700">Descripción</label><textarea id="productDescription" rows="2" placeholder="Descripción detallada" class="w-full border rounded-lg px-3 py-2 mt-1"></textarea></div>
-              <div><label for="productPrice" class="block text-sm font-medium text-gray-700">Precio (L)*</label><input type="number" id="productPrice" step="0.01" placeholder="0.00" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
-              <button type="submit" class="mt-4 md:col-span-2 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Producto</button>
-            </form>
-          </div>
-          <div>
-            <h4 class="font-semibold text-gray-700 mb-3">Productos Registrados</h4>
-            <div id="productsList" class="space-y-2 max-h-60 overflow-y-auto"></div>
-          </div>
+    <div id="productManagerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Maestro de Productos</h3>
+                <button onclick="hideProductManager()" class="text-gray-500 hover:text-gray-700">✕</button>
+            </div>
+
+            <div class="mb-6">
+                <h4 class="font-semibold text-gray-700 mb-3">Producto (Agregar/Editar)</h4>
+                    <form id="productForm" onsubmit="handleProductFormSubmit(event)" class="space-y-4">
+                        <input type="hidden" id="productId" />
+                        <div>
+                            <label for="productName" class="block text-sm font-medium text-gray-700">Nombre del Producto*</label>
+                            <input type="text" id="productName" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+                        </div>
+                        
+                        <div>
+                            <label for="productDescription" class="block text-sm font-medium text-gray-700">Descripción del Producto</label>
+                            <textarea id="productDescription" rows="3" class="w-full border rounded-lg px-3 py-2 mt-1"></textarea>
+                        </div>
+                        <div>
+                            <label for="productCode" class="block text-sm font-medium text-gray-700">Código</label>
+                            <input type="text" id="productCode" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Ej: SERV-01">
+                        </div>
+                        <div>
+                            <label for="productPrice" class="block text-sm font-medium text-gray-700">Precio de Venta (L)*</label>
+                            <input type="number" step="0.01" id="productPrice" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <input id="productIsExempt" type="checkbox" class="h-4 w-4 rounded border-gray-300">
+                            <label for="productIsExempt" class="text-sm font-medium text-gray-700">Este producto es Exento de Impuesto (ISV)</label>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Producto</button>
+                    </form>
+            </div>
+
+            <div>
+                <h4 class="font-semibold text-gray-700 mb-3">Productos Registrados</h4>
+                <div id="productsList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+            </div>
+            
+            </div>
         </div>
-      </div>
     </div>
 
     <div id="clientModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
@@ -634,15 +654,43 @@
     </div>
 
     <div id="historySection" class="section hidden">
-      <div class="bg-white rounded-lg shadow-lg p-6">
-        <h2 class="text-2xl font-bold mb-6 flex items-center"><span class="bg-yellow-custom text-white p-2 rounded-lg mr-3">📋</span> Historial de Documentos</h2>
-        <div class="flex flex-wrap gap-4 mb-6 no-print">
-          <select id="typeFilter" onchange="filterHistory()" class="border rounded px-3 py-2"><option value="">Todos</option><option value="factura">Facturas</option><option value="recibo">Recibos</option></select>
-          <select id="companyFilter" onchange="filterHistory()" class="border rounded px-3 py-2"><option value="">Todas las empresas</option></select>
-          <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">📊 Exportar a Excel</button>          
+        <div class="bg-white p-6 rounded-lg shadow-lg no-print">
+            <h2 class="text-2xl font-bold mb-4">Historial de Documentos</h2>
+
+            <div class="flex flex-wrap gap-4 items-center mb-4">
+                <div class="flex-grow">
+                    <label for="historyCompanyFilter" class="text-sm font-medium">Filtrar por Empresa:</label>
+                    <select id="historyCompanyFilter" onchange="filterHistoryByCompany(this.value)" class="w-full mt-1 border rounded-lg px-3 py-2"></select>
+                </div>
+
+                <div>
+                    <label class="text-sm font-medium">Filtrar por Rango de Fechas:</label>
+                    <div class="flex gap-2 mt-1">
+                        <input type="date" id="historyDateStart" onchange="filterHistoryByDate()" class="border rounded-lg px-3 py-2" placeholder="Desde">
+                        <input type="date" id="historyDateEnd" onchange="filterHistoryByDate()" class="border rounded-lg px-3 py-2" placeholder="Hasta">
+                        <button onclick="clearDateFilter()" class="px-3 py-2 text-sm rounded-lg bg-gray-300 hover:bg-gray-400" title="Limpiar filtro de fecha">✕</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-sm font-medium">Filtrar por Tipo:</label>
+                    <div id="historyTypeFilter" class="flex gap-2 mt-1">
+                        <button onclick="filterHistory('all')" class="px-4 py-2 text-sm rounded-lg bg-blue-custom text-white">Todos</button>
+                        <button onclick="filterHistory('factura')" class="px-4 py-2 text-sm rounded-lg bg-gray-200">Facturas</button>
+                        <button onclick="filterHistory('recibo')" class="px-4 py-2 text-sm rounded-lg bg-gray-200">Recibos</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-transparent select-none">Acción</label>
+                    <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold">
+                        📊 Exportar a Excel
+                    </button>
+                </div>
+            </div>
+            
+            <div id="historyList" class="space-y-3"></div>
         </div>
-        <div id="historyList" class="space-y-4"></div>
-      </div>
     </div>
 
     <div id="reportsSection" class="section hidden">
@@ -670,10 +718,15 @@ let currentCompanyId = null; // ID de la empresa seleccionada para editar
 let authorizations = []; // lista de registros autorizaciones
 let products = []; // lista de registros products
 let clients = []; // lista de registros clients
-let users = [];
-let roles = [];
-let bankAccounts = [];
-let invoice_items = [];
+let users = []; // lista de registros users
+let roles = []; //roles de usuarios
+let bankAccounts = []; // lista de registros bank_accounts
+let invoice_items = []; //lista de items de facturas/recibos
+let currentlyDisplayedDocs = []; //variable para exportar los datos de pantalla
+let currentHistoryFilter = 'all'; // Filtro de historial
+let currentHistoryCompany = 'all'; // Empresa seleccionada para el historial
+let currentHistoryDateStart = ''; // Fecha de inicio del rango
+let currentHistoryDateEnd = '';   // Fecha de fin del rango
 
 
 // --- Auth: Login / Logout ---
@@ -820,7 +873,7 @@ async function loadData() {
     // Actualizar la interfaz de usuario
     console.log("Paso 3: Actualizando la interfaz de usuario con los datos cargados...");
     updateCompanySelects();
-    updateCompanyFilter();
+    //updateCompanyFilter();
     updateReports();
     loadHistory();
     populateClientSelects();
@@ -1019,7 +1072,7 @@ function updateCompanySelects() {
     }
 }
 
-// REEMPLAZA tu función updateCompanyData con esta
+// función updateCompanyData
 async function updateCompanyData() {
     const select = document.getElementById('companySelect');
     const companyId = select.value;
@@ -1239,15 +1292,7 @@ async function deleteAuth(id) {
     }
 }
 
-
-
 // --- Lógica Principal de Facturas ---
-/*async function generateInvoice(editingId = null) {
-    if (editingId) {
-        alert("La edición de facturas con numeración automática aún no está implementada en esta versión.");
-        return; // Prevenir edición por ahora para simplificar la lógica
-    }*/
-
 async function generateInvoice(editingId = null) {
     const saveBtn = document.getElementById('saveInvoiceBtn');
     saveBtn.disabled = true;
@@ -1276,12 +1321,36 @@ async function generateInvoice(editingId = null) {
         }
     });
 
+    // 1. Separar subtotales en gravables y exentos
+    let taxableSubtotal = 0;
+    let exemptSubtotal = 0;
+    itemsFromForm.forEach(item => {
+        // Buscamos el producto completo para saber si es exento
+        const product = products.find(p => p.id === item.productId || `${p.name} (${p.product_code || 'S/C'})` === item.description);
+        const lineTotal = item.quantity * item.price;
+        
+        if (product && product.is_exempt) {
+            exemptSubtotal += lineTotal; // Suma a los exentos
+        } else {
+            taxableSubtotal += lineTotal; // Suma a los gravables
+        }
+    });
+
     const subtotal = itemsFromForm.reduce((sum, item) => sum + (item.quantity * item.price), 0);
     const discount = parseFloat(document.getElementById('discountAmount').value) || 0;
-    const subtotalAfterDiscount = subtotal - discount;
-    let taxRateForCalc = (taxRateValue === 'exonerado') ? 0 : parseFloat(taxRateValue) || 0;
-    const taxAmount = subtotalAfterDiscount * (taxRateForCalc / 100);
-    const total = subtotalAfterDiscount + taxAmount;
+
+// 2. Aplicar el descuento proporcionalmente para calcular el impuesto correctamente
+    let discountOnTaxable = 0;
+    if (subtotal > 0) {
+        discountOnTaxable = (taxableSubtotal / subtotal) * discount;
+    }
+    
+    const taxableBase = taxableSubtotal - discountOnTaxable;
+    const taxRateForCalc = (taxRateValue === 'exonerado') ? 0 : parseFloat(taxRateValue) || 0;
+
+    // 3. Calcular el impuesto SOLO sobre la base gravable
+    const taxAmount = taxableBase * (taxRateForCalc / 100);
+    const total = subtotal - discount + taxAmount;
 
     try {
         if (editingId) {
@@ -1398,7 +1467,6 @@ async function generateInvoice(editingId = null) {
     }
 }
 
-// AGREGA ESTA NUEVA FUNCIÓN a tu script
 function handleTaxChange() {
     const taxRateSelect = document.getElementById('taxRate');
     const exoneradoFieldsDiv = document.getElementById('exoneradoFields');
@@ -1433,21 +1501,53 @@ function resetInvoiceForm() {
     document.getElementById('invoicePreview').innerHTML = '<p class="text-gray-500 text-center mt-20">La vista previa aparecerá aquí</p>';
 }
 
-// REEMPLAZA tu función updateInvoicePreview con esta
+//función updateInvoicePreview
 function updateInvoicePreview(docData, items, authData) {
     const preview = document.getElementById('invoicePreview');
     const company = findCompanyById(docData.company);
     const logoUrl = company && company.logo ? pb.files.getURL(company, company.logo) : '';
     const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="Logo" class="h-24 mb-6 object-contain">` : '';
 
-    let importeExonerado = 0, importeExento = 0, importeGravado15 = 0, importeGravado18 = 0;
-    let isv15 = 0, isv18 = 0;
+// 1. Separar subtotales en gravables y exentos a partir de los artículos ('items')
+    let taxableSubtotal = 0;
+    let exemptSubtotal = 0;
+    items.forEach(item => {
+        // Buscamos el producto completo para saber si es exento
+        const product = products.find(p => `${p.name} (${p.product_code || 'S/C'})` === item.description);
+        const lineTotal = item.quantity * item.price;
+        
+        if (product && product.is_exempt) {
+            exemptSubtotal += lineTotal; // Suma a los exentos
+        } else {
+            taxableSubtotal += lineTotal; // Suma a los gravables
+        }
+    });
+
+    // 2. Preparar las variables para el desglose de totales de la impresión
+    let importeExonerado = 0;
+    // El importe exento ahora es la suma de los artículos marcados como exentos
+    let importeExento = exemptSubtotal; 
+    let importeGravado15 = 0;
+    let importeGravado18 = 0;
+    let isv15 = 0;
+    let isv18 = 0;
+
     const taxRateValue = docData.taxRate;
 
-    if (taxRateValue === 'exonerado') { importeExonerado = docData.subtotal; } 
-    else if (taxRateValue == '0') { importeExento = docData.subtotal; } 
-    else if (taxRateValue == '15') { importeGravado15 = docData.subtotal; isv15 = docData.taxAmount; } 
-    else if (taxRateValue == '18') { importeGravado18 = docData.subtotal; isv18 = docData.taxAmount; }
+    // Si la factura completa es de tipo "Exonerado", se suma todo en esa línea
+    if (taxRateValue === 'exonerado') {
+        importeExonerado = docData.subtotal;
+        // Reiniciamos los otros importes porque todo es exonerado
+        importeExento = 0; 
+    } else if (taxRateValue == '15') {
+        // El importe gravado es la suma de los artículos que no son exentos
+        importeGravado15 = taxableSubtotal;
+        isv15 = docData.taxAmount;
+    } else if (taxRateValue == '18') {
+        importeGravado18 = taxableSubtotal;
+        isv18 = docData.taxAmount;
+    }
+    // Si la tasa es 0%, 'importeExento' ya tiene el valor correcto de exemptSubtotal, y los demás son 0.
 
     let formattedRange = 'N/A';
     if (authData) {
@@ -1559,13 +1659,26 @@ function addInvoiceItem() {
     const newItem = document.createElement('div');
     newItem.className = 'invoice-item grid grid-cols-12 gap-2 items-center';
 
+    // Usamos 'productSelected(this)' en el onchange
     newItem.innerHTML = `
-        <input type="number" placeholder="Cant." class="col-span-2 border rounded px-2 py-1 quantity" oninput="calculateTotals()">
-        <select class="col-span-6 border rounded px-2 py-1 description" onchange="productSelected(this)">
-            <option value="">Seleccione un producto...</option>
-        </select>
-        <input type="number" step="0.01" placeholder="Precio Unit." class="col-span-3 border rounded px-2 py-1 price" oninput="calculateTotals()">
-        <button type="button" onclick="removeItem(this)" class="col-span-1 bg-red-500 text-white rounded px-2 py-1">✕</button>
+        <div class="col-span-5">
+            <select class="description w-full border rounded-lg px-3 py-2" onchange="productSelected(this)">
+                <option value="">Seleccione un producto...</option>
+            </select>
+        </div>
+        <div class="col-span-2">
+            <input type="number" class="quantity w-full border rounded-lg px-3 py-2" value="1" oninput="calculateTotals()">
+        </div>
+        <div class="col-span-2">
+            <input type="number" step="0.01" class="price w-full border rounded-lg px-3 py-2" oninput="calculateTotals()">
+        </div>
+        <div class="col-span-2 flex items-center justify-center gap-2">
+             <input type="checkbox" class="item-is-exempt h-4 w-4" disabled>
+             <label class="text-xs">Exento</label>
+        </div>
+        <div class="col-span-1">
+            <button type="button" onclick="removeInvoiceItem(this)" class="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center">✕</button>
+        </div>
     `;
 
     // Poblar el menú desplegable con los productos del maestro
@@ -1584,16 +1697,23 @@ function addInvoiceItem() {
 
 // función productSelected
 function productSelected(selectElement) {
-    const productId = selectElement.value;
-    const selectedProduct = products.find(p => p.id === productId);
-
-    const parentItem = selectElement.closest('.invoice-item');
-    const priceInput = parentItem.querySelector('.price');
-
-    if (selectedProduct) {
-        priceInput.value = selectedProduct.default_price.toFixed(2);
+    // 1. Obtiene el ID del producto que seleccionaste.
+    const selectedProductId = selectElement.value;
+    
+    // 2. Busca el producto completo en nuestra lista de productos.
+    const product = products.find(p => p.id === selectedProductId);
+    
+    // 3. Encuentra la fila ('invoice-item') a la que pertenece este menú desplegable.
+    const itemRow = selectElement.closest('.invoice-item');
+    
+    if (product) {
+        // 4. Si se encontró el producto, actualiza los campos de la misma fila.
+        itemRow.querySelector('.price').value = product.default_price; // Actualiza el precio
+        itemRow.querySelector('.item-is-exempt').checked = product.is_exempt; // Marca si es exento
     } else {
-        priceInput.value = '';
+        // Si el usuario selecciona "Seleccione un producto...", limpia los campos.
+        itemRow.querySelector('.price').value = '';
+        itemRow.querySelector('.item-is-exempt').checked = false;
     }
     
     calculateTotals();
@@ -1604,34 +1724,46 @@ function removeItem(button) {
     calculateTotals();
 }
 
-// REEMPLAZA tu función calculateTotals con esta
+//función calculateTotals
 function calculateTotals() {
-    let subtotal = 0;
+    let taxableSubtotal = 0;
+    let exemptSubtotal = 0;
+
     document.querySelectorAll('.invoice-item').forEach(itemDiv => {
         const quantity = parseFloat(itemDiv.querySelector('.quantity').value) || 0;
         const price = parseFloat(itemDiv.querySelector('.price').value) || 0;
-        subtotal += quantity * price;
+        const isExempt = itemDiv.querySelector('.item-is-exempt').checked;
+        const lineTotal = quantity * price;
+        
+        if (isExempt) {
+            exemptSubtotal += lineTotal;
+        } else {
+            taxableSubtotal += lineTotal;
+        }
     });
 
-    // --- LÓGICA DE DESCUENTO AÑADIDA ---
+    const subtotal = taxableSubtotal + exemptSubtotal;
     const discount = parseFloat(document.getElementById('discountAmount').value) || 0;
-    const subtotalAfterDiscount = subtotal - discount;
-    // --- FIN DE LA LÓGICA ---
-
+    
+    // Proporcionalmente aplicar el descuento
+    const totalBeforeDiscount = subtotal;
+    let discountOnTaxable = 0;
+    if (totalBeforeDiscount > 0) {
+        discountOnTaxable = (taxableSubtotal / totalBeforeDiscount) * discount;
+    }
+    
+    const taxableBase = taxableSubtotal - discountOnTaxable;
     const taxRateSelect = document.getElementById('taxRate');
-    // Si es 'exonerado', la tasa es 0. Si no, es el valor numérico.
     const taxRate = taxRateSelect.value === 'exonerado' ? 0 : parseFloat(taxRateSelect.value) || 0;
-
-    // El impuesto se calcula sobre el subtotal después del descuento
-    const taxAmount = subtotalAfterDiscount * (taxRate / 100);
-    const total = subtotalAfterDiscount + taxAmount;
+    const taxAmount = taxableBase * (taxRate / 100);
+    const total = subtotal - discount + taxAmount;
 
     document.getElementById('subtotal').textContent = `L ${subtotal.toFixed(2)}`;
     document.getElementById('taxAmount').textContent = `L ${taxAmount.toFixed(2)}`;
     document.getElementById('total').textContent = `L ${total.toFixed(2)}`;
 }
 
-// Funcion de numeros
+// Función de numeros
 function numeroALetras(num) {
     const unidades = ['', 'UNO', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE'];
     const decenas = ['', 'DIEZ', 'VEINTE', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA'];
@@ -1670,7 +1802,7 @@ function handleReceiptSubmit() {
     generateReceipt(editingId || null);
 }
 
-// REEMPLAZA tu función generateReceipt con esta
+//función generateReceipt
 async function generateReceipt(editingId = null) {
     const saveBtn = document.getElementById('saveReceiptBtn');
     saveBtn.disabled = true;
@@ -1772,6 +1904,14 @@ function updateReceiptPreview(docData) {
     const logoUrl = company && company.logo ? pb.files.getURL(company, company.logo) : '';
     const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="Logo" class="h-24 mb-6 object-contain">` : '';
 
+    let bankAccountsHtml = '';
+    if (company && bankAccounts.length > 0) {
+        const companyBankAccounts = bankAccounts.filter(acc => acc.company === company.id);
+        if (companyBankAccounts.length > 0) {
+            bankAccountsHtml = `<div class="border-t mt-4 pt-2 text-xs"><h4 class="font-bold mb-1">Cuentas Bancarias para Pagos</h4>${companyBankAccounts.map(acc => `<p><strong>${escapeHtml(acc.bank_name)} (${escapeHtml(acc.account_type)}):</strong> <span>${escapeHtml(acc.account_name)}</span> - <strong>#${escapeHtml(acc.account_number)}</strong></p>`).join('')}</div>`;
+        }
+    }
+
     preview.innerHTML = `<div>
         <div class="flex justify-between items-start mb-6">
             <div>${logoHtml}<h2 class="text-xl font-bold">${escapeHtml(company ? company.name : 'N/A')}</h2>
@@ -1793,46 +1933,131 @@ function updateReceiptPreview(docData) {
             <p>_________________________</p>
             <p class="text-sm">Firma y Sello</p>
         </div>
+            ${bankAccountsHtml}
         </div>`;
 }
 
 // --- Historial y Edición ---
 function loadHistory() {
-    const listContainer = document.getElementById('historyList');
-    listContainer.innerHTML = '';
-    const typeFilter = document.getElementById('typeFilter').value;
-    const companyFilter = document.getElementById('companyFilter').value;
-    const filteredDocs = documents.filter(doc => {
-        const typeMatch = !typeFilter || doc.type.toLowerCase() === typeFilter;
-        const companyMatch = !companyFilter || doc.company === companyFilter;
-        return typeMatch && companyMatch;
-    });
-    if (filteredDocs.length === 0) {
-        listContainer.innerHTML = '<p class="text-gray-500 text-center mt-10">No hay documentos.</p>';
+    const historyList = document.getElementById('historyList');
+    if (!historyList) return;
+
+    // 1. Empieza con la lista completa de documentos.
+    let filteredDocs = documents;
+
+    // --- LÓGICA DE FILTRADO POR RANGO DE FECHAS ---
+    if (currentHistoryDateStart || currentHistoryDateEnd) {
+        filteredDocs = filteredDocs.filter(doc => {
+            const docDate = doc.date.substring(0, 10); // Extrae solo la parte 'YYYY-MM-DD'
+            
+            // Si hay fecha de inicio y la del documento es anterior, se descarta.
+            if (currentHistoryDateStart && docDate < currentHistoryDateStart) {
+                return false;
+            }
+            // Si hay fecha de fin y la del documento es posterior, se descarta.
+            if (currentHistoryDateEnd && docDate > currentHistoryDateEnd) {
+                return false;
+            }
+            // Si pasa ambas validaciones, se incluye.
+            return true;
+        });
+    }
+
+    // 2. Aplica el filtro por tipo (Factura, Recibo, Todos).
+    if (currentHistoryFilter !== 'all') {
+        filteredDocs = filteredDocs.filter(doc => doc.type?.toLowerCase() === currentHistoryFilter);
+    }
+
+    // 3. Aplica el filtro por empresa.
+    if (currentHistoryCompany !== 'all') {
+        filteredDocs = filteredDocs.filter(doc => doc.company === currentHistoryCompany);
+    }
+    
+    // 4. Guarda la lista ya filtrada en una variable global para que la función de exportar a Excel la pueda usar.
+    currentlyDisplayedDocs = filteredDocs;
+
+    // 5. Muestra los resultados en la pantalla.
+    historyList.innerHTML = '';
+    if (currentlyDisplayedDocs.length === 0) {
+        historyList.innerHTML = '<p class="text-center text-gray-500">No hay documentos que coincidan con los filtros.</p>';
         return;
     }
-    filteredDocs.forEach(doc => {
-        const docCompany = doc.expand && doc.expand.company;
+
+    currentlyDisplayedDocs.forEach(doc => {
         const docDiv = document.createElement('div');
-        docDiv.className = 'bg-gray-50 p-4 rounded-lg shadow-sm';
-        const totalAmount = doc.total ? doc.total.toFixed(2) : (doc.amount || 0).toFixed(2);
+
+        docDiv.className = 'flex justify-between items-start bg-gray-100 p-3 rounded-lg shadow-sm';
+
+        const companyName = doc.expand?.company?.name || 'N/A';
+        const total = doc.total || doc.amount || 0;
+        const docColor = (doc.type?.toLowerCase() === 'factura') ? 'text-blue-custom' : 'text-orange-custom';
+
+        // 2. Estructura interna: separamos la parte izquierda y derecha
         docDiv.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-                <div class="md:col-span-2">
-                    <span class="font-bold uppercase">${escapeHtml(doc.type)} #${escapeHtml(doc.number)}</span>
-                    <p class="text-sm text-gray-600">Empresa: ${escapeHtml(docCompany ? docCompany.name : 'N/A')}</p>
-                    <p class="text-sm text-gray-600">Cliente: ${escapeHtml(doc.clientName)}</p>
+            <div class="flex-grow pr-4">
+                <p class="font-bold ${docColor}">${escapeHtml(doc.type)} #${escapeHtml(doc.number)}</p>
+                <p class="text-sm text-gray-600">Cliente: ${escapeHtml(doc.clientName)}</p>
+                <p class="text-xs text-gray-500">Emitido por: ${escapeHtml(companyName)}</p>
+            </div>
+
+            <div class="flex flex-col items-end w-40 flex-shrink-0">
+                <p class="font-bold text-lg">L ${total.toFixed(2)}</p>
+                <p class="text-xs text-gray-500">${new Date(doc.date).toLocaleDateString()}</p>
+                <div class="mt-1">
+                    <button onclick="editDocument('${doc.id}')" class="text-sm bg-blue-500 text-white px-3 py-1 rounded">Editar</button>
                 </div>
-                <div class="text-right">
-                    <p class="text-lg font-bold text-green-600">L ${totalAmount}</p>
-                    <p class="text-xs text-gray-500">${new Date(doc.date).toLocaleDateString()}</p>
-                </div>
-                <div class="text-right">
-                    <button onclick="editDocument('${doc.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">✏️ Editar</button>
-                </div>
-            </div>`;
-        listContainer.appendChild(docDiv);
+            </div>
+        `;
+        historyList.appendChild(docDiv);
     });
+}
+
+//funciones de filtro de fecha
+function filterHistoryByDate() {
+    // 1. Lee los valores de ambos campos de fecha.
+    currentHistoryDateStart = document.getElementById('historyDateStart').value;
+    currentHistoryDateEnd = document.getElementById('historyDateEnd').value;
+    
+    // 2. Llama a loadHistory() para redibujar la lista con el rango.
+    loadHistory();
+}
+
+function clearDateFilter() {
+    // 1. Limpia las variables globales del rango.
+    currentHistoryDateStart = '';
+    currentHistoryDateEnd = '';
+    
+    // 2. Limpia los valores de los campos en el HTML.
+    document.getElementById('historyDateStart').value = '';
+    document.getElementById('historyDateEnd').value = '';
+    
+    // 3. Llama a loadHistory() para mostrar todos los registros de nuevo.
+    loadHistory();
+}
+
+// --- Lógica de Filtros para el Historial ---
+
+function filterHistory(type) {
+    currentHistoryFilter = type;
+    const filterButtons = document.querySelectorAll('#historyTypeFilter button');
+    filterButtons.forEach(btn => {
+        if (btn.getAttribute('onclick').includes(`'${type}'`)) {
+            btn.classList.add('bg-blue-custom', 'text-white');
+            btn.classList.remove('bg-gray-200');
+        } else {
+            btn.classList.remove('bg-blue-custom', 'text-white');
+            btn.classList.add('bg-gray-200');
+        }
+    });
+    loadHistory();
+}
+
+function filterHistoryByCompany(companyId) {
+    // Actualiza la variable global con la empresa seleccionada.
+    currentHistoryCompany = companyId;
+    
+    // Llama a loadHistory() para que vuelva a dibujar la lista con el nuevo filtro.
+    loadHistory();
 }
 
 async function editDocument(id) {
@@ -1966,11 +2191,11 @@ function showProductManager() {
     document.getElementById('productForm').reset(); // Limpiar formulario
     document.getElementById('productId').value = ''; // Limpiar ID de edición
     renderProductsList(); // Dibujar la lista de productos existentes
-    document.getElementById('productModal').classList.remove('hidden');
+    document.getElementById('productManagerModal').classList.remove('hidden');
 }
 
 function hideProductManager() {
-    document.getElementById('productModal').classList.add('hidden');
+    document.getElementById('productManagerModal').classList.add('hidden');
 }
 
 function renderProductsList() {
@@ -1983,7 +2208,6 @@ function renderProductsList() {
     }
     listContainer.innerHTML = '';
 
-    // Este es el log más importante para esta función
     console.log("Datos de 'products' al momento de renderizar la lista:", products);
 
     if (!products || products.length === 0) {
@@ -1996,13 +2220,21 @@ function renderProductsList() {
         console.log(`Renderizando producto en la lista #${index + 1}: ${product.name}`);
         const productDiv = document.createElement('div');
         productDiv.className = 'grid grid-cols-6 gap-4 items-center bg-gray-100 p-3 rounded-lg shadow-sm';
+        
+        // --- INICIO DE LA CORRECCIÓN ---
+        // Se añade '|| 0' para asegurar que si el precio no existe, se use 0 como valor por defecto.
+        const price = product.default_price || 0;
+        // --- FIN DE LA CORRECCIÓN ---
+        
         productDiv.innerHTML = `
             <span class="col-span-2 font-medium text-sm">${escapeHtml(product.name)}</span>
             <span class="col-span-2 text-xs text-gray-600">Código: ${escapeHtml(product.product_code || 'N/A')}</span>
-            <span class="font-semibold text-sm text-right">L ${product.default_price.toFixed(2)}</span>
-            <div class="flex gap-2 justify-end">
-                <button onclick="selectProductForEdit('${product.id}')" class="bg-blue-500 hover-bg-blue-600 text-white px-3 py-1 rounded-lg text-sm">Editar</button>
-                <button onclick="deleteProduct('${product.id}')" class="bg-red-500 hover-bg-red-600 text-white px-3 py-1 rounded-lg text-sm">Eliminar</button>
+            
+            <span class="col-span-1 font-semibold text-sm text-right">L ${price.toFixed(2)}</span>
+            
+            <div class="col-span-1 flex gap-2 justify-end">
+                <button onclick="selectProductForEdit('${product.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm">Editar</button>
+                <button onclick="deleteProduct('${product.id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm">Eliminar</button>
             </div>
         `;
         listContainer.appendChild(productDiv);
@@ -2019,6 +2251,7 @@ async function handleProductFormSubmit(event) {
         product_code: document.getElementById('productCode').value,
         description: document.getElementById('productDescription').value,
         default_price: parseFloat(document.getElementById('productPrice').value),
+        is_exempt: document.getElementById('productIsExempt').checked,
     };
 
     try {
@@ -2041,17 +2274,21 @@ async function handleProductFormSubmit(event) {
 
 function selectProductForEdit(id) {
     const product = products.find(p => p.id === id);
-    if (!product) return;
+    if (!product) {
+        console.error("Producto no encontrado con ID:", id);
+        return;
+    }
 
-    // Llenar el formulario con los datos del producto
+    // Rellena el formulario con los datos del producto encontrado
     document.getElementById('productId').value = product.id;
     document.getElementById('productName').value = product.name;
     document.getElementById('productCode').value = product.product_code || '';
     document.getElementById('productDescription').value = product.description || '';
     document.getElementById('productPrice').value = product.default_price;
+    document.getElementById('productIsExempt').checked = product.is_exempt;
     
-    // Enfocar en el primer campo para una mejor experiencia de usuario
-    document.getElementById('productName').focus();
+    // Desplaza la vista hacia arriba para ver el formulario
+    document.querySelector('#productManagerModal .bg-white').scrollTo(0, 0);
 }
 
 async function deleteProduct(id) {
@@ -2528,40 +2765,61 @@ async function deleteBankAccount(id) {
 }
 
 // --- Reportes y Exportación ---
-function filterHistory() { loadHistory(); }
+/*function filterHistory() { 
+  loadHistory(); 
+}*/
+
 function updateCompanyFilter() {
-  const select = document.getElementById('companyFilter');
-  select.innerHTML = '<option value="">Todas las empresas</option>';
-  companies.forEach(c => {
-    const option = document.createElement('option');
-    option.value = c.id; option.textContent = c.name;
-    select.appendChild(option);
-  });
+    const historyCompanyFilter = document.getElementById('historyCompanyFilter');
+    // Verificamos si el elemento existe antes de continuar
+    if (!historyCompanyFilter) return;
+
+    let options = '<option value="all">Todas las Empresas</option>';
+    companies.forEach(company => {
+        options += `<option value="${company.id}">${escapeHtml(company.name)}</option>`;
+    });
+    historyCompanyFilter.innerHTML = options;
+    historyCompanyFilter.value = currentHistoryCompany;
+}
+
+function showHistory() {
+    // Primero, poblamos los filtros AHORA que la sección será visible
+    updateCompanyFilter();
+    
+    // Luego, cargamos el contenido del historial
+    loadHistory();
+    
+    // Finalmente, mostramos la sección
+    showSection('history');
 }
 
 function exportToExcel() {
-    if (documents.length === 0) {
-        alert('No hay datos para exportar.');
+    // 1. Verifica si hay datos en la vista actual para exportar.
+    // Usa la variable global 'currentlyDisplayedDocs' que se actualiza con los filtros.
+    if (currentlyDisplayedDocs.length === 0) {
+        alert('No hay datos en la vista actual para exportar.');
         return;
     }
 
-    // 1. Preparar los datos para la hoja de cálculo
+    // 2. Define los encabezados para las columnas del archivo Excel.
     const headers = [
         "ID", "Tipo", "Numero", "Fecha", "Empresa", "RTN Empresa", 
         "Cliente", "Subtotal", "Descuento", "ISV", "Total", 
         "Metodo de Pago", "Observaciones", "Artículos"
     ];
 
-    const data = documents.map(doc => {
+    // 3. Prepara los datos, convirtiendo cada documento en una fila para el Excel.
+    const data = currentlyDisplayedDocs.map(doc => {
         const docCompany = doc.expand && doc.expand.company;
         
-        // Formatear la lista de artículos para una sola celda
+        // Formatea la lista de artículos para que quepa en una sola celda.
         let itemsString = '';
         if (doc.type?.toLowerCase() === 'factura') {
-            // Buscamos los items relacionados que ya cargamos
+            // Busca los artículos relacionados en la lista global 'invoice_items'.
             const relatedItems = invoice_items.filter(item => item.invoice === doc.id);
             itemsString = relatedItems.map(item => `${item.quantity}x ${item.description} @ L${item.price}`).join('; ');
         } else {
+            // Para los recibos, usamos el campo 'concept'.
             itemsString = doc.concept || '';
         }
 
@@ -2583,11 +2841,11 @@ function exportToExcel() {
         ];
     });
 
-    // 2. Crear la hoja de cálculo (worksheet) a partir de los datos
+    // 4. Usa la biblioteca SheetJS para crear la hoja de cálculo.
     const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
 
-    // 3. (Opcional, pero recomendado) Ajustar el ancho de las columnas
-    const colWidths = headers.map(header => ({ wch: header.length + 5 })); // Ancho inicial
+    // 5. (Opcional pero recomendado) Ajusta automáticamente el ancho de las columnas.
+    const colWidths = headers.map(header => ({ wch: header.length + 5 }));
     data.forEach(row => {
         row.forEach((cell, i) => {
             const len = cell ? String(cell).length : 10;
@@ -2598,30 +2856,13 @@ function exportToExcel() {
     });
     ws['!cols'] = colWidths;
 
-    // 4. Crear el libro de trabajo (workbook) y añadir la hoja
+    // 6. Crea el libro de trabajo y añade la hoja.
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Reporte de Documentos");
+    XLSX.utils.book_append_sheet(wb, ws, "Reporte Filtrado");
 
-    // 5. Generar y descargar el archivo XLSX
-    XLSX.writeFile(wb, "reporte_documentos.xlsx");
+    // 7. Genera y descarga el archivo .xlsx.
+    XLSX.writeFile(wb, "reporte_filtrado.xlsx");
 }
-
-/*async function clearAllData() {
-    if (!confirm('¿Estás seguro de que deseas eliminar TODOS los documentos? Esta acción es irreversible.')) return;
-    try {
-        const records = await pb.collection('documents').getFullList({
-            filter: `created_by = "${pb.authStore.model.id}"`
-        });
-        for (const record of records) {
-            await pb.collection('documents').delete(record.id);
-        }
-        alert('Todos los documentos han sido eliminados.');
-        loadData();
-    } catch (error) {
-        console.error('Error al limpiar los datos:', error);
-        alert('Hubo un error al intentar eliminar los documentos.');
-    }
-}*/
 
 function updateReports() {
     const totalDocsEl = document.getElementById('totalDocs');
