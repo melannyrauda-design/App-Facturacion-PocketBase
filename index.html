@@ -110,7 +110,7 @@
         </button>
         <p id="loginError" class="text-red-500 text-sm mt-4 hidden text-center">Credenciales inválidas o error de conexión.</p>
         <div class="mt-6 text-sm text-center text-gray-500">
-          <p>Nota: Necesitas un usuario creado en PocketBase (colección `users`).</p>
+          <p>Nota: Necesitas un usuario creado en PocketBase.</p>
         </div>
       </div>
     </div>
@@ -119,593 +119,923 @@
 
 <div id="appScreen" class="hidden">
 
-  <div class="container mx-auto p-4 max-w-7xl">
+    <div class="container mx-auto p-4 max-w-7xl">
 
-    <div class="bg-gray-50 shadow-md rounded-xl p-4 sm:p-6 mb-6 no-print">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-gray-200">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-800">Sistema de Facturación</h1>
-          <p class="text-sm text-gray-500 mt-1">🇭🇳 Honduras - Moneda: Lempira (L)</p>
-        </div>
-        <div class="flex items-center gap-4 mt-4 sm:mt-0">
-          <div class="flex items-center gap-3 bg-gray-100 px-3 py-1.5 rounded-full">
-            <img id="userAvatar" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0idy0xMCBoLTEwIHRleHQtZ3JheS00MDAiPgogIDxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTE4LjY4NSAxOS4xMjZDNjcuNzU1IDIxLjU4NSA5LjEyNiAyMS41ODUgNC4zMTUgMTkuMTI2Yy0uOTgwLS40ODgtMS4zNzgtMS4xODYtMS4zOTgtMS45NDlBLjczNS43MzUgMCAwMTEgMTcuNzVWMTNjMC0uMzgxLjMyNS0uNjg2LjczNC0uNjkzQTYwLjQ4MSA2MC40ODEgMCAwMTkgMTIuMjVjLjg3MiAwIDEuNzMzLjAyIDEuNTkuMDQzLjMyOS4wMDQuNjM5LjE3OC44NDIuNDQ1bDIuMDIgMi43YS43NS43NSAwIDAwMS4xMiAwTDE3LjYyIDExLjdjLjIwMy0uMjY3LjUxMy0uNDQxLjg0Mi0uNDQ1YTYwLjQ3OCA2MC40NzggMCAwMTEuNTkuMDQzYy40MS4wMDcuNzM0LjMxMi43MzQuNjkzdjQuNzVjMCAuMzIxLjMyNS42MjYuNzM0LjY0NmEuNzM1LjcMNSAwIDAxLS4wMjEuNTg2Yy0uMDIuNzYzLS40MTggMS40NjEtMS4zOTggMS45NDlaTTkuMzMgOC40NDljLS44MjcgMC0xLjUxLS42NjMtMS41MS0xLjQ3N1M4LjUgNS41IDkuMzMgNS41YzEuNDEyIDAgMi4yNzYgMS41MjkgMS44MDcgMi43MzItLjU1NiAxLjQyMy0xLjQ0MyAyLjcxNC0xLjgwNyAyLjcxNFptNS4zNC0uMTg4Yy0uNTU2IDEuNDIzLTEuNDQzIDIuNzE0LTEuODA3IDIuNzE0LS44MjUgMC0xLjUwOS0uNjYzLTEuNTA5LTEuNDc0UzEzLjY2IDUuNSAxNC40OCA1..NWMxLjQxMyAwIDIuMjc3IDEuNTI5IDEuODA4IDIuNzMxWiIgY2xpcC1ydWxlPSJldmVub2RkIiAvPgo8L3N2Zz4K" alt="User Avatar" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm">
-            <div id="currentUser" class="text-sm font-medium text-gray-700"></div>
-          </div>
-          <button onclick="logout()" class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-lg transition-colors duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
-            <span>Cerrar Sesión</span>
-          </button>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-4 mt-4">
-        <button onclick="showSection('invoice')" class="flex items-center justify-center gap-2 p-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Facturación</span></button>
-        <button onclick="showSection('receipt')" class="flex items-center justify-center gap-2 p-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Recibos</span></button>
-        <button onclick="showHistory()" class="flex items-center justify-center gap-2 p-3 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Historial</span></button>
-        <button onclick="showSection('reports')" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Reportes</span></button>
-        <button onclick="showCompanyManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Empresas</span></button>
-        <button onclick="showAuthManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Autorizaciones</span></button>
-        <button onclick="showProductManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Productos</span></button>
-        <button onclick="showClientManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Clientes</span></button>
-        <button onclick="showUserManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-slate-600 hover:bg-slate-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Usuarios</button>
-        <button onclick="showBankAccountManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Cuentas Bancarias</button>
-      </div>
-    </div>
-
-    <div id="companyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
-      <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-bold text-gray-800">Gestión de Empresas</h3>
-            <button onclick="hideCompanyManager()" class="text-gray-500 hover:text-gray-700">✕</button>
-          </div>
-          <div class="mb-6">
-            <h4 class="font-semibold text-gray-700 mb-3">Empresa (Agregar/Editar)</h4>
-            <form id="companyForm" onsubmit="handleCompanyFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input type="hidden" id="companyId" />
-              <input type="text" id="newCompanyName" placeholder="Nombre de la empresa" class="border rounded-lg px-3 py-2" required>
-              <input type="text" id="newCompanyRTN" placeholder="RTN" class="border rounded-lg px-3 py-2">
-              <input type="text" id="newCompanyAddress" placeholder="Dirección" class="border rounded-lg px-3 py-2 md:col-span-2">
-              <input type="text" id="newCompanyPhone" placeholder="Teléfono" class="border rounded-lg px-3 py-2">
-              <input type="text" id="newCompanyEmail" placeholder="Email" class="border rounded-lg px-3 py-2">
-              <label for="newCompanyLogo" class="block mt-2 font-semibold md:col-span-2">Logo:</label>
-              <input type="file" id="newCompanyLogo" name="logo" accept="image/*" class="border p-2 rounded w-full md:col-span-2"/>
-              <div id="logoPreviewContainer" class="col-span-2 hidden">
-                  <p class="text-gray-700">Logo actual:</p>
-                  <img id="currentLogoPreview" src="" alt="Logo actual" class="h-20 w-auto mt-2 object-contain" />
-              </div>
-              <button type="submit" class="mt-4 md:col-span-2 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Empresa</button>
-            </form>
-          </div>
-          <div>
-            <h4 class="font-semibold text-gray-700 mb-3">Empresas Registradas</h4>
-            <div id="companiesList" class="space-y-2 max-h-60 overflow-y-auto"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div id="authModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
-      <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-bold text-gray-800">Gestión de Autorizaciones Fiscales</h3>
-            <button onclick="hideAuthManager()" class="text-gray-500 hover:text-gray-700">✕</button>
-          </div>
-          <div class="mb-6">
-            <h4 class="font-semibold text-gray-700 mb-3">Autorización (Agregar/Editar)</h4>
-            <form id="authForm" onsubmit="handleAuthFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <input type="hidden" id="authId" />
-              <div class="md:col-span-3"><label for="authCompany" class="block text-sm font-medium text-gray-700">Empresa*</label><select id="authCompany" class="w-full border rounded-lg px-3 py-2 mt-1" required></select></div>
-              <div class="md:col-span-2"><label for="authCAI" class="block text-sm font-medium text-gray-700">CAI*</label><input type="text" id="authCAI" placeholder="3BE298-..." class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
-              <div><label for="authFechaLimite" class="block text-sm font-medium text-gray-700">Fecha Límite*</label><input type="date" id="authFechaLimite" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
-              <div><label for="authRangoInicio" class="block text-sm font-medium text-gray-700">Rango Inicio*</label><input type="number" id="authRangoInicio" placeholder="1" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
-              <div><label for="authRangoFin" class="block text-sm font-medium text-gray-700">Rango Fin*</label><input type="number" id="authRangoFin" placeholder="10000" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
-              <div><label for="authNumeroActual" class="block text-sm font-medium text-gray-700">Número Actual*</label><input type="number" id="authNumeroActual" placeholder="1" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
-              <div><label for="authCodSucursal" class="block text-sm font-medium text-gray-700">Cod. Sucursal*</label><input type="text" id="authCodSucursal" placeholder="000" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
-              <div><label for="authCodPuntoEmision" class="block text-sm font-medium text-gray-700">Cod. Punto Emisión*</label><input type="text" id="authCodPuntoEmision" placeholder="001" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
-              <div><label for="authCodTipoDoc" class="block text-sm font-medium text-gray-700">Cod. Tipo Doc*</label><input type="text" id="authCodTipoDoc" placeholder="01" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
-              <div class="md:col-span-3 flex items-center gap-3 mt-2"><input id="authEstaActiva" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-custom focus:ring-blue-custom"><label for="authEstaActiva" class="text-sm font-medium text-gray-700">Marcar como la autorización activa</label></div>
-              <button type="submit" class="mt-4 md:col-span-3 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Autorización</button>
-            </form>
-          </div>
-          <div>
-            <h4 class="font-semibold text-gray-700 mb-3">Autorizaciones Registradas</h4>
-            <div id="authList" class="space-y-2 max-h-60 overflow-y-auto"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="productManagerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-gray-800">Maestro de Productos</h3>
-                <button onclick="hideProductManager()" class="text-gray-500 hover:text-gray-700">✕</button>
+        <div class="bg-gray-50 shadow-md rounded-xl p-4 sm:p-6 mb-6 no-print">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-gray-200">
+            <div>
+            <h1 class="text-3xl font-bold text-gray-800">Sistema de Facturación</h1>
+            <p class="text-sm text-gray-500 mt-1">🇭🇳 Honduras - Moneda: Lempira (L)</p>
             </div>
-
-            <div class="mb-6">
-                <h4 class="font-semibold text-gray-700 mb-3">Producto (Agregar/Editar)</h4>
-                    <form id="productForm" onsubmit="handleProductFormSubmit(event)" class="space-y-4">
-                        <input type="hidden" id="productId" />
-                        <div>
-                            <label for="productName" class="block text-sm font-medium text-gray-700">Nombre del Producto*</label>
-                            <input type="text" id="productName" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+                <div class="flex items-center gap-4 mt-4 sm:mt-0">
+                    <div class="flex items-center gap-3 bg-gray-100 px-3 py-1.5 rounded-full">
+                        <img id="userAvatar" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0idy0xMCBoLTEwIHRleHQtZ3JheS00MDAiPgogIDxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTE4LjY4NSAxOS4xMjZDNjcuNzU1IDIxLjU4NSA5LjEyNiAyMS41ODUgNC4zMTUgMTkuMTI2Yy0uOTgwLS40ODgtMS4zNzgtMS4xODYtMS4zOTgtMS45NDlBLjczNS43MzUgMCAwMTEgMTcuNzVWMTNjMC0uMzgxLjMyNS0uNjg2LjczNC0uNjkzQTYwLjQ4MSA2MC40ODEgMCAwMTkgMTIuMjVjLjg3MiAwIDEuNzMzLjAyIDEuNTkuMDQzLjMyOS4wMDQuNjM5LjE3OC44NDIuNDQ1bDIuMDIgMi43YS43NS43NSAwIDAwMS4xMiAwTDE3LjYyIDExLjdjLjIwMy0uMjY3LjUxMy0uNDQxLjg0Mi0uNDQ1YTYwLjQ3OCA2MC40NzggMCAwMTEuNTkuMDQzYy40MS4wMDcuNzM0LjMxMi43MzQuNjkzdjQuNzVjMCAuMzIxLjMyNS42MjYuNzM0LjY0NmEuNzM1LjcMNSAwIDAxLS4wMjEuNTg2Yy0uMDIuNzYzLS40MTggMS40NjEtMS4zOTggMS45NDlaTTkuMzMgOC40NDljLS44MjcgMC0xLjUxLS42NjMtMS41MS0xLjQ3N1M4LjUgNS41IDkuMzMgNS41YzEuNDEyIDAgMi4yNzYgMS41MjkgMS44MDcgMi43MzItLjU1NiAxLjQyMy0xLjQ0MyAyLjcxNC0xLjgwNyAyLjcxNFptNS4zNC0uMTg4Yy0uNTU2IDEuNDIzLTEuNDQzIDIuNzE0LTEuODA3IDIuNzE0LS44MjUgMC0xLjUwOS0uNjYzLTEuNTA5LTEuNDc0UzEzLjY2IDUuNSAxNC40OCA1..NWMxLjQxMyAwIDIuMjc3IDEuNTI5IDEuODA4IDIuNzMxWiIgY2xpcC1ydWxlPSJldmVub2RkIiAvPgo8L3N2Zz4K" alt="User Avatar" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm">
+                        <div id="currentUser" class="text-sm font-medium text-gray-700">                
                         </div>
+                    </div>
+                    <div class="flex-grow"></div> <div class="relative">
+                        <button onclick="toggleNotificationPanel()" id="notification-bell-btn" class="relative text-gray-600 hover:text-blue-custom p-2 rounded-full focus:outline-none">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341A6.002 6.002 0 006 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                            <span id="notification-count-badge" class="hidden absolute top-0 right-0 block w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">0</span>
+                        </button>
                         
-                        <div>
-                            <label for="productDescription" class="block text-sm font-medium text-gray-700">Descripción del Producto</label>
-                            <textarea id="productDescription" rows="3" class="w-full border rounded-lg px-3 py-2 mt-1"></textarea>
+                        <div id="notification-panel" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl overflow-hidden z-50">
+                            <div class="py-2 px-4 border-b border-gray-200">
+                                <h3 class="font-bold text-gray-800">Notificaciones</h3>
+                            </div>
+                            <div id="notification-list" class="divide-y divide-gray-100 max-h-96 overflow-y-auto">
+                                <p class="text-center text-gray-500 p-4">No tienes notificaciones nuevas.</p>
+                            </div>
                         </div>
-                        <div>
-                            <label for="productCode" class="block text-sm font-medium text-gray-700">Código</label>
-                            <input type="text" id="productCode" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Ej: SERV-01">
-                        </div>
-                        <div>
-                            <label for="productPrice" class="block text-sm font-medium text-gray-700">Precio de Venta (L)*</label>
-                            <input type="number" step="0.01" id="productPrice" class="w-full border rounded-lg px-3 py-2 mt-1" required>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <input id="productIsExempt" type="checkbox" class="h-4 w-4 rounded border-gray-300">
-                            <label for="productIsExempt" class="text-sm font-medium text-gray-700">Este producto es Exento de Impuesto (ISV)</label>
-                        </div>
-                        <button type="submit" class="w-full bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Producto</button>
-                    </form>
-            </div>
-
-            <div>
-                <h4 class="font-semibold text-gray-700 mb-3">Productos Registrados</h4>
-                <div id="productsList" class="space-y-2 max-h-60 overflow-y-auto"></div>
-            </div>
-            
-            </div>
-        </div>
-    </div>
-
-    <div id="clientModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
-      <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-bold text-gray-800">Maestro de Clientes</h3>
-            <button onclick="hideClientManager()" class="text-gray-500 hover:text-gray-700">✕</button>
-          </div>
-
-          <div class="mb-6">
-            <h4 class="font-semibold text-gray-700 mb-3">Cliente (Agregar/Editar)</h4>
-            <form id="clientForm" onsubmit="handleClientFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input type="hidden" id="clientId" />
-              
-              <div>
-                <label for="clientName" class="block text-sm font-medium text-gray-700">Nombre Completo o Razón Social*</label>
-                <input type="text" id="clientName" class="w-full border rounded-lg px-3 py-2 mt-1" required>
-              </div>
-              <div>
-                <label for="clientCode" class="block text-sm font-medium text-gray-700">Código de Cliente</label>
-                <input type="text" id="clientCode" class="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-100" readonly>
-              </div>
-              <div>
-                <label for="clientRTN" class="block text-sm font-medium text-gray-700">RTN</label>
-                <input type="text" id="clientRTN" class="w-full border rounded-lg px-3 py-2 mt-1">
-              </div>
-              <div>
-                <label for="clientPhone" class="block text-sm font-medium text-gray-700">Teléfono</label>
-                <input type="text" id="clientPhone" class="w-full border rounded-lg px-3 py-2 mt-1">
-              </div>
-              
-              <div>
-                <label for="clientContactPerson" class="block text-sm font-medium text-gray-700">Persona de Contacto</label>
-                <input type="text" id="clientContactPerson" class="w-full border rounded-lg px-3 py-2 mt-1">
-              </div>
-              <div>
-                <label for="clientEmail" class="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" id="clientEmail" class="w-full border rounded-lg px-3 py-2 mt-1">
-              </div>
-
-              <div class="md:col-span-2">
-                <label for="clientAddress" class="block text-sm font-medium text-gray-700">Dirección</label>
-                <input type="text" id="clientAddress" class="w-full border rounded-lg px-3 py-2 mt-1">
-              </div>
-
-              <div class="md:col-span-2">
-                  <label for="clientNotes" class="block text-sm font-medium text-gray-700">Notas</label>
-                  <textarea id="clientNotes" rows="3" class="w-full border rounded-lg px-3 py-2 mt-1"></textarea>
-              </div>
-              <hr class="md:col-span-2 my-2"/>
-
-              <div>
-                <label for="entityType" class="block text-sm font-medium text-gray-700">Tipo</label>
-                <select id="entityType" class="w-full border rounded-lg px-3 py-2 mt-1">
-                    <option value="Cliente">Cliente</option>
-                    <option value="Proveedor">Proveedor</option>
-                    <option value="Ambos">Ambos</option>
-                </select>
-              </div>
-              <div>
-                <label for="clientGroup" class="block text-sm font-medium text-gray-700">Grupo de Cliente</label>
-                <input type="text" id="clientGroup" list="clientGroupList" class="w-full border rounded-lg px-3 py-2 mt-1">
-                <datalist id="clientGroupList"></datalist>
-              </div>
-              <div>
-                <label for="priceList" class="block text-sm font-medium text-gray-700">Lista de Precios</label>
-                <input type="text" id="priceList" list="priceLists" class="w-full border rounded-lg px-3 py-2 mt-1">
-                <datalist id="priceLists"></datalist>
-              </div>
-              
-              <div>
-                <label for="paymentTerms" class="block text-sm font-medium text-gray-700">Forma de Pago</label>
-                <input type="text" id="paymentTerms" list="paymentTermsList" placeholder="Ej: Crédito" class="w-full border rounded-lg px-3 py-2 mt-1">
-                <datalist id="paymentTermsList"></datalist>
-              </div>
-              <div>
-                <label for="creditDays" class="block text-sm font-medium text-gray-700">Días de Crédito</label>
-                <input type="number" id="creditDays" placeholder="0" class="w-full border rounded-lg px-3 py-2 mt-1">
-              </div>
-              <div>
-                <label for="creditLimit" class="block text-sm font-medium text-gray-700">Límite de Crédito (L)</label>
-                <input type="number" step="0.01" id="creditLimit" placeholder="0.00" class="w-full border rounded-lg px-3 py-2 mt-1">
-              </div>
-
-              <div class="md:col-span-3 flex items-center gap-3 mt-2">
-                <input id="clientIsActive" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-custom focus:ring-blue-custom">
-                <label for="clientIsActive" class="text-sm font-medium text-gray-700">Cliente Activo</label>
-              </div>
-              
-              <button type="submit" class="mt-4 md:col-span-3 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Cliente</button>
-            </form>
-          </div>
-
-            <div>
-              <h4 class="font-semibold text-gray-700 mb-3">Clientes Registrados</h4>
-              <div id="clientsList" class="space-y-2 max-h-60 overflow-y-auto"></div>
-            </div>
-          </div>
-        </div>
-    </div>
-
-    <div id="userManagerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
-      <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-bold text-gray-800">Gestión de Usuarios</h3>
-            <button onclick="hideUserManager()" class="text-gray-500 hover:text-gray-700">✕</button>
-          </div>
-
-          <div class="mb-6">
-            <h4 class="font-semibold text-gray-700 mb-3">Usuario (Agregar/Editar)</h4>
-            <form id="userForm" onsubmit="handleUserFormSubmit(event)" class="space-y-4">
-              <input type="hidden" id="userId" />
-              
-              <div>
-                <label for="userNameDisplay" class="block text-sm font-medium text-gray-700">Nombre Usuario*</label>
-                <input type="text" id="userNameDisplay" class="w-full border rounded-lg px-3 py-2 mt-1" required placeholder="Ej: Juan Pérez">
-              </div>
-              <div>
-                <label for="userEmail" class="block text-sm font-medium text-gray-700">Email*</label>
-                <input type="email" id="userEmail" class="w-full border rounded-lg px-3 py-2 mt-1" required>
-              </div>
-
-              <div>
-                <label for="userRole" class="block text-sm font-medium text-gray-700">Rol*</label>
-                <select id="userRole" class="w-full border rounded-lg px-3 py-2 mt-1" required></select>
-              </div>
-              <div>
-                <label for="userPassword" class="block text-sm font-medium text-gray-700">Contraseña</label>
-                <input type="password" id="userPassword" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Dejar en blanco para no cambiar">
-              </div>
-              <div>
-                <label for="userPasswordConfirm" class="block text-sm font-medium text-gray-700">Confirmar Contraseña</label>
-                <input type="password" id="userPasswordConfirm" class="w-full border rounded-lg px-3 py-2 mt-1">
-              </div>
-              <div>
-                <label for="userAvatarFile" class="block text-sm font-medium text-gray-700">Avatar</label>
-                <input type="file" id="userAvatarFile" class="w-full border rounded-lg p-2 mt-1">
-              </div>
-              
-              <button type="submit" class="w-full mt-4 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Usuario</button>
-            </form>
-          </div>
-
-          <div>
-            <h4 class="font-semibold text-gray-700 mb-3">Usuarios Registrados</h4>
-            <div id="usersList" class="space-y-2 max-h-60 overflow-y-auto"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="bankAccountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
-      <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-bold text-gray-800">Cuentas Bancarias por Empresa</h3>
-            <button onclick="hideBankAccountManager()" class="text-gray-500 hover:text-gray-700">✕</button>
-          </div>
-
-          <div class="mb-6">
-            <h4 class="font-semibold text-gray-700 mb-3">Cuenta (Agregar/Editar)</h4>
-            <form id="bankAccountForm" onsubmit="handleBankAccountFormSubmit(event)" class="space-y-4">
-              <input type="hidden" id="accountId" />
-              
-              <div>
-                <label for="accountCompany" class="block text-sm font-medium text-gray-700">Empresa*</label>
-                <select id="accountCompany" class="w-full border rounded-lg px-3 py-2 mt-1" required></select>
-              </div>
-              <div>
-                <label for="accountBankName" class="block text-sm font-medium text-gray-700">Nombre del Banco*</label>
-                <input type="text" id="accountBankName" class="w-full border rounded-lg px-3 py-2 mt-1" required>
-              </div>
-              <div>
-                <label for="accountName" class="block text-sm font-medium text-gray-700">Nombre de la Cuenta*</label>
-                <input type="text" id="accountName" placeholder="Ej: Cuenta Principal" class="w-full border rounded-lg px-3 py-2 mt-1" required>
-              </div>
-              <div>
-                <label for="accountNumber" class="block text-sm font-medium text-gray-700">Número de Cuenta*</label>
-                <input type="text" id="accountNumber" class="w-full border rounded-lg px-3 py-2 mt-1" required>
-              </div>
-              <div>
-                <label for="accountType" class="block text-sm font-medium text-gray-700">Tipo de Cuenta*</label>
-                <select id="accountType" class="w-full border rounded-lg px-3 py-2 mt-1" required>
-                    <option value="Cheques">Cheques</option>
-                    <option value="Ahorros">Ahorros</option>
-                </select>
-              </div>
-              
-              <button type="submit" class="w-full mt-4 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Cuenta</button>
-            </form>
-          </div>
-
-          <div>
-            <h4 class="font-semibold text-gray-700 mb-3">Cuentas Registradas</h4>
-            <div id="bankAccountsList" class="space-y-2 max-h-60 overflow-y-auto"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-    <div id="invoiceSection" class="section">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-blue-custom no-print">
-          <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-            <span class="bg-blue-custom text-white p-2 rounded-lg mr-3">📄</span> <span id="invoiceTitle">Nueva Factura</span>
-          </h2>
-          <form id="invoiceForm" class="space-y-4" onsubmit="return false;">
-            <input type="hidden" id="editingInvoiceId">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Número de Factura</label>
-                <input type="text" id="invoiceNumber" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100" readonly>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
-                <input type="date" id="invoiceDate" class="w-full border border-gray-300 rounded-lg px-3 py-2">
-              </div>
-            </div>
-            <div id="authInfo" class="hidden text-sm text-gray-600 bg-purple-50 p-3 rounded-lg">
-              <p><strong>CAI Activo:</strong> <span id="activeCAI"></span></p>
-              <p><strong>Rango:</strong> <span id="activeRange"></span> | <strong>Fecha Límite:</strong> <span id="activeDate"></span></p>
-            </div>
-            <div class="bg-blue-50 p-4 rounded-lg">
-              <h3 class="text-lg font-semibold text-gray-800 mb-3">Datos de la Empresa</h3>
-              <select id="companySelect" onchange="updateCompanyData()" class="w-full border border-gray-300 rounded-lg px-3 py-2"><option value="">Seleccionar empresa...</option></select>
-            </div>
-            <div class="bg-orange-50 p-4 rounded-lg">
-              <h3 class="text-lg font-semibold text-gray-800 mb-3">Cliente</h3>
-              
-              <label for="invoiceClientSelect" class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Cliente Existente</label>
-              <select id="invoiceClientSelect" onchange="clientSelected('invoice')" class="w-full border rounded px-3 py-2 mb-3"></select>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="text" id="clientName" placeholder="Nombre del cliente" class="border rounded px-3 py-2">
-                <input type="text" id="clientRTN" placeholder="RTN del cliente" class="border rounded px-3 py-2">
-                <input type="text" id="clientAddress" placeholder="Dirección" class="md:col-span-2 border rounded px-3 py-2">
-              </div>
-            </div>
-            <div class="bg-yellow-50 p-4 rounded-lg">
-              <h3 class="text-lg font-semibold text-gray-800 mb-3">Productos/Servicios</h3>
-              <div id="invoiceItems" class="space-y-2">                
-              </div>
-              <button type="button" onclick="addInvoiceItem()" class="mt-2 bg-yellow-custom hover:bg-yellow-600 text-white px-4 py-2 rounded-lg">+ Agregar</button>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <h3 class="text-lg font-semibold text-gray-800 mb-3">Detalles del Pago</h3>              
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Método de Pago</label>
-                  <select id="paymentMethod" class="w-full border rounded px-3 py-2">
-                    <option value="Contado">Contado</option>
-                    <option value="Transferencia Bancaria">Transferencia Bancaria</option>
-                    <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
-                    <option value="Tarjeta de Débito">Tarjeta de Débito</option>
-                    <option value="Cheque">Cheque</option>
-                    <option value="Depósito Bancario">Depósito Bancario</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">ISV (%)</label>
-                  <select id="taxRate" onchange="handleTaxChange()" class="w-full border rounded px-3 py-2">
-                    <option value="15">15% - ISV estándar</option>
-                    <option value="18">18% - ISV especial</option>
-                    <option value="0">0% - Exento</option>
-                    <option value="exonerado">Exonerado</option>
-                  </select>
-                </div>
-              </div>
-
-              <div id="exoneradoFields" class="hidden mt-4 space-y-4 border-t pt-4">
-                <h4 class="text-md font-semibold text-gray-700">Detalles de Exoneración</h4>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700"># Correlativo de Orden de Compra Exenta</label>
-                  <input type="text" id="ordenCompraExenta" class="w-full border rounded px-3 py-2 mt-1">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700"># Correlativo de Constancia de Registro Exonerado</label>
-                  <input type="text" id="constanciaRegistroExonerado" class="w-full border rounded px-3 py-2 mt-1">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700"># Identificativo del Registro de la SAG</label>
-                  <input type="text" id="registroSAG" class="w-full border rounded px-3 py-2 mt-1">
-                </div>
-              </div>
-              </div>
-              <div class="bg-blue-50 p-4 rounded-lg">
-                <div class="space-y-3 text-right">
-                  <div class="flex justify-between items-center">
-                    <span>Subtotal:</span> 
-                    <span id="subtotal">L 0.00</span>
-                  </div>
-                  
-                  <div class="flex justify-between items-center gap-4">
-                    <label for="discountAmount" class="text-sm font-medium text-gray-700">Descuento (L):</label>
-                    <input type="number" step="0.01" id="discountAmount" placeholder="0.00" 
-                          class="w-32 border rounded-lg px-3 py-1 text-right" 
-                          oninput="calculateTotals()">
-                  </div>
-                  <div class="flex justify-between items-center">
-                    <span>ISV:</span> 
-                    <span id="taxAmount">L 0.00</span>
-                  </div>
-                  <div class="flex justify-between font-bold text-lg border-t pt-2">
-                    <span>TOTAL:</span> 
-                    <span id="total">L 0.00</span>
-                  </div>
-                </div>
-              </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
-              <textarea id="observations" rows="3" class="w-full border rounded px-3 py-2"></textarea>
-            </div>
-            <div class="flex gap-4">
-                <button type="button" id="saveInvoiceBtn" onclick="handleInvoiceSubmit()" class="w-full bg-gradient-to-r from-blue-custom to-blue-600 text-white py-3 rounded-lg text-lg font-semibold">💾 Guardar Factura</button>
-                <button type="button" onclick="resetInvoiceForm()" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-lg text-lg font-semibold">✨ Nueva</button>
-            </div>
-          </form>
-        </div>
-        <div class="bg-white rounded-lg shadow-lg p-6">
-          <div class="flex justify-between items-center mb-4 no-print">
-            <h3 class="text-xl font-bold">Vista Previa</h3>
-            <button onclick="printDocument()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">🖨️ Imprimir</button>
-          </div>
-          <div id="invoicePreview" class="border rounded-lg p-4 min-h-96">
-            <p class="text-gray-500 text-center mt-20">La vista previa aparecerá aquí</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="receiptSection" class="section hidden">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-orange-custom no-print">
-          <h2 class="text-2xl font-bold mb-6 flex items-center"><span class="bg-orange-custom text-white p-2 rounded-lg mr-3">🧾</span> <span id="receiptTitle">Nuevo Recibo</span></h2>
-          <form id="receiptForm" class="space-y-4" onsubmit="return false;">
-            <input type="hidden" id="editingReceiptId">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Número de Recibo</label>
-                <input type="text" id="receiptNumber" class="w-full border rounded px-3 py-2 bg-gray-100" readonly>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
-                <input type="date" id="receiptDate" class="w-full border rounded px-3 py-2">
-              </div>
-            </div>
-            <div class="bg-orange-50 p-4 rounded-lg">
-              <h3 class="text-lg font-semibold text-gray-800 mb-3">Datos de la Empresa</h3>
-              <select id="receiptCompanySelect" onchange="updateReceiptCompanyData()" class="w-full border rounded px-3 py-2"><option value="">Seleccionar empresa...</option></select>
-            </div>
-            <div class="bg-blue-50 p-4 rounded-lg">
-              <h3 class="text-lg font-semibold text-gray-800 mb-3">Cliente</h3>
-
-              <label for="receiptClientSelect" class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Cliente Existente</label>
-              <select id="receiptClientSelect" onchange="clientSelected('receipt')" class="w-full border rounded px-3 py-2 mb-3"></select>
-              
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="text" id="receiptClientName" placeholder="Nombre del cliente" class="border rounded px-3 py-2">
-                <input type="text" id="receiptClientPhone" placeholder="Teléfono" class="border rounded px-3 py-2">
-                <input type="text" id="receiptClientAddress" placeholder="Dirección" class="md:col-span-2 border rounded px-3 py-2">
-              </div>
-            </div>
-            <div class="bg-yellow-50 p-4 rounded-lg">
-              <h3 class="text-lg font-semibold text-gray-800 mb-3">Detalles del Pago</h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Monto (L) *</label><input type="number" step="0.01" id="receiptAmount" placeholder="0.00" class="w-full border rounded px-3 py-2" required></div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Método de Pago</label><select id="receiptPaymentMethod" class="w-full border rounded px-3 py-2"><option value="Efectivo">Efectivo</option><option value="Transferencia Bancaria">Transferencia Bancaria</option><option value="Tarjeta de Crédito">Tarjeta de Crédito</option><option value="Tarjeta de Débito">Tarjeta de Débito</option><option value="Cheque">Cheque</option><option value="Depósito Bancario">Depósito Bancario</option></select></div>
-              </div>
-            </div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Concepto/Descripción</label><textarea id="receiptConcept" rows="3" placeholder="Descripción del pago..." class="w-full border rounded px-3 py-2"></textarea></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label><textarea id="receiptObservations" rows="2" class="w-full border rounded px-3 py-2"></textarea></div>
-            <div class="flex gap-4">
-                <button type="button" id="saveReceiptBtn" onclick="handleReceiptSubmit()" class="w-full bg-gradient-to-r from-orange-custom to-orange-600 text-white py-3 rounded-lg text-lg font-semibold">💾 Guardar Recibo</button>
-                <button type="button" onclick="resetReceiptForm()" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-lg text-lg font-semibold">✨ Nuevo</button>
-            </div>
-          </form>
-        </div>
-        <div class="bg-white rounded-lg shadow-lg p-6">
-          <div class="flex justify-between items-center mb-4 no-print">
-            <h3 class="text-xl font-bold">Vista Previa</h3>
-            <button onclick="printDocument()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">🖨️ Imprimir</button>
-          </div>
-          <div id="receiptPreview" class="border rounded-lg p-4 min-h-96">
-            <p class="text-gray-500 text-center mt-20">La vista previa aparecerá aquí</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="historySection" class="section hidden">
-        <div class="bg-white p-6 rounded-lg shadow-lg no-print">
-            <h2 class="text-2xl font-bold mb-4">Historial de Documentos</h2>
-
-            <div class="flex flex-wrap gap-4 items-center mb-4">
-                <div class="flex-grow">
-                    <label for="historyCompanyFilter" class="text-sm font-medium">Filtrar por Empresa:</label>
-                    <select id="historyCompanyFilter" onchange="filterHistoryByCompany(this.value)" class="w-full mt-1 border rounded-lg px-3 py-2"></select>
-                </div>
-
-                <div>
-                    <label class="text-sm font-medium">Filtrar por Rango de Fechas:</label>
-                    <div class="flex gap-2 mt-1">
-                        <input type="date" id="historyDateStart" onchange="filterHistoryByDate()" class="border rounded-lg px-3 py-2" placeholder="Desde">
-                        <input type="date" id="historyDateEnd" onchange="filterHistoryByDate()" class="border rounded-lg px-3 py-2" placeholder="Hasta">
-                        <button onclick="clearDateFilter()" class="px-3 py-2 text-sm rounded-lg bg-gray-300 hover:bg-gray-400" title="Limpiar filtro de fecha">✕</button>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="text-sm font-medium">Filtrar por Tipo:</label>
-                    <div id="historyTypeFilter" class="flex gap-2 mt-1">
-                        <button onclick="filterHistory('all')" class="px-4 py-2 text-sm rounded-lg bg-blue-custom text-white">Todos</button>
-                        <button onclick="filterHistory('factura')" class="px-4 py-2 text-sm rounded-lg bg-gray-200">Facturas</button>
-                        <button onclick="filterHistory('recibo')" class="px-4 py-2 text-sm rounded-lg bg-gray-200">Recibos</button>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-transparent select-none">Acción</label>
-                    <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold">
-                        📊 Exportar a Excel
+                    </div>          
+                    <button onclick="logout()" class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-lg transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+                        <span>Cerrar Sesión</span>
                     </button>
                 </div>
             </div>
-            
-            <div id="historyList" class="space-y-3"></div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-4 mt-4">
+                <button onclick="showSection('invoiceSection')" class="flex items-center justify-center gap-2 p-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Facturación</span></button>
+                <button onclick="showSection('receiptSection')" class="flex items-center justify-center gap-2 p-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Recibos</span></button>
+                <button onclick="showHistory()" class="flex items-center justify-center gap-2 p-3 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Historial</span></button>
+                <button onclick="showSection('reportsSection')" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Reportes</span></button>
+                <button onclick="showCompanyManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Empresas</span></button>
+                <button onclick="showAuthManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Autorizaciones</span></button>
+                <button onclick="showProductManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Productos</span></button>
+                <button onclick="showClientManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Clientes</span></button>
+                <button onclick="showUserManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-slate-600 hover:bg-slate-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Usuarios</button>
+                <button onclick="showBankAccountManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Cuentas Bancarias</button>
+                <button onclick="showAgenda()" class="flex items-center justify-center gap-2 p-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Agenda</button>
+                <button onclick="showMorosidadReport()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-stone-600 hover:bg-stone-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Morosidad</button>
+            </div>
         </div>
-    </div>
 
-    <div id="reportsSection" class="section hidden">
-      <div class="bg-white rounded-lg shadow-lg p-6">
-        <h2 class="text-2xl font-bold mb-6 flex items-center"><span class="bg-gray-600 text-white p-2 rounded-lg mr-3">📊</span> Panel de Reportes</h2>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div class="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-custom"><h3 class="text-lg font-semibold">Total Documentos</h3><p id="totalDocs" class="text-3xl font-bold text-blue-custom">0</p></div>
-          <div class="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-custom"><h3 class="text-lg font-semibold">Facturas</h3><p id="totalInvoices" class="text-3xl font-bold text-orange-custom">0</p></div>
-          <div class="bg-yellow-50 p-6 rounded-lg border-l-4 border-yellow-custom"><h3 class="text-lg font-semibold">Recibos</h3><p id="totalReceipts" class="text-3xl font-bold text-yellow-custom">0</p></div>
-          <div class="bg-green-50 p-6 rounded-lg border-l-4 border-green-500"><h3 class="text-lg font-semibold">Ingresos Totales</h3><p id="totalRevenue" class="text-3xl font-bold text-green-600">L 0</p></div>
+        <div id="companyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Gestión de Empresas</h3>
+                <button onclick="hideCompanyManager()" class="text-gray-500 hover:text-gray-700">✕</button>
+            </div>
+            <div class="mb-6">
+                <h4 class="font-semibold text-gray-700 mb-3">Empresa (Agregar/Editar)</h4>
+                <form id="companyForm" onsubmit="handleCompanyFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="hidden" id="companyId" />
+                <input type="text" id="newCompanyName" placeholder="Nombre de la empresa" class="border rounded-lg px-3 py-2" required>
+                <input type="text" id="newCompanyRTN" placeholder="RTN" class="border rounded-lg px-3 py-2">
+                <input type="text" id="newCompanyAddress" placeholder="Dirección" class="border rounded-lg px-3 py-2 md:col-span-2">
+                <input type="text" id="newCompanyPhone" placeholder="Teléfono" class="border rounded-lg px-3 py-2">
+                <input type="text" id="newCompanyEmail" placeholder="Email" class="border rounded-lg px-3 py-2">
+                <label for="newCompanyLogo" class="block mt-2 font-semibold md:col-span-2">Logo:</label>
+                <input type="file" id="newCompanyLogo" name="logo" accept="image/*" class="border p-2 rounded w-full md:col-span-2"/>
+                <div id="logoPreviewContainer" class="col-span-2 hidden">
+                    <p class="text-gray-700">Logo actual:</p>
+                    <img id="currentLogoPreview" src="" alt="Logo actual" class="h-20 w-auto mt-2 object-contain" />
+                </div>
+                <button type="submit" class="mt-4 md:col-span-2 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Empresa</button>
+                </form>
+            </div>
+            <div>
+                <h4 class="font-semibold text-gray-700 mb-3">Empresas Registradas</h4>
+                <div id="companiesList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+            </div>
+            </div>
         </div>
-        <div class="bg-gray-50 p-6 rounded-lg"><h3 class="text-xl font-bold mb-4">Resumen por Empresa</h3><div id="companyBreakdown"></div></div>
-      </div>
+        </div>
+        
+        <div id="authModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Gestión de Autorizaciones Fiscales</h3>
+                <button onclick="hideAuthManager()" class="text-gray-500 hover:text-gray-700">✕</button>
+            </div>
+            <div class="mb-6">
+                <h4 class="font-semibold text-gray-700 mb-3">Autorización (Agregar/Editar)</h4>
+                <form id="authForm" onsubmit="handleAuthFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input type="hidden" id="authId" />
+                <div class="md:col-span-3"><label for="authCompany" class="block text-sm font-medium text-gray-700">Empresa*</label><select id="authCompany" class="w-full border rounded-lg px-3 py-2 mt-1" required></select></div>
+                <div class="md:col-span-2"><label for="authCAI" class="block text-sm font-medium text-gray-700">CAI*</label><input type="text" id="authCAI" placeholder="3BE298-..." class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+                <div><label for="authFechaLimite" class="block text-sm font-medium text-gray-700">Fecha Límite*</label><input type="date" id="authFechaLimite" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+                <div><label for="authRangoInicio" class="block text-sm font-medium text-gray-700">Rango Inicio*</label><input type="number" id="authRangoInicio" placeholder="1" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+                <div><label for="authRangoFin" class="block text-sm font-medium text-gray-700">Rango Fin*</label><input type="number" id="authRangoFin" placeholder="10000" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+                <div><label for="authNumeroActual" class="block text-sm font-medium text-gray-700">Número Actual*</label><input type="number" id="authNumeroActual" placeholder="1" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+                <div><label for="authCodSucursal" class="block text-sm font-medium text-gray-700">Cod. Sucursal*</label><input type="text" id="authCodSucursal" placeholder="000" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+                <div><label for="authCodPuntoEmision" class="block text-sm font-medium text-gray-700">Cod. Punto Emisión*</label><input type="text" id="authCodPuntoEmision" placeholder="001" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+                <div><label for="authCodTipoDoc" class="block text-sm font-medium text-gray-700">Cod. Tipo Doc*</label><input type="text" id="authCodTipoDoc" placeholder="01" class="w-full border rounded-lg px-3 py-2 mt-1" required></div>
+                <div class="md:col-span-3 flex items-center gap-3 mt-2"><input id="authEstaActiva" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-custom focus:ring-blue-custom"><label for="authEstaActiva" class="text-sm font-medium text-gray-700">Marcar como la autorización activa</label></div>
+                <button type="submit" class="mt-4 md:col-span-3 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Autorización</button>
+                </form>
+            </div>
+            <div>
+                <h4 class="font-semibold text-gray-700 mb-3">Autorizaciones Registradas</h4>
+                <div id="authList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+            </div>
+            </div>
+        </div>
+        </div>
+
+        <div id="productManagerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">Maestro de Productos</h3>
+                    <button onclick="hideProductManager()" class="text-gray-500 hover:text-gray-700">✕</button>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="font-semibold text-gray-700 mb-3">Producto (Agregar/Editar)</h4>
+                        <form id="productForm" onsubmit="handleProductFormSubmit(event)" class="space-y-4">
+                            <input type="hidden" id="productId" />
+                            <div>
+                                <label for="productName" class="block text-sm font-medium text-gray-700">Nombre del Producto*</label>
+                                <input type="text" id="productName" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+                            </div>
+                            
+                            <div>
+                                <label for="productDescription" class="block text-sm font-medium text-gray-700">Descripción del Producto</label>
+                                <textarea id="productDescription" rows="3" class="w-full border rounded-lg px-3 py-2 mt-1"></textarea>
+                            </div>
+                            <div>
+                                <label for="productCode" class="block text-sm font-medium text-gray-700">Código</label>
+                                <input type="text" id="productCode" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Ej: SERV-01">
+                            </div>
+                            <div>
+                                <label for="productPrice" class="block text-sm font-medium text-gray-700">Precio de Venta (L)*</label>
+                                <input type="number" step="0.01" id="productPrice" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <input id="productIsExempt" type="checkbox" class="h-4 w-4 rounded border-gray-300">
+                                <label for="productIsExempt" class="text-sm font-medium text-gray-700">Este producto es Exento de Impuesto (ISV)</label>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Producto</button>
+                        </form>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3">Productos Registrados</h4>
+                    <div id="productsList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                </div>
+                
+                </div>
+            </div>
+        </div>
+
+        <div id="clientModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Maestro de Clientes</h3>
+                <button onclick="hideClientManager()" class="text-gray-500 hover:text-gray-700">✕</button>
+            </div>
+
+            <div class="mb-6">
+                <h4 class="font-semibold text-gray-700 mb-3">Cliente (Agregar/Editar)</h4>
+                <form id="clientForm" onsubmit="handleClientFormSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="hidden" id="clientId" />
+                
+                <div>
+                    <label for="clientName" class="block text-sm font-medium text-gray-700">Nombre Completo o Razón Social*</label>
+                    <input type="text" id="clientName" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+                </div>
+                <div>
+                    <label for="clientCode" class="block text-sm font-medium text-gray-700">Código de Cliente</label>
+                    <input type="text" id="clientCode" class="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-100" readonly>
+                </div>
+                <div>
+                    <label for="clientRTN" class="block text-sm font-medium text-gray-700">RTN</label>
+                    <input type="text" id="clientRTN" class="w-full border rounded-lg px-3 py-2 mt-1">
+                </div>
+                <div>
+                    <label for="clientPhone" class="block text-sm font-medium text-gray-700">Teléfono</label>
+                    <input type="text" id="clientPhone" class="w-full border rounded-lg px-3 py-2 mt-1">
+                </div>
+                
+                <div>
+                    <label for="clientContactPerson" class="block text-sm font-medium text-gray-700">Persona de Contacto</label>
+                    <input type="text" id="clientContactPerson" class="w-full border rounded-lg px-3 py-2 mt-1">
+                </div>
+                <div>
+                    <label for="clientEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="clientEmail" class="w-full border rounded-lg px-3 py-2 mt-1">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label for="clientAddress" class="block text-sm font-medium text-gray-700">Dirección</label>
+                    <input type="text" id="clientAddress" class="w-full border rounded-lg px-3 py-2 mt-1">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label for="clientNotes" class="block text-sm font-medium text-gray-700">Notas</label>
+                    <textarea id="clientNotes" rows="3" class="w-full border rounded-lg px-3 py-2 mt-1"></textarea>
+                </div>
+                <hr class="md:col-span-2 my-2"/>
+
+                <div>
+                    <label for="entityType" class="block text-sm font-medium text-gray-700">Tipo</label>
+                    <select id="entityType" class="w-full border rounded-lg px-3 py-2 mt-1">
+                        <option value="Cliente">Cliente</option>
+                        <option value="Proveedor">Proveedor</option>
+                        <option value="Ambos">Ambos</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="clientGroup" class="block text-sm font-medium text-gray-700">Grupo de Cliente</label>
+                    <input type="text" id="clientGroup" list="clientGroupList" class="w-full border rounded-lg px-3 py-2 mt-1">
+                    <datalist id="clientGroupList"></datalist>
+                </div>
+                <div>
+                    <label for="priceList" class="block text-sm font-medium text-gray-700">Lista de Precios</label>
+                    <input type="text" id="priceList" list="priceLists" class="w-full border rounded-lg px-3 py-2 mt-1">
+                    <datalist id="priceLists"></datalist>
+                </div>
+                
+                <div>
+                    <label for="paymentTerms" class="block text-sm font-medium text-gray-700">Forma de Pago</label>
+                    <input type="text" id="paymentTerms" list="paymentTermsList" placeholder="Ej: Crédito" class="w-full border rounded-lg px-3 py-2 mt-1">
+                    <datalist id="paymentTermsList"></datalist>
+                </div>
+                <div>
+                    <label for="creditDays" class="block text-sm font-medium text-gray-700">Días de Crédito</label>
+                    <input type="number" id="creditDays" placeholder="0" class="w-full border rounded-lg px-3 py-2 mt-1">
+                </div>
+                <div>
+                    <label for="creditLimit" class="block text-sm font-medium text-gray-700">Límite de Crédito (L)</label>
+                    <input type="number" step="0.01" id="creditLimit" placeholder="0.00" class="w-full border rounded-lg px-3 py-2 mt-1">
+                </div>
+
+                <div class="md:col-span-3 flex items-center gap-3 mt-2">
+                    <input id="clientIsActive" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-custom focus:ring-blue-custom">
+                    <label for="clientIsActive" class="text-sm font-medium text-gray-700">Cliente Activo</label>
+                </div>
+                
+                <button type="submit" class="mt-4 md:col-span-3 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Cliente</button>
+                </form>
+            </div>
+
+                <div>
+                <h4 class="font-semibold text-gray-700 mb-3">Clientes Registrados</h4>
+                <div id="clientsList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <div id="userManagerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Gestión de Usuarios</h3>
+                <button onclick="hideUserManager()" class="text-gray-500 hover:text-gray-700">✕</button>
+            </div>
+
+            <div class="mb-6">
+                <h4 class="font-semibold text-gray-700 mb-3">Usuario (Agregar/Editar)</h4>
+                <form id="userForm" onsubmit="handleUserFormSubmit(event)" class="space-y-4">
+                <input type="hidden" id="userId" />
+                
+                <div>
+                    <label for="userNameDisplay" class="block text-sm font-medium text-gray-700">Nombre Usuario*</label>
+                    <input type="text" id="userNameDisplay" class="w-full border rounded-lg px-3 py-2 mt-1" required placeholder="Ej: Juan Pérez">
+                </div>
+                <div>
+                    <label for="userEmail" class="block text-sm font-medium text-gray-700">Email*</label>
+                    <input type="email" id="userEmail" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+                </div>
+
+                <div>
+                    <label for="userRole" class="block text-sm font-medium text-gray-700">Rol*</label>
+                    <select id="userRole" class="w-full border rounded-lg px-3 py-2 mt-1" required></select>
+                </div>
+                <div>
+                    <label for="userPassword" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                    <input type="password" id="userPassword" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Dejar en blanco para no cambiar">
+                </div>
+                <div>
+                    <label for="userPasswordConfirm" class="block text-sm font-medium text-gray-700">Confirmar Contraseña</label>
+                    <input type="password" id="userPasswordConfirm" class="w-full border rounded-lg px-3 py-2 mt-1">
+                </div>
+                <div>
+                    <label for="userAvatarFile" class="block text-sm font-medium text-gray-700">Avatar</label>
+                    <input type="file" id="userAvatarFile" class="w-full border rounded-lg p-2 mt-1">
+                </div>
+                
+                <button type="submit" class="w-full mt-4 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Usuario</button>
+                </form>
+            </div>
+
+            <div>
+                <h4 class="font-semibold text-gray-700 mb-3">Usuarios Registrados</h4>
+                <div id="usersList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+            </div>
+            </div>
+        </div>
+        </div>
+
+        <div id="bankAccountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 no-print">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Cuentas Bancarias por Empresa</h3>
+                <button onclick="hideBankAccountManager()" class="text-gray-500 hover:text-gray-700">✕</button>
+            </div>
+
+            <div class="mb-6">
+                <h4 class="font-semibold text-gray-700 mb-3">Cuenta (Agregar/Editar)</h4>
+                <form id="bankAccountForm" onsubmit="handleBankAccountFormSubmit(event)" class="space-y-4">
+                <input type="hidden" id="accountId" />
+                
+                <div>
+                    <label for="accountCompany" class="block text-sm font-medium text-gray-700">Empresa*</label>
+                    <select id="accountCompany" class="w-full border rounded-lg px-3 py-2 mt-1" required></select>
+                </div>
+                <div>
+                    <label for="accountBankName" class="block text-sm font-medium text-gray-700">Nombre del Banco*</label>
+                    <input type="text" id="accountBankName" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+                </div>
+                <div>
+                    <label for="accountName" class="block text-sm font-medium text-gray-700">Nombre de la Cuenta*</label>
+                    <input type="text" id="accountName" placeholder="Ej: Cuenta Principal" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+                </div>
+                <div>
+                    <label for="accountNumber" class="block text-sm font-medium text-gray-700">Número de Cuenta*</label>
+                    <input type="text" id="accountNumber" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+                </div>
+                <div>
+                    <label for="accountType" class="block text-sm font-medium text-gray-700">Tipo de Cuenta*</label>
+                    <select id="accountType" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+                        <option value="Cheques">Cheques</option>
+                        <option value="Ahorros">Ahorros</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="w-full mt-4 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Guardar Cuenta</button>
+                </form>
+            </div>
+
+            <div>
+                <h4 class="font-semibold text-gray-700 mb-3">Cuentas Registradas</h4>
+                <div id="bankAccountsList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+            </div>
+            </div>
+        </div>
+        </div>
+
+
+        <div id="invoiceSection" class="section">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-blue-custom no-print">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="bg-blue-custom text-white p-2 rounded-lg mr-3">📄</span> <span id="invoiceTitle">Nueva Factura</span>
+            </h2>
+            <form id="invoiceForm" class="space-y-4" onsubmit="return false;">
+                <input type="hidden" id="editingInvoiceId">
+                <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Número de Factura</label>
+                    <input type="text" id="invoiceNumber" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100" readonly>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                    <input type="date" id="invoiceDate" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                </div>
+                </div>
+                <div id="authInfo" class="hidden text-sm text-gray-600 bg-purple-50 p-3 rounded-lg">
+                <p><strong>CAI Activo:</strong> <span id="activeCAI"></span></p>
+                <p><strong>Rango:</strong> <span id="activeRange"></span> | <strong>Fecha Límite:</strong> <span id="activeDate"></span></p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Datos de la Empresa</h3>
+                <select id="companySelect" onchange="updateCompanyData()" class="w-full border border-gray-300 rounded-lg px-3 py-2"><option value="">Seleccionar empresa...</option></select>
+                </div>
+                <div class="bg-orange-50 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Cliente</h3>
+                
+                <label for="invoiceClientSelect" class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Cliente Existente</label>
+                <select id="invoiceClientSelect" onchange="clientSelected('invoice')" class="w-full border rounded px-3 py-2 mb-3"></select>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="clientName" placeholder="Nombre del cliente" class="border rounded px-3 py-2">
+                    <input type="text" id="clientRTN" placeholder="RTN del cliente" class="border rounded px-3 py-2">
+                    <input type="text" id="clientAddress" placeholder="Dirección" class="md:col-span-2 border rounded px-3 py-2">
+                </div>
+                </div>
+                <div class="bg-yellow-50 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Productos/Servicios</h3>
+                <div id="invoiceItems" class="space-y-2">                
+                </div>
+                <button type="button" onclick="addInvoiceItem()" class="mt-2 bg-yellow-custom hover:bg-yellow-600 text-white px-4 py-2 rounded-lg">+ Agregar</button>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Detalles del Pago</h3>              
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Método de Pago</label>
+                    <select id="paymentMethod" class="w-full border rounded px-3 py-2">
+                        <option value="Contado">Contado</option>
+                        <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+                        <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+                        <option value="Tarjeta de Débito">Tarjeta de Débito</option>
+                        <option value="Cheque">Cheque</option>
+                        <option value="Depósito Bancario">Depósito Bancario</option>
+                    </select>
+                    </div>
+                    <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ISV (%)</label>
+                    <select id="taxRate" onchange="handleTaxChange()" class="w-full border rounded px-3 py-2">
+                        <option value="15">15% - ISV estándar</option>
+                        <option value="18">18% - ISV especial</option>
+                        <option value="0">0% - Exento</option>
+                        <option value="exonerado">Exonerado</option>
+                    </select>
+                    </div>
+                </div>
+
+                <div id="exoneradoFields" class="hidden mt-4 space-y-4 border-t pt-4">
+                    <h4 class="text-md font-semibold text-gray-700">Detalles de Exoneración</h4>
+                    <div>
+                    <label class="block text-sm font-medium text-gray-700"># Correlativo de Orden de Compra Exenta</label>
+                    <input type="text" id="ordenCompraExenta" class="w-full border rounded px-3 py-2 mt-1">
+                    </div>
+                    <div>
+                    <label class="block text-sm font-medium text-gray-700"># Correlativo de Constancia de Registro Exonerado</label>
+                    <input type="text" id="constanciaRegistroExonerado" class="w-full border rounded px-3 py-2 mt-1">
+                    </div>
+                    <div>
+                    <label class="block text-sm font-medium text-gray-700"># Identificativo del Registro de la SAG</label>
+                    <input type="text" id="registroSAG" class="w-full border rounded px-3 py-2 mt-1">
+                    </div>
+                </div>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <div class="space-y-3 text-right">
+                    <div class="flex justify-between items-center">
+                        <span>Subtotal:</span> 
+                        <span id="subtotal">L 0.00</span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center gap-4">
+                        <label for="discountAmount" class="text-sm font-medium text-gray-700">Descuento (L):</label>
+                        <input type="number" step="0.01" id="discountAmount" placeholder="0.00" 
+                            class="w-32 border rounded-lg px-3 py-1 text-right" 
+                            oninput="calculateTotals()">
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>ISV:</span> 
+                        <span id="taxAmount">L 0.00</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-lg border-t pt-2">
+                        <span>TOTAL:</span> 
+                        <span id="total">L 0.00</span>
+                    </div>
+                    </div>
+                </div>
+                <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+                <textarea id="observations" rows="3" class="w-full border rounded px-3 py-2"></textarea>
+                </div>
+                <div class="flex gap-4">
+                    <button type="button" id="saveInvoiceBtn" onclick="handleInvoiceSubmit()" class="w-full bg-gradient-to-r from-blue-custom to-blue-600 text-white py-3 rounded-lg text-lg font-semibold">💾 Guardar Factura</button>
+                    <button type="button" onclick="resetInvoiceForm()" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-lg text-lg font-semibold">✨ Nueva</button>
+                </div>
+            </form>
+            </div>
+            <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-4 no-print">
+                <h3 class="text-xl font-bold">Vista Previa</h3>
+                <button onclick="printDocument()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">🖨️ Imprimir</button>
+            </div>
+            <div id="invoicePreview" class="border rounded-lg p-4 min-h-96">
+                <p class="text-gray-500 text-center mt-20">La vista previa aparecerá aquí</p>
+            </div>
+            </div>
+        </div>
+        </div>
+
+        <div id="receiptSection" class="section hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-orange-custom no-print">
+            <h2 class="text-2xl font-bold mb-6 flex items-center"><span class="bg-orange-custom text-white p-2 rounded-lg mr-3">🧾</span> <span id="receiptTitle">Nuevo Recibo</span></h2>
+            <form id="receiptForm" class="space-y-4" onsubmit="return false;">
+                <input type="hidden" id="editingReceiptId">
+                <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Número de Recibo</label>
+                    <input type="text" id="receiptNumber" class="w-full border rounded px-3 py-2 bg-gray-100" readonly>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                    <input type="date" id="receiptDate" class="w-full border rounded px-3 py-2">
+                </div>
+                </div>
+                <div class="bg-orange-50 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Datos de la Empresa</h3>
+                <select id="receiptCompanySelect" onchange="updateReceiptCompanyData()" class="w-full border rounded px-3 py-2"><option value="">Seleccionar empresa...</option></select>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Cliente</h3>
+
+                <label for="receiptClientSelect" class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Cliente Existente</label>
+                <select id="receiptClientSelect" onchange="clientSelected('receipt')" class="w-full border rounded px-3 py-2 mb-3"></select>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="receiptClientName" placeholder="Nombre del cliente" class="border rounded px-3 py-2">
+                    <input type="text" id="receiptClientPhone" placeholder="Teléfono" class="border rounded px-3 py-2">
+                    <input type="text" id="receiptClientAddress" placeholder="Dirección" class="md:col-span-2 border rounded px-3 py-2">
+                </div>
+                </div>
+                <div class="bg-yellow-50 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Detalles del Pago</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Monto (L) *</label><input type="number" step="0.01" id="receiptAmount" placeholder="0.00" class="w-full border rounded px-3 py-2" required></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Método de Pago</label><select id="receiptPaymentMethod" class="w-full border rounded px-3 py-2"><option value="Efectivo">Efectivo</option><option value="Transferencia Bancaria">Transferencia Bancaria</option><option value="Tarjeta de Crédito">Tarjeta de Crédito</option><option value="Tarjeta de Débito">Tarjeta de Débito</option><option value="Cheque">Cheque</option><option value="Depósito Bancario">Depósito Bancario</option></select></div>
+                </div>
+                </div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Concepto/Descripción</label><textarea id="receiptConcept" rows="3" placeholder="Descripción del pago..." class="w-full border rounded px-3 py-2"></textarea></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label><textarea id="receiptObservations" rows="2" class="w-full border rounded px-3 py-2"></textarea></div>
+                <div class="flex gap-4">
+                    <button type="button" id="saveReceiptBtn" onclick="handleReceiptSubmit()" class="w-full bg-gradient-to-r from-orange-custom to-orange-600 text-white py-3 rounded-lg text-lg font-semibold">💾 Guardar Recibo</button>
+                    <button type="button" onclick="resetReceiptForm()" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-lg text-lg font-semibold">✨ Nuevo</button>
+                </div>
+            </form>
+            </div>
+            <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-4 no-print">
+                <h3 class="text-xl font-bold">Vista Previa</h3>
+                <button onclick="printDocument()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">🖨️ Imprimir</button>
+            </div>
+            <div id="receiptPreview" class="border rounded-lg p-4 min-h-96">
+                <p class="text-gray-500 text-center mt-20">La vista previa aparecerá aquí</p>
+            </div>
+            </div>
+        </div>
+        </div>
+
+        <div id="historySection" class="section hidden">
+            <div class="bg-white p-6 rounded-lg shadow-lg no-print">
+                <h2 class="text-2xl font-bold mb-4">Historial de Documentos</h2>
+
+                <div class="flex flex-wrap gap-4 items-center mb-4">
+                    <div class="flex-grow">
+                        <label for="historyCompanyFilter" class="text-sm font-medium">Filtrar por Empresa:</label>
+                        <select id="historyCompanyFilter" onchange="filterHistoryByCompany(this.value)" class="w-full mt-1 border rounded-lg px-3 py-2"></select>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-medium">Filtrar por Rango de Fechas:</label>
+                        <div class="flex gap-2 mt-1">
+                            <input type="date" id="historyDateStart" onchange="filterHistoryByDate()" class="border rounded-lg px-3 py-2" placeholder="Desde">
+                            <input type="date" id="historyDateEnd" onchange="filterHistoryByDate()" class="border rounded-lg px-3 py-2" placeholder="Hasta">
+                            <button onclick="clearDateFilter()" class="px-3 py-2 text-sm rounded-lg bg-gray-300 hover:bg-gray-400" title="Limpiar filtro de fecha">✕</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-medium">Filtrar por Tipo:</label>
+                        <div id="historyTypeFilter" class="flex gap-2 mt-1">
+                            <button onclick="filterHistory('all')" class="px-4 py-2 text-sm rounded-lg bg-blue-custom text-white">Todos</button>
+                            <button onclick="filterHistory('factura')" class="px-4 py-2 text-sm rounded-lg bg-gray-200">Facturas</button>
+                            <button onclick="filterHistory('recibo')" class="px-4 py-2 text-sm rounded-lg bg-gray-200">Recibos</button>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 items-end">
+                        <div>
+                            <label class="block text-sm font-medium text-transparent select-none">Acción</label>
+                            <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center justify-center">
+                                <span class="mr-2">📊</span> 
+                                Exportar a Excel
+                            </button>
+                        </div>
+                        <div data-role="admin">                            
+                            <button onclick="batchUpdateOldInvoices()" id="batch-update-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center justify-center">
+                                <span class="mr-2">🔧</span>
+                                Actualizar Facturas Antiguas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="historyList" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <div id="reportsSection" class="section hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold mb-6 flex items-center"><span class="bg-gray-600 text-white p-2 rounded-lg mr-3">📊</span> Panel de Reportes</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-custom"><h3 class="text-lg font-semibold">Total Documentos</h3><p id="totalDocs" class="text-3xl font-bold text-blue-custom">0</p></div>
+            <div class="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-custom"><h3 class="text-lg font-semibold">Facturas</h3><p id="totalInvoices" class="text-3xl font-bold text-orange-custom">0</p></div>
+            <div class="bg-yellow-50 p-6 rounded-lg border-l-4 border-yellow-custom"><h3 class="text-lg font-semibold">Recibos</h3><p id="totalReceipts" class="text-3xl font-bold text-yellow-custom">0</p></div>
+            <div class="bg-green-50 p-6 rounded-lg border-l-4 border-green-500"><h3 class="text-lg font-semibold">Ingresos Totales</h3><p id="totalRevenue" class="text-3xl font-bold text-green-600">L 0</p></div>
+            </div>
+            <div class="bg-gray-50 p-6 rounded-lg"><h3 class="text-xl font-bold mb-4">Resumen por Empresa</h3><div id="companyBreakdown"></div></div>
+        </div>
+        </div>
+
+        <div id="agendaSection" class="hidden p-4 md:p-6 lg:p-8 space-y-6">
+            <h2 class="text-3xl font-bold text-gray-800">🗓️ Agenda Personal</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-semibold text-gray-700">Productividad del día</h3>
+                        <span class="text-xl">🚀</span>
+                    </div>
+                    <div class="text-3xl font-bold text-blue-custom" id="productivity">85%</div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                        <div class="bg-blue-600 h-2 rounded-full" style="width: 85%" id="productivity-bar"></div>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-semibold text-gray-700">Tareas Completadas</h3>
+                        <span class="text-xl">✅</span>
+                    </div>
+                    <div class="text-3xl font-bold text-green-600" id="completed-tasks">0</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-semibold text-gray-700">Tiempo Enfocado</h3>
+                        <span class="text-xl">⏱️</span>
+                    </div>
+                    <div class="text-3xl font-bold text-orange-custom" id="focused-time">0h 0m</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-semibold text-gray-700">Racha Diaria</h3>
+                        <span class="text-xl">🔥</span>
+                    </div>
+                    <div class="text-3xl font-bold text-red-500" id="streak">1</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">➕ Agregar Tarea Rápida</h3>
+                        
+                        <div class="mb-2">
+                            <input type="text" id="quick-task" placeholder="¿Qué necesitas hacer hoy?" class="w-full flex-1 border rounded-lg px-3 py-2">
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <select id="quick-category" class="flex-grow border rounded-lg px-3 py-2">
+                                <option value="trabajo">💼 Trabajo</option>
+                                <option value="personal">👤 Personal</option>
+                                <option value="salud">💪 Salud</option>
+                                <option value="estudios">📚 Estudios</option>
+                                <option value="hogar">🏠 Hogar</option>
+                            </select>
+                            
+                            <select id="quick-time-estimate" class="flex-grow border rounded-lg px-3 py-2">
+                                <option value="15">15 min</option>
+                                <option value="30" selected>30 min</option>
+                                <option value="60">1 hora</option>
+                                <option value="120">2 horas</option>
+                            </select>
+                            
+                            <button type="button" id="add-quick-btn" class="bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold">Agregar</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4" id="detailed-task-title">📝 Crear Tarea Detallada</h3>
+                        <div class="space-y-4">
+                        
+                            <input type="hidden" id="detailed-task-id">
+
+                            <div id="assign-user-container" data-role="admin" class="hidden">
+                                <label for="assign-to-user" class="block text-sm font-medium text-gray-700">Asignar Tarea A:</label>
+                                <select id="assign-to-user" class="w-full border rounded-lg px-3 py-2 mt-1">
+                                </select>
+                            </div>
+
+                            <input type="text" id="detailed-title" placeholder="Título de la tarea" class="w-full border rounded-lg px-3 py-2">
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <select id="category" class="w-full border rounded-lg px-3 py-2">
+                                    <option value="trabajo">💼 Trabajo</option>
+                                    <option value="personal">👤 Personal</option>
+                                    <option value="salud">💪 Salud</option>
+                                    <option value="estudios">📚 Estudios</option>
+                                    <option value="hogar">🏠 Hogar</option>
+                                </select>
+                                <select id="priority" class="w-full border rounded-lg px-3 py-2">
+                                    <option value="baja">🟢 Baja</option>
+                                    <option value="media">🟡 Media</option>
+                                    <option value="alta">🟠 Alta</option>
+                                    <option value="urgente">🔴 Urgente</option>
+                                </select>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <input type="number" id="time-estimate" class="w-full border rounded-lg px-3 py-2 md:col-span-1" placeholder="Tiempo (en minutos)">
+                                <input type="date" id="due-date" class="w-full border rounded-lg px-3 py-2 md:col-span-1">
+                                <input type="time" id="due-time" class="w-full border rounded-lg px-3 py-2 md:col-span-1">
+                            </div>
+
+                            <textarea id="notes" placeholder="Notas adicionales..." rows="3" class="w-full border rounded-lg px-3 py-2"></textarea>
+                            
+                            <div class="flex gap-2">
+                                <button type="button" id="add-detailed-btn" class="w-full bg-orange-custom hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold">Crear Tarea</button>
+                                <button type="button" id="cancel-edit-btn" onclick="resetDetailedTaskForm()" class="w-full bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold hidden">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+                            <div class="flex gap-2 flex-wrap items-center">
+                                <h3 class="text-xl font-bold text-gray-800 mr-4">📋 Mis Tareas</h3>
+                                <button type="button" id="filter-all" class="filter-btn px-3 py-1 rounded-lg text-sm font-medium bg-blue-custom text-white">Todas</button>
+                                
+                                <button type="button" id="filter-pendiente" class="filter-btn px-3 py-1 rounded-lg text-sm font-medium bg-gray-200 text-gray-700">Pendiente</button>
+                                <button type="button" id="filter-en-curso" class="filter-btn px-3 py-1 rounded-lg text-sm font-medium bg-gray-200 text-gray-700">En Curso</button>
+                                <button type="button" id="filter-en-revision" class="filter-btn px-3 py-1 rounded-lg text-sm font-medium bg-gray-200 text-gray-700">En Revisión</button>
+                                <button type="button" id="filter-completada" class="filter-btn px-3 py-1 rounded-lg text-sm font-medium bg-gray-200 text-gray-700">Completada</button>
+                                <button type="button" id="clear-completed-btn" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-medium">Limpiar</button>
+                            </div>
+                            
+                            <div class="flex items-center gap-2">
+                                <label for="task-sort-select" class="text-sm font-medium text-gray-700">Ordenar por:</label>
+                                <select id="task-sort-select" class="border rounded-lg px-3 py-1 text-sm" onchange="setTaskSort()">
+                                    <option value="created_desc">Más Recientes</option>
+                                    <option value="due_date_asc">Fecha de Vencimiento</option>
+                                    <option value="priority_desc">Prioridad (Alta a Baja)</option>
+                                    <option value="time_asc">Tiempo (Menor a Mayor)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div id="tasks-container" class="space-y-3">
+                            <div class="text-center text-gray-500 py-4">
+                                <span class="text-3xl block mb-2">📝</span>
+                                <p>No hay tareas. ¡Agrega tu primera tarea!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:col-span-1 space-y-6">
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">🍅 Timer Pomodoro</h3>
+                        
+                        <div class="text-5xl font-mono text-center text-blue-custom mb-4" id="timer-display">25:00</div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+                            <select id="pomodoro-task" class="w-full border rounded-lg px-3 py-2 text-sm">
+                                <option value="">Seleccionar Tarea a Enfocar...</option>
+                                </select>
+                            <select id="pomodoro-sessions" class="w-full border rounded-lg px-3 py-2 text-sm">
+                                <option value="1">1 Sesión</option>
+                                <option value="2">2 Sesiones</option>
+                                <option value="3">3 Sesiones</option>
+                                <option value="4" selected>4 Sesiones</option>
+                                <option value="6">5 Sesiones</option>
+                                <option value="6">6 Sesiones</option>
+                            </select>
+                        </div>
+
+                        <div class="flex gap-2 justify-center mb-4">
+                            <button type="button" id="start-timer-btn" class="bg-orange-custom hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold">Iniciar</button>
+                            <button type="button" id="pause-timer-btn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold">Pausa</button>
+                            <button type="button" id="reset-timer-btn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold">Reset</button>
+                        </div>
+
+                        <div class="flex gap-2 justify-center mb-4">
+                            <button type="button" id="set-time-work" class="text-xs px-3 py-1 rounded-full bg-blue-custom text-white">Trabajo (25m)</button>
+                            <button type="button" id="set-time-short-break" class="text-xs px-3 py-1 rounded-full bg-green-500 text-white">Descanso (5m)</button>
+                            <button type="button" id="set-time-long-break" class="text-xs px-3 py-1 rounded-full bg-gray-400 text-white">Largo (15m)</button>
+                        </div>
+
+                        <p class="text-gray-500" id="pomodoro-info">Sesión 1 de 4 - Modo: Trabajo</p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📝 Notas Rápidas</h3>
+                        <textarea id="quick-notes" placeholder="Anota tus ideas aquí..." rows="6" class="w-full border rounded-lg px-3 py-2"></textarea>
+                        <button type="button" id="save-notes-btn" class="w-full mt-3 bg-blue-custom hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold">Guardar Notas</button>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">📊 Estadísticas</h3>
+                        <div class="space-y-4">
+
+                            <div>
+                                <div class="flex justify-between text-sm font-semibold mb-1">
+                                    <span class="text-gray-700">Mi Progreso Total</span>
+                                    <span class="text-blue-custom" id="stats-total-progress-text">0/0</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div id="stats-total-progress-bar" class="bg-blue-custom h-3 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Tareas completadas (mis últimos 7 días):</span>
+                                <span class="font-semibold text-gray-900" id="stats-week-tasks">0</span>
+                            </div>
+
+                            <hr class="my-2">
+
+                            <h4 class="text-md font-semibold text-gray-700">Mi Progreso por Categoría</h4>
+                            <div id="stats-category-breakdown" class="space-y-3">
+                                <p class="text-sm text-gray-500 text-center">No hay tareas con categoría.</p>
+                            </div>
+
+                            <div data-role="admin" class="hidden">
+                                <hr class="my-4 border-gray-300">
+                                <h4 class="text-md font-semibold text-gray-700">Progreso del Equipo</h4>
+                                <div id="stats-team-breakdown" class="space-y-3 mt-3">
+                                    </div>
+                            </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="morosidadSection" class="hidden p-4 md:p-6 lg:p-8 space-y-6">
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex flex-wrap justify-between items-end gap-4 mb-2">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800">📊 Análisis de Morosidad</h1>
+                        <p class="text-gray-600">Seguimiento automático de cuentas por cobrar</p>
+                    </div>
+                    
+                    <div class="flex gap-4 items-end">
+                        <div class="w-full sm:w-64">
+                            <label for="morosidadCompanyFilter" class="block text-sm font-medium text-gray-700">Filtrar por Empresa</label>
+                            <select id="morosidadCompanyFilter" onchange="filterMorosidadByCompany(this.value)" class="w-full mt-1 border rounded-lg px-3 py-2"></select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-transparent select-none">Acción</label>
+                            <button onclick="exportMorosidadToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center justify-center">
+                                <span class="mr-2">📊</span> 
+                                Exportar a Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+                <div class="bg-green-100 rounded-lg p-4 border-l-4 border-green-500">
+                    <div class="text-green-800 text-sm font-medium">Por Vencer (0-30 días)</div>
+                    <div id="morosidad-rango-30" class="text-2xl font-bold text-green-700">L 0.00</div>
+                </div>
+                <div class="bg-yellow-100 rounded-lg p-4 border-l-4 border-yellow-500">
+                    <div class="text-yellow-800 text-sm font-medium">Vencido (31-60 días)</div>
+                    <div id="morosidad-rango-60" class="text-2xl font-bold text-yellow-700">L 0.00</div>
+                </div>
+                <div class="bg-orange-100 rounded-lg p-4 border-l-4 border-orange-500">
+                    <div class="text-orange-800 text-sm font-medium">Vencido (61-90 días)</div>
+                    <div id="morosidad-rango-90" class="text-2xl font-bold text-orange-700">L 0.00</div>
+                </div>
+                <div class="bg-red-100 rounded-lg p-4 border-l-4 border-red-500">
+                    <div class="text-red-800 text-sm font-medium">Vencido (Más de 90 días)</div>
+                    <div id="morosidad-rango-90-plus" class="text-2xl font-bold text-red-700">L 0.00</div>
+                </div>
+                <div class="bg-gray-100 rounded-lg p-4 border-l-4 border-gray-500">
+                    <div class="text-gray-800 text-sm font-medium">Total Pendiente</div>
+                    <div id="morosidad-total" class="text-2xl font-bold text-gray-700">L 0.00</div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-800">📋 Detalle de Facturas Pendientes</h2>
+                    </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th id="sort-cliente" onclick="sortMorosidadReport('cliente')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                                    Cliente
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factura</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F. Emisión</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F. Vencimiento</th>
+                                <th id="sort-monto" onclick="sortMorosidadReport('monto')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                                    Total Factura
+                                </th>
+                                <th id="sort-dias" onclick="sortMorosidadReport('dias')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                                    Días Vencido
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="morosidadTableBody" class="bg-white divide-y divide-gray-200">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <script>
@@ -727,7 +1057,16 @@ let currentHistoryFilter = 'all'; // Filtro de historial
 let currentHistoryCompany = 'all'; // Empresa seleccionada para el historial
 let currentHistoryDateStart = ''; // Fecha de inicio del rango
 let currentHistoryDateEnd = '';   // Fecha de fin del rango
-
+let agendaTasks = []; //lista de tareas programadas
+let agendaNote = null; //notas rapidas
+let agendaInitialized = false; // Inicializar agenda
+let currentFilter = 'all'; //Para los filtros de tareas
+let currentTaskSort = 'created_desc'; // Valor por defecto: Más Recientes
+let activeNotifications = []; // Notificaciones
+let morosidadSortBy = 'cliente'; // Columna por defecto para ordenar
+let morosidadSortOrder = 'asc';   // Orden por defecto (ascendente)
+let morosidadCompanyFilter = 'all'; // Filtro de empresa para este reporte
+let morosidadReportData = []; // Guardará los datos filtrados para la exportación
 
 // --- Auth: Login / Logout ---
 async function login() {
@@ -812,12 +1151,16 @@ async function loadData() {
         // Cargar las otras colecciones
         const companiesList = await pb.collection('companies').getFullList({ sort: '-created' });
         companies = companiesList || [];
+        //Carga la lista de documentos
         const documentsList = await pb.collection('documents').getFullList({ sort: '-created', expand: 'company' });
         documents = documentsList || [];
+        //Carga la lista de autorizaciones
         const authList = await pb.collection('autorizaciones_factura').getFullList({ sort: '-created', expand: 'empresa' });
         authorizations = authList || [];
+        //Cargar la lista de clientes
         const clientsList = await pb.collection('clients').getFullList({ sort: 'name' });
         clients = clientsList || [];
+        
         // Para simplificar, las guardamos en un solo objeto
         window.catalogs = {};
         const [groups, prices, terms] = await Promise.all([   
@@ -851,6 +1194,40 @@ async function loadData() {
         try {
             const productsList = await pb.collection('products').getFullList({ sort: '-created' });
             products = productsList || [];
+
+            // Cargar Tareas de Agenda
+            let taskFilter = `user = "${pb.authStore.model.id}"`; // Operador solo ve lo suyo
+            if (pb.authStore.model.expand.role.name === 'admin') {
+                taskFilter = ''; // Admin ve TODAS las tareas
+            }
+
+            try {
+                // Carga las tareas del usuario logueado
+                const tasksList = await pb.collection('agenda_tasks').getFullList({ 
+                        filter: taskFilter, 
+                        sort: '-created',
+                        expand: 'user,assigned_by' // Expandimos para ver los nombres
+                    });
+                agendaTasks = tasksList || [];
+                checkAppNotifications();
+
+                // Carga la nota rápida del usuario
+                try {
+                    const note = await pb.collection('agenda_notes').getFirstListItem(`user = "${pb.authStore.model.id}"`);
+                    agendaNote = note;
+                } catch (err) {
+                    // Si no tiene nota, le crea una vacía
+                    console.log("Creando registro de nota para el usuario.");
+                    agendaNote = await pb.collection('agenda_notes').create({
+                        user: pb.authStore.model.id,
+                        content: ''
+                    });
+                }
+
+            } catch (err) {
+                console.error("Error al cargar datos de la agenda:", err);
+                // Podrías mostrar un error, pero por ahora solo lo logueamos
+            }
             
             // Este console.log es la prueba definitiva.
             console.log("Paso 2: ¡ÉXITO AL CARGAR PRODUCTOS! La lista de productos contiene:", products);
@@ -923,6 +1300,80 @@ function applyPermissions() {
         el.style.display = 'none';
     });
 }
+
+//---Notifiaciones ----
+function toggleNotificationPanel() {
+    const panel = document.getElementById('notification-panel');
+    panel.classList.toggle('hidden');
+}
+
+function checkAppNotifications() {
+    activeNotifications = []; // Limpia la lista
+    const today = new Date().setHours(0, 0, 0, 0); // Timestamp de hoy a medianoche
+
+    agendaTasks.forEach(task => {
+        // La tarea no está completada
+        const isPending = task.status !== 'Completada';
+        
+        if (isPending && task.due_date) {
+            const taskDueDate = new Date(task.due_date).setHours(0, 0, 0, 0);
+            
+            // Si la tarea venció (es de ayer o antes) O vence hoy
+            if (taskDueDate <= today) {
+                activeNotifications.push(task);
+            }
+        }
+    });
+    
+    // Ordena por fecha (más vencidas primero)
+    activeNotifications.sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
+    
+    // Actualiza la interfaz visual
+    renderNotifications();
+}
+
+function renderNotifications() {
+    const list = document.getElementById('notification-list');
+    const badge = document.getElementById('notification-count-badge');
+    
+    if (activeNotifications.length === 0) {
+        list.innerHTML = '<p class="text-center text-gray-500 p-4">No tienes notificaciones nuevas.</p>';
+        badge.classList.add('hidden');
+        badge.textContent = '0';
+    } else {
+        list.innerHTML = ''; // Limpia la lista
+        badge.textContent = activeNotifications.length;
+        badge.classList.remove('hidden');
+
+        activeNotifications.forEach(task => {
+            const li = document.createElement('a');
+            li.href = "#"; // Para que parezca un enlace
+            li.className = "block p-3 hover:bg-gray-100";
+            
+            // Hacer que al hacer clic te lleve a la agenda y resalte la tarea
+            li.onclick = (e) => {
+                e.preventDefault();
+                showAgenda();
+                // Opcional: añadir una clase para resaltar la tarea
+                // document.getElementById('task-' + task.id).classList.add('highlight'); 
+                toggleNotificationPanel();
+            };
+
+            const isOverdue = new Date(task.due_date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0);
+            const dateText = isOverdue ? 'Venció' : 'Vence hoy';
+
+            li.innerHTML = `
+                <div class="font-semibold text-sm text-gray-800">${escapeHtml(task.title)}</div>
+                <div class="text-xs text-gray-600">
+                    <span class="font-medium ${isOverdue ? 'text-red-500' : 'text-orange-500'}">${dateText}</span>
+                    - ${new Date(task.due_date).toLocaleDateString()}
+                </div>
+            `;
+            list.appendChild(li);
+        });
+    }
+}
+//--- Final Notifiaciones ----
 
 // --- Gestión de Empresas ---
 async function addCompany(formData) {
@@ -1153,14 +1604,44 @@ function findCompanyById(id) {
     return id ? companies.find(c => c.id === id) || null : null;
 }
 
-function showSection(section) {
-    document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-    document.getElementById(section + 'Section').classList.remove('hidden');
-    if (section === 'history') loadHistory();
-    if (section === 'reports') updateReports();
+// función showSection
+function showSection(sectionId) {
+    // Lista de TODAS las secciones principales de tu aplicación
+    const sections = [
+        'invoiceSection', 
+        'receiptSection', 
+        'historySection', 
+        'reportsSection', 
+        'productManagerModal', // Si estos son modales, no deberían estar aquí, pero ajusta según tu lógica
+        'clientModal',
+        'userManagerModal',
+        'bankAccountModal',
+        'agendaSection',
+        'morosidadSection'
+    ];
+
+    // Oculta todas las secciones
+    sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.classList.add('hidden');
+        } else {
+            // Este console.log te dirá si falta algún ID
+            console.warn(`La sección con id '${id}' no se encontró.`);
+        }
+    });
+
+    // Muestra solo la sección objetivo
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.remove('hidden');
+    } else {
+        console.error(`Error: No se pudo mostrar la sección '${sectionId}' porque no se encontró en el HTML.`);
+    }
 }
 
-function printDocument() { window.print(); }
+//function printDocument() { window.print(); }
+
 function escapeHtml(unsafe) {
   if (unsafe === undefined || unsafe === null) return '';
   return String(unsafe).replace(/[&<>\"'`=\\/]/g, s => ({
@@ -1321,6 +1802,25 @@ async function generateInvoice(editingId = null) {
         }
     });
 
+    // --- LÓGICA DE VENCIMIENTO ---
+    // 1. Encontrar el cliente seleccionado en nuestra lista global
+    const clienteSeleccionado = clients.find(c => c.name === clientName);
+    
+    // 2. Obtener sus días de crédito (o 0 si no se encuentra o no tiene)
+    const creditDays = clienteSeleccionado ? (clienteSeleccionado.credit_days || 0) : 0;
+    
+    // 3. Calcular la nueva fecha de vencimiento
+    // (Aseguramos que la fecha se cree en la zona horaria local)
+    const parts = invoiceDate.split('-'); // Formato YYYY-MM-DD
+    const emisionDate = new Date(parts[0], parts[1] - 1, parts[2]); // Meses son 0-indexados
+    
+    emisionDate.setDate(emisionDate.getDate() + creditDays);
+    
+    // 4. Convertir a un string YYYY-MM-DD para PocketBase
+    const newDueDate = emisionDate.toISOString().split('T')[0];
+    
+    // --- FIN DE LA LÓGICA ---
+
     // 1. Separar subtotales en gravables y exentos
     let taxableSubtotal = 0;
     let exemptSubtotal = 0;
@@ -1339,7 +1839,7 @@ async function generateInvoice(editingId = null) {
     const subtotal = itemsFromForm.reduce((sum, item) => sum + (item.quantity * item.price), 0);
     const discount = parseFloat(document.getElementById('discountAmount').value) || 0;
 
-// 2. Aplicar el descuento proporcionalmente para calcular el impuesto correctamente
+    // 2. Aplicar el descuento proporcionalmente para calcular el impuesto correctamente
     let discountOnTaxable = 0;
     if (subtotal > 0) {
         discountOnTaxable = (taxableSubtotal / subtotal) * discount;
@@ -1363,6 +1863,7 @@ async function generateInvoice(editingId = null) {
                 type: 'Factura',
                 company: currentCompany.id,
                 date: invoiceDate,
+                due_date: newDueDate,
                 clientName, clientRTN, clientAddress,
                 subtotal, discount_amount: discount, taxRate: taxRateValue,
                 taxAmount, total, paymentMethod, observations,
@@ -1417,7 +1918,7 @@ async function generateInvoice(editingId = null) {
                     number: invoiceNumber,
                     type: 'Factura',
                     company: currentCompany.id,
-                    date: invoiceDate, clientName, clientRTN, clientAddress,
+                    date: invoiceDate, due_date: newDueDate, clientName, clientRTN, clientAddress,
                     subtotal, discount_amount: discount, taxRate: taxRateValue,
                     taxAmount, total, paymentMethod, observations,
                     created_by: pb.authStore.model.id,
@@ -1561,8 +2062,8 @@ function updateInvoicePreview(docData, items, authData) {
         <tr>
             <td class="border px-4 py-2 text-center">${escapeHtml(item.quantity)}</td>
             <td class="border px-4 py-2">${escapeHtml(item.description)}</td>
-            <td class="border px-4 py-2 text-right">L ${item.price.toFixed(2)}</td>
-            <td class="border px-4 py-2 text-right">L ${(item.quantity * item.price).toFixed(2)}</td>
+            <td class="border px-4 py-2 text-right">L ${formatNumber(item.price)}</td>
+            <td class="border px-4 py-2 text-right">L ${formatNumber(item.quantity * item.price)}</td>
         </tr>`).join('');
 
     let bankAccountsHtml = '';
@@ -1616,17 +2117,17 @@ function updateInvoicePreview(docData, items, authData) {
 
             <div class="w-1/2 text-right text-xs">
                 <div class="grid grid-cols-2 gap-1">
-                    <span>Importe Exonerado:</span> <span class="font-semibold">L. ${importeExonerado.toFixed(2)}</span>
-                    <span>Importe Exento:</span> <span class="font-semibold">L. ${importeExento.toFixed(2)}</span>
-                    <span>Importe Gravado 15%:</span> <span class="font-semibold">L. ${importeGravado15.toFixed(2)}</span>
-                    <span>Importe Gravado 18%:</span> <span class="font-semibold">L. ${importeGravado18.toFixed(2)}</span>
+                    <span>Importe Exonerado:</span> <span class="font-semibold">L. ${formatNumber(importeExonerado)}</span>
+                    <span>Importe Exento:</span> <span class="font-semibold">L. ${formatNumber(importeExento)}</span>
+                    <span>Importe Gravado 15%:</span> <span class="font-semibold">L. ${formatNumber(importeGravado15)}</span>
+                    <span>Importe Gravado 18%:</span> <span class="font-semibold">L. ${formatNumber(importeGravado18)}</span>
                     <span class="col-span-2 border-t mt-1 pt-1"></span>
-                    <span>Sub-Total:</span> <span class="font-semibold">L. ${docData.subtotal.toFixed(2)}</span>
-                    <span>Descuentos y Rebajas Otorrgados:</span> <span class="font-semibold">L. ${(docData.discount_amount || 0).toFixed(2)}</span>
-                    <span>ISV 15%:</span> <span class="font-semibold">L. ${isv15.toFixed(2)}</span>
-                    <span>ISV 18%:</span> <span class="font-semibold">L. ${isv18.toFixed(2)}</span>
+                    <span>Sub-Total:</span> <span class="font-semibold">L. ${formatNumber(docData.subtotal)}</span>
+                    <span>Descuentos y Rebajas Otorrgados:</span> <span class="font-semibold">L. ${formatNumber(docData.discount_amount || 0)}</span>
+                    <span>ISV 15%:</span> <span class="font-semibold">L. ${formatNumber(isv15)}</span>
+                    <span>ISV 18%:</span> <span class="font-semibold">L. ${formatNumber(isv18)}</span>
                     <span class="col-span-2 border-t mt-1 pt-1"></span>
-                    <span class="font-bold text-lg">TOTAL A PAGAR:</span> <span class="font-bold text-lg">L. ${docData.total.toFixed(2)}</span>
+                    <span class="font-bold text-lg">TOTAL A PAGAR:</span> <span class="font-bold text-lg">L. ${formatNumber(docData.total)}</span>
                 </div>
             </div>
         </div>
@@ -1758,9 +2259,9 @@ function calculateTotals() {
     const taxAmount = taxableBase * (taxRate / 100);
     const total = subtotal - discount + taxAmount;
 
-    document.getElementById('subtotal').textContent = `L ${subtotal.toFixed(2)}`;
-    document.getElementById('taxAmount').textContent = `L ${taxAmount.toFixed(2)}`;
-    document.getElementById('total').textContent = `L ${total.toFixed(2)}`;
+    document.getElementById('subtotal').textContent = `L ${formatNumber(subtotal)}`;
+    document.getElementById('taxAmount').textContent = `L ${formatNumber(taxAmount)}`;
+    document.getElementById('total').textContent = `L ${formatNumber(total)}`;
 }
 
 // Función de numeros
@@ -1796,6 +2297,7 @@ function numeroALetras(num) {
     return textoFinal.trim();
 }
 
+
 // --- Lógica de Recibos ---
 function handleReceiptSubmit() {
     const editingId = document.getElementById('editingReceiptId').value;
@@ -1818,6 +2320,16 @@ async function generateReceipt(editingId = null) {
     const receiptConcept = document.getElementById('receiptConcept').value;
     const receiptObservations = document.getElementById('receiptObservations').value;
 
+    // --- ▼▼▼ INICIO DE LÓGICA DE VENCIMIENTO AÑADIDA ▼▼▼ ---
+    const clienteSeleccionado = clients.find(c => c.name === clientName);
+    const creditDays = clienteSeleccionado ? (clienteSeleccionado.credit_days || 0) : 0;
+    
+    const parts = receiptDate.split('-');
+    const emisionDate = new Date(parts[0], parts[1] - 1, parts[2]);
+    emisionDate.setDate(emisionDate.getDate() + creditDays);
+    const newDueDate = emisionDate.toISOString().split('T')[0];
+    // --- ▲▲▲ FIN DE LÓGICA AÑADIDA ▲▲▲ ---
+
     try {
         if (editingId) {
             // --- LÓGICA PARA ACTUALIZAR UN RECIBO EXISTENTE ---
@@ -1826,7 +2338,7 @@ async function generateReceipt(editingId = null) {
                 number: receiptNumber, // Mantenemos el número original
                 type: 'Recibo',
                 company: currentCompany.id,
-                date: receiptDate, clientName, clientPhone, clientAddress,
+                date: receiptDate, due_date: newDueDate, clientName, clientPhone, clientAddress,
                 amount: receiptAmount, paymentMethod, concept: receiptConcept,
                 observations: receiptObservations,
                 created_by: pb.authStore.model.id,
@@ -1848,7 +2360,7 @@ async function generateReceipt(editingId = null) {
                     number: receiptNumber.toString(),
                     type: 'Recibo',
                     company: currentCompany.id,
-                    date: receiptDate, clientName, clientPhone, clientAddress,
+                    date: receiptDate, due_date: newDueDate, clientName, clientPhone, clientAddress,
                     amount: receiptAmount, paymentMethod, concept: receiptConcept,
                     observations: receiptObservations,
                     created_by: pb.authStore.model.id,
@@ -1922,7 +2434,7 @@ function updateReceiptPreview(docData) {
             <p class="text-lg"># ${escapeHtml(docData.number)}</p><p>Fecha: ${escapeHtml(docData.date)}</p></div>
         </div><hr class="mb-4"><div class="mb-4 text-sm">
         <p>Recibido de: <span class="font-bold">${escapeHtml(docData.clientName)}</span></p>
-        <p>Por la cantidad de: <span class="font-bold">L ${docData.amount.toFixed(2)}</span></p>
+        <p>Por la cantidad de: <span class="font-bold">L ${formatNumber(docData.amount)}</span></p>
         <p>Concepto: <span class="font-bold">${escapeHtml(docData.concept)}</span></p></div>
         <hr class="my-4"><div class="text-sm"><p>Método de Pago: ${escapeHtml(docData.paymentMethod)}</p></div>
         
@@ -1998,11 +2510,12 @@ function loadHistory() {
                 <p class="font-bold ${docColor}">${escapeHtml(doc.type)} #${escapeHtml(doc.number)}</p>
                 <p class="text-sm text-gray-600">Cliente: ${escapeHtml(doc.clientName)}</p>
                 <p class="text-xs text-gray-500">Emitido por: ${escapeHtml(companyName)}</p>
+                <p class="text-xs text-gray-500">Fecha Emisión: ${new Date(doc.date).toLocaleDateString()}</p>
             </div>
 
             <div class="flex flex-col items-end w-40 flex-shrink-0">
-                <p class="font-bold text-lg">L ${total.toFixed(2)}</p>
-                <p class="text-xs text-gray-500">${new Date(doc.date).toLocaleDateString()}</p>
+                <p class="font-bold text-lg">L ${formatNumber(total)}</p>                
+                <p class="text-xs text-gray-500">Fecha Vence: ${new Date(doc.due_date).toLocaleDateString()}</p>
                 <div class="mt-1">
                     <button onclick="editDocument('${doc.id}')" class="text-sm bg-blue-500 text-white px-3 py-1 rounded">Editar</button>
                 </div>
@@ -2153,7 +2666,7 @@ function populateInvoiceForm(doc, items, authData) {
     // 7. Actualiza los cálculos y la vista previa
     calculateTotals();
     updateInvoicePreview(doc, items, authData);
-    showSection('invoice');
+    showSection('invoiceSection');
     window.scrollTo(0, 0); // Desplaza la vista hacia arriba
 }
 
@@ -2182,7 +2695,7 @@ function populateReceiptForm(doc) {
     document.getElementById('saveReceiptBtn').textContent = '💾 Guardar Cambios';
 
     updateReceiptPreview(doc);
-    showSection('receipt');
+    showSection('receiptSection');
     window.scrollTo(0, 0);
 }
 
@@ -2220,17 +2733,15 @@ function renderProductsList() {
         console.log(`Renderizando producto en la lista #${index + 1}: ${product.name}`);
         const productDiv = document.createElement('div');
         productDiv.className = 'grid grid-cols-6 gap-4 items-center bg-gray-100 p-3 rounded-lg shadow-sm';
-        
-        // --- INICIO DE LA CORRECCIÓN ---
+                
         // Se añade '|| 0' para asegurar que si el precio no existe, se use 0 como valor por defecto.
         const price = product.default_price || 0;
-        // --- FIN DE LA CORRECCIÓN ---
         
         productDiv.innerHTML = `
             <span class="col-span-2 font-medium text-sm">${escapeHtml(product.name)}</span>
             <span class="col-span-2 text-xs text-gray-600">Código: ${escapeHtml(product.product_code || 'N/A')}</span>
             
-            <span class="col-span-1 font-semibold text-sm text-right">L ${price.toFixed(2)}</span>
+            <span class="col-span-1 font-semibold text-sm text-right">L ${formatNumber(price)}</span>
             
             <div class="col-span-1 flex gap-2 justify-end">
                 <button onclick="selectProductForEdit('${product.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm">Editar</button>
@@ -2536,7 +3047,7 @@ function populateRolesDropdown() {
     });
 }
 
-// REEMPLAZA tu función renderUsersList con esta
+//función renderUsersList
 function renderUsersList() {
     const listContainer = document.getElementById('usersList');
     listContainer.innerHTML = '';
@@ -2657,14 +3168,14 @@ async function handleUserFormSubmit(event) {
     }
 }
 
-// REEMPLAZA tu función selectUserForEdit con esta
+//función selectUserForEdit
 function selectUserForEdit(id) {
     const user = users.find(u => u.id === id);
     if (!user) return;
 
     document.getElementById('userForm').reset();
     document.getElementById('userId').value = user.id;
-    document.getElementById('userNameDisplay').value = user.name || ''; // <-- CAMPO AÑADIDO
+    document.getElementById('userNameDisplay').value = user.name || '';
     document.getElementById('userEmail').value = user.email;
     document.getElementById('userRole').value = user.role;
 }
@@ -2764,11 +3275,1104 @@ async function deleteBankAccount(id) {
     }
 }
 
-// --- Reportes y Exportación ---
-/*function filterHistory() { 
-  loadHistory(); 
-}*/
+// --- Agenda Personal Logica ---
 
+function showAgenda() {
+    // 1. Configurar los event listeners CADA VEZ que se muestra la sección
+    // Esto evita errores con elementos que no existen en otras pantallas
+    
+    // Tarea rápida
+    document.getElementById('add-quick-btn').onclick = addQuickTask;
+    document.getElementById('quick-task').onkeypress = (e) => { if (e.key === 'Enter') addQuickTask(); };
+
+    // Tarea detallada
+    document.getElementById('add-detailed-btn').onclick = addDetailedTask;
+
+    // Filtros
+    document.getElementById('filter-all').onclick = () => filterTasks('all');
+    document.getElementById('filter-pendiente').onclick = () => filterTasks('Pendiente');
+    document.getElementById('filter-en-curso').onclick = () => filterTasks('En Curso');
+    document.getElementById('filter-en-revision').onclick = () => filterTasks('En Revisión');
+    document.getElementById('filter-completada').onclick = () => filterTasks('Completada');
+    document.getElementById('clear-completed-btn').onclick = clearCompleted;
+    document.getElementById('task-sort-select').onchange = setTaskSort;
+
+    // Timer
+    document.getElementById('start-timer-btn').onclick = startTimer;
+    document.getElementById('pause-timer-btn').onclick = pauseTimer;
+    document.getElementById('reset-timer-btn').onclick = resetTimer;
+
+    // Notas
+    document.getElementById('save-notes-btn').onclick = saveNotes;
+
+    // --- EVENT LISTENERS PARA EL TIMER ---
+    document.getElementById('start-timer-btn').onclick = startTimer;
+    document.getElementById('pause-timer-btn').onclick = pauseTimer;
+    document.getElementById('reset-timer-btn').onclick = resetTimer;
+    
+    // Listeners para los botones de presets
+    document.getElementById('set-time-work').onclick = () => setTimer(25, 'work');
+    document.getElementById('set-time-short-break').onclick = () => setTimer(5, 'shortBreak');
+    document.getElementById('set-time-long-break').onclick = () => setTimer(15, 'longBreak');
+    
+    // Listener para actualizar el total de sesiones
+    document.getElementById('pomodoro-sessions').onchange = () => {
+        totalPomodoroSessions = parseInt(document.getElementById('pomodoro-sessions').value);
+        updatePomodoroInfo();
+    };
+
+    // Poblar el menú de asignación de usuarios (si es admin)
+    const userSelect = document.getElementById('assign-to-user');
+    if (userSelect && pb.authStore.model.expand.role.name === 'admin') {
+        userSelect.innerHTML = ''; // Limpiar opciones
+        
+        // Añadir a todos los usuarios
+        users.forEach(user => {
+            const option = document.createElement('option');
+            option.value = user.id;
+            option.textContent = user.name;
+            userSelect.appendChild(option);
+        });
+        
+        // Poner al propio admin como seleccionado por defecto
+        userSelect.value = pb.authStore.model.id;
+    }
+
+    // 2. Cargar datos iniciales en la vista
+    loadNotes();
+    renderTasks();
+    updateStats();
+    populateTimerTasks();
+    updateTimerDisplay();
+    updatePomodoroInfo();
+    
+    // 3. Mostrar la sección de la agenda
+    showSection('agendaSection');
+}
+
+// --- Funciones Modificadas para PocketBase ---
+
+async function addQuickTask() {
+    const input = document.getElementById('quick-task');
+    const taskText = input.value.trim();
+
+    if (taskText) {
+        const taskData = {
+            user: pb.authStore.model.id,
+            title: taskText,
+            category: document.getElementById('quick-category').value,
+            time_estimate: parseInt(document.getElementById('quick-time-estimate').value),            
+            priority: 'media', // Prioridad por defecto para tareas rápidas
+            due_date: null,
+            notes: '',
+            status: 'Pendiente',
+            completed_at: null
+        };
+        
+        try {
+            const newTask = await pb.collection('agenda_tasks').create(taskData);
+            agendaTasks.unshift(newTask); 
+            renderTasks();
+            updateStats();
+            checkAppNotifications(); // Actualiza las notifaciones
+            input.value = ''; // Limpia solo el campo de texto
+        } catch (err) {
+            console.error('Error al agregar tarea rápida:', err);
+            alert("Error al guardar la tarea. Revisa la consola.");
+        }
+    }
+}
+
+async function addDetailedTask() {
+    // 1. Revisa si estamos en modo "Edición" (si hay un ID en el campo oculto)
+    const taskId = document.getElementById('detailed-task-id').value;
+
+    const title = document.getElementById('detailed-title').value.trim();
+    if (!title) return;
+
+    // 2. Combina fecha y hora
+    const dateVal = document.getElementById('due-date').value;
+    const timeVal = document.getElementById('due-time').value;
+    let fullDueDate = null;
+    if (dateVal && timeVal) {
+        fullDueDate = new Date(`${dateVal}T${timeVal}`).toISOString();
+    } else if (dateVal) {
+        fullDueDate = new Date(dateVal).toISOString();
+    }
+
+    // 3. Obtiene el tiempo estimado (con valor por defecto)
+    const timeValueString = document.getElementById('time-estimate').value;
+    const parsedTime = parseInt(timeValueString);
+    const timeEstimateValue = !isNaN(parsedTime) ? parsedTime : 30;
+
+    // --- LÓGICA DE ASIGNACIÓN ---
+    let assignedToUserId = pb.authStore.model.id; 
+    let assignedByUserId = null;
+    
+    if (pb.authStore.model.expand.role.name === 'admin') {
+        assignedToUserId = document.getElementById('assign-to-user').value;
+        if (assignedToUserId !== pb.authStore.model.id) {
+            assignedByUserId = pb.authStore.model.id;
+        } else {
+            // Si el admin se la asigna a sí mismo, 'assigned_by' debe ser nulo
+            assignedByUserId = null; 
+        }
+    }
+    // --- FIN DE LÓGICA ---
+
+    // 4. Prepara los datos
+    const taskData = {
+        // 'user' no se actualiza, ya está asignado
+        title: title,
+        category: document.getElementById('category').value,
+        priority: document.getElementById('priority').value,
+        time_estimate: timeEstimateValue,
+        due_date: fullDueDate,
+        notes: document.getElementById('notes').value.trim(),
+    };
+
+    try {
+        if (taskId) {
+            // --- MODO ACTUALIZAR ---
+            // Añadimos los campos de asignación a los datos de actualización
+            Object.assign(taskData, {
+                user: assignedToUserId, // El nuevo usuario asignado
+                assigned_by: assignedByUserId // Quién lo asignó
+            });
+
+            // No actualizamos 'is_completed' ni 'completed_at' desde aquí
+            const updatedTask = await pb.collection('agenda_tasks').update(taskId, taskData);
+            
+            // Reemplaza la tarea vieja con la actualizada en la lista local
+            const index = agendaTasks.findIndex(t => t.id === taskId);
+            agendaTasks[index] = updatedTask;
+            
+            alert('¡Tarea actualizada!');
+        } else {
+            // --- MODO CREAR ---
+            Object.assign(taskData, {
+                user: assignedToUserId, // Asigna al usuario seleccionado
+                assigned_by: assignedByUserId, // Registra quién la asignó
+                status: 'Pendiente',
+                completed_at: null
+            });
+            
+            const newTask = await pb.collection('agenda_tasks').create(taskData);
+            agendaTasks.unshift(newTask);
+            alert('¡Tarea creada!');
+        }
+        
+        resetDetailedTaskForm(); // Limpia y resetea el formulario
+        renderTasks(); // Actualiza la lista
+        updateStats(); // Actualiza las estadísticas
+        checkAppNotifications(); // Actualiza las notifaciones
+
+    } catch (err) {
+        console.error('Error al guardar tarea detallada:', err);
+        alert("Error al guardar la tarea. Revisa la consola.");
+    }
+}
+
+async function updateTaskStatus(selectElement, taskId) {
+    const newStatus = selectElement.value;
+    const task = agendaTasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    // Actualiza el estado localmente
+    task.status = newStatus;
+    
+    // Prepara los datos para PocketBase
+    const dataToUpdate = {
+        status: newStatus
+    };
+
+    // Si la tarea se marca como "Completada", guarda la fecha
+    if (newStatus === 'Completada') {
+        task.completed_at = new Date().toISOString();
+        dataToUpdate.completed_at = task.completed_at;
+    } 
+    // Si se revierte de "Completada" a otro estado
+    else if (task.completed_at !== null) { 
+        task.completed_at = null;
+        dataToUpdate.completed_at = null;
+    }
+
+    try {
+        // Actualiza en PocketBase
+        await pb.collection('agenda_tasks').update(taskId, dataToUpdate);
+        
+        // Vuelve a renderizar la lista (para aplicar estilos) y las estadísticas
+        renderTasks();
+        updateStats();
+        checkAppNotifications();
+    } catch (err) {
+        console.error('Error al actualizar el estado:', err);
+        alert("Error al actualizar el estado.");
+    }
+}
+// Hacemos que la función sea accesible desde el HTML
+window.updateTaskStatus = updateTaskStatus;
+
+async function deleteTask(taskId) {
+    if (!confirm('¿Seguro que quieres eliminar esta tarea?')) return;
+
+    try {
+        await pb.collection('agenda_tasks').delete(taskId);
+        
+        // Elimina de la lista local
+        agendaTasks = agendaTasks.filter(task => task.id !== taskId);
+        renderTasks();
+        updateStats();
+    } catch (err) {
+        console.error('Error al eliminar tarea:', err);
+        alert("Error al eliminar la tarea.");
+    }
+}
+window.deleteTask = deleteTask; // Hacerla accesible desde el HTML
+
+async function clearCompleted() {
+    // CORRECCIÓN 1: Buscar tareas usando el nuevo campo 'status'
+    const completedTasks = agendaTasks.filter(task => task.status === 'Completada');
+    
+    if (completedTasks.length === 0) {
+        alert("No hay tareas completadas para limpiar."); // Opcional: un aviso al usuario
+        return;
+    }
+    
+    if (!confirm('¿Estás seguro de que deseas eliminar permanentemente todas las tareas completadas?')) return;
+
+    try {
+        // Borrar una por una de la base de datos
+        for (const task of completedTasks) {
+            await pb.collection('agenda_tasks').delete(task.id);
+        }
+        
+        // CORRECCIÓN 2: Actualizar la lista local filtrando por 'status'
+        agendaTasks = agendaTasks.filter(task => task.status !== 'Completada');
+        
+        // Volver a dibujar la interfaz
+        renderTasks();
+        updateStats();
+    } catch (err) {
+        console.error('Error al limpiar tareas:', err);
+        alert("Ocurrió un error al eliminar las tareas.");
+    }
+}
+
+function loadNotes() {
+    // La nota se carga en loadData, aquí solo la mostramos
+    if (agendaNote) {
+        document.getElementById('quick-notes').value = agendaNote.content;
+    }
+}
+
+async function saveNotes() {
+    const notesArea = document.getElementById('quick-notes');
+    if (!agendaNote) return;
+
+    try {
+        agendaNote.content = notesArea.value;
+        await pb.collection('agenda_notes').update(agendaNote.id, { 
+            content: agendaNote.content 
+        });
+        
+        const btn = document.getElementById('save-notes-btn');
+        const originalText = btn.textContent;
+        btn.textContent = '✅ Guardado';
+        btn.disabled = true;
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }, 2000);
+    } catch (err) {
+        console.error('Error al guardar notas:', err);
+        alert("Error al guardar las notas.");
+    }
+}
+
+function setTaskSort() {
+    currentTaskSort = document.getElementById('task-sort-select').value;
+    renderTasks(); // Vuelve a dibujar la lista con el nuevo orden
+}
+
+function renderTasks() {
+    const container = document.getElementById('tasks-container');
+    if (!container) return;
+
+    // 1. Filtrar Tareas (según los botones "Todas", "Pendientes", "Completadas")
+    let filteredTasks = agendaTasks;
+    
+    if (currentFilter !== 'all') {
+        filteredTasks = agendaTasks.filter(task => task.status === currentFilter);
+    }
+    
+    
+    // 2. Ordenar Tareas (según el menú "Ordenar por:")
+    let sortedTasks = [...filteredTasks]; // Copia la lista filtrada para ordenarla
+
+    // Función auxiliar para convertir prioridad a número
+    const priorityToNumber = (priority) => {
+        switch (priority) {
+            case 'urgente': return 4;
+            case 'alta': return 3;
+            case 'media': return 2;
+            case 'baja': return 1;
+            default: return 0;
+        }
+    };
+
+    switch (currentTaskSort) {
+        case 'created_desc':
+            // Ordena por fecha de creación (por defecto)
+            sortedTasks.sort((a, b) => new Date(b.created) - new Date(a.created));
+            break;
+        case 'due_date_asc':
+            // Ordena por fecha de vencimiento (las tareas sin fecha van al final)
+            sortedTasks.sort((a, b) => {
+                if (a.due_date && b.due_date) return new Date(a.due_date) - new Date(b.due_date);
+                if (a.due_date && !b.due_date) return -1; // a (con fecha) va primero
+                if (!a.due_date && b.due_date) return 1;  // b (con fecha) va primero
+                return 0; // ambos no tienen fecha
+            });
+            break;
+        case 'priority_desc':
+            // Ordena por prioridad (de más alta a más baja)
+            sortedTasks.sort((a, b) => priorityToNumber(b.priority) - priorityToNumber(a.priority));
+            break;
+        case 'time_asc':
+            // Ordena por tiempo estimado (de menor a mayor)
+            sortedTasks.sort((a, b) => (a.time_estimate || 0) - (b.time_estimate || 0));
+            break;
+    }
+
+    // 3. Renderizar (Dibujar) la Lista
+    if (sortedTasks.length === 0) {
+        container.innerHTML = `<div class="text-center text-gray-500 py-4"><span class="text-3xl block mb-2">📝</span><p>No hay tareas en esta categoría.</p></div>`;
+        return;
+    }
+    
+    const categoryEmojis = { trabajo: '💼', personal: '👤', salud: '💪', estudios: '📚', hogar: '🏠' };
+    
+    let html = '';
+    // Usamos la lista 'sortedTasks' para generar el HTML
+    sortedTasks.forEach(task => { 
+        // Lógica para mostrar asignación (si es admin o si fue asignada)
+        let assignmentText = '';
+        const isAdmin = pb.authStore.model.expand.role.name === 'admin';
+        
+        if (isAdmin && task.user !== pb.authStore.model.id) {
+            assignmentText = `<p class="text-xs font-semibold text-blue-custom mt-1">Para: ${escapeHtml(task.expand?.user?.name || 'N/A')}</p>`;
+        } else if (task.assigned_by) {
+            assignmentText = `<p class="text-xs font-semibold text-orange-custom mt-1">De: ${escapeHtml(task.expand?.assigned_by?.name || 'N/A')}</p>`;
+        }
+        
+        // Genera el <select> para el estado
+        const statusOptions = ['Pendiente', 'En Curso', 'En Revisión', 'Completada'];
+        const statusSelectHtml = `
+            <select onchange="updateTaskStatus(this, '${task.id}')" 
+                    class="text-xs font-semibold p-1 border rounded-md ${getStatusColorClass(task.status)}">
+                ${statusOptions.map(opt => 
+                    `<option value="${opt}" ${task.status === opt ? 'selected' : ''}>${opt}</option>`
+                ).join('')}
+            </select>
+        `;
+
+        html += `<div class="border-l-4 p-4 rounded-r-lg ${task.status === 'Completada' ? 'bg-gray-100 opacity-60' : 'bg-white shadow-sm'}" style="border-left-color: ${getPriorityColor(task.priority)}">
+                    <div class="flex items-start gap-3">
+                        
+                        <div class="flex-1">
+                            <h4 class="font-semibold ${task.status === 'Completada' ? 'line-through' : ''}">${escapeHtml(task.title)}</h4>
+                            ${assignmentText}
+                            <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mt-1">
+                                <span>${categoryEmojis[task.category] || '📋'} ${task.category}</span>
+                                <span>⏱️ ${task.time_estimate} min</span>
+                                ${task.due_date ? `<span>📅 ${new Date(task.due_date).toLocaleString()}</span>` : ''}
+                            </div>
+                            ${task.notes ? `<p class="text-sm text-gray-600 mt-2">${escapeHtml(task.notes)}</p>` : ''}
+                        </div>
+                        
+                        <div class="flex flex-col gap-2 items-end w-40 flex-shrink-0">
+                            ${statusSelectHtml} <div class="flex gap-1">
+                                <button onclick="selectTaskForEdit('${task.id}')" class="text-xs bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md font-semibold">Editar</button>
+                                <button onclick="deleteTask('${task.id}')" class="text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-md">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                 </div>`;
+    });
+    
+    container.innerHTML = html;
+}
+
+// Función auxiliar para dar color al <select>
+function getStatusColorClass(status) {
+    switch (status) {
+        case 'Pendiente': return 'bg-gray-200 text-gray-800';
+        case 'En Curso': return 'bg-blue-100 text-blue-800';
+        case 'En Revisión': return 'bg-yellow-100 text-yellow-800';
+        case 'Completada': return 'bg-green-100 text-green-800';
+        default: return 'bg-gray-200';
+    }
+}
+
+function selectTaskForEdit(taskId) {
+    const task = agendaTasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    // 1. Rellena el formulario con los datos de la tarea
+    document.getElementById('detailed-task-id').value = task.id;
+    document.getElementById('detailed-title').value = task.title;
+    document.getElementById('category').value = task.category;
+    document.getElementById('priority').value = task.priority;
+    document.getElementById('time-estimate').value = task.time_estimate;
+    document.getElementById('notes').value = task.notes;
+
+    // 2. Formatea la fecha y hora para los inputs
+    if (task.due_date) {
+        document.getElementById('due-date').value = task.due_date.substring(0, 10);
+        document.getElementById('due-time').value = task.due_date.substring(11, 16);
+    } else {
+        document.getElementById('due-date').value = '';
+        document.getElementById('due-time').value = '';
+    }
+
+    // 3. Rellena el menú de "Asignar A" (si es admin)
+    const userSelect = document.getElementById('assign-to-user');
+    if (userSelect && pb.authStore.model.expand.role.name === 'admin') {
+        userSelect.value = task.user; // Asigna el ID del usuario que tiene la tarea
+    }
+
+    // 4. Cambia la interfaz al modo "Edición"
+    document.getElementById('detailed-task-title').textContent = '✏️ Modificar Tarea';
+    document.getElementById('add-detailed-btn').textContent = 'Guardar Cambios';
+    document.getElementById('cancel-edit-btn').classList.remove('hidden');
+
+    // 5. Desplaza la vista al formulario de edición
+    document.getElementById('detailed-task-title').scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetDetailedTaskForm() {
+    // 1. Limpia los campos
+    document.getElementById('detailed-task-id').value = '';
+    document.getElementById('detailed-title').value = '';
+    document.getElementById('time-estimate').value = '';
+    document.getElementById('notes').value = '';
+    document.getElementById('due-date').value = '';
+    document.getElementById('due-time').value = '';
+
+    // 2. Restaura la interfaz al modo "Crear"
+    document.getElementById('detailed-task-title').textContent = '📝 Crear Tarea Detallada';
+    document.getElementById('add-detailed-btn').textContent = 'Crear Tarea';
+    document.getElementById('cancel-edit-btn').classList.add('hidden');
+}
+
+function getPriorityColor(priority) {
+    switch (priority) {
+        case 'baja': return '#22c55e'; // Verde
+        case 'media': return '#f59e0b'; // Naranja
+        case 'alta': return '#ef4444'; // Rojo
+        case 'urgente': return '#8b0000'; // Rojo Oscuro
+        default: return '#6b7280'; // Gris
+    }
+}
+
+// --- Función para filtrar tareas ---
+function filterTasks(filter) {
+    currentFilter = filter; // filter ahora es 'all', 'Pendiente', 'En Curso', etc.
+    
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => {
+        btn.classList.remove('bg-blue-custom', 'text-white');
+        btn.classList.add('bg-gray-200', 'text-gray-700');
+    });
+    
+    // Genera el ID del botón a partir del filtro (ej: "En Curso" -> "filter-en-curso")
+    let buttonId = 'filter-' + filter.toLowerCase().replace(' ', '-');
+    const activeBtn = document.getElementById(buttonId);
+    
+    if (activeBtn) {
+        activeBtn.classList.add('bg-blue-custom', 'text-white');
+        activeBtn.classList.remove('bg-gray-200', 'text-gray-700');
+    }
+    
+    renderTasks();
+}
+
+// --- Funciones del Timer Pomodoro (SIN CAMBIOS) ---
+let timerInterval = null;
+let currentTime = 25 * 60; // 25 minutos en segundos
+let pomodoroSession = 1;
+let totalPomodoroSessions = 4;
+let isTimerRunning = false;
+let currentMode = 'work'; // 'work', 'shortBreak', 'longBreak'
+
+// --- FUNCIÓN: Poblar Tareas en el Timer ---
+// Llena el menú desplegable con las tareas pendientes
+function populateTimerTasks() {
+    const taskSelect = document.getElementById('pomodoro-task');
+    taskSelect.innerHTML = '<option value="">Seleccionar Tarea a Enfocar...</option>';
+    
+    const pendingTasks = agendaTasks.filter(task => !task.is_completed);
+    
+    pendingTasks.forEach(task => {
+        const option = document.createElement('option');
+        option.value = task.id;
+        option.textContent = `(${task.time_estimate}m) ${escapeHtml(task.title)}`;
+        taskSelect.appendChild(option);
+    });
+}
+
+// --- FUNCIÓN: Establecer Tiempo ---
+// Es llamada por los botones de presets (25m, 5m, 15m)
+function setTimer(minutes, mode) {
+    pauseTimer(); // Detiene cualquier timer que esté corriendo
+    currentTime = minutes * 60;
+    currentMode = mode;
+    updateTimerDisplay();
+    updatePomodoroInfo();
+}
+
+function startTimer() {
+    if (isTimerRunning) return; // Evita múltiples intervalos
+    isTimerRunning = true;
+    
+    // Lee los valores actuales al iniciar
+    totalPomodoroSessions = parseInt(document.getElementById('pomodoro-sessions').value);
+    updatePomodoroInfo(); // Actualiza el texto
+    
+    timerInterval = setInterval(() => {
+        currentTime--;
+        updateTimerDisplay();
+        
+        if (currentTime <= 0) {
+            pauseTimer(); // Detiene el intervalo
+            
+            if (currentMode === 'work') {
+                pomodoroSession++;
+                if (pomodoroSession > totalPomodoroSessions) {
+                    // Ciclo completado, descanso largo
+                    alert('¡Ciclo Pomodoro completado! 🍅 Inicia un descanso largo (15 min).');
+                    setTimer(15, 'longBreak');
+                } else {
+                    // Descanso corto
+                    alert('¡Sesión de trabajo completada! 🍅 Inicia un descanso corto (5 min).');
+                    setTimer(5, 'shortBreak');
+                }
+            } else {
+                // El descanso terminó, volver al trabajo
+                if (currentMode === 'longBreak') {
+                    pomodoroSession = 1; // Reinicia el conteo de sesiones
+                }
+                alert('¡Descanso terminado! 🍅 Hora de volver al trabajo.');
+                setTimer(25, 'work');
+            }
+            // Inicia automáticamente el siguiente timer (opcional, puedes quitarlo si prefieres inicio manual)
+            startTimer(); 
+        }
+    }, 1000);
+}
+
+function pauseTimer() {
+    if (isTimerRunning) {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+    }
+}
+
+function resetTimer() {
+    pauseTimer();
+    pomodoroSession = 1;
+    totalPomodoroSessions = parseInt(document.getElementById('pomodoro-sessions').value);
+    setTimer(25, 'work'); // Resetea a 25 minutos de trabajo
+}
+
+function updateTimerDisplay() {
+    const minutes = Math.floor(currentTime / 60);
+    const seconds = currentTime % 60;
+    const display = document.getElementById('timer-display');
+    if (display) {
+        display.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+}
+
+function updatePomodoroInfo() {
+    const info = document.getElementById('pomodoro-info');
+    if (!info) return;
+
+    let modeText = "Trabajo";
+    if (currentMode === 'shortBreak') modeText = "Descanso Corto";
+    if (currentMode === 'longBreak') modeText = "Descanso Largo";
+    
+    // Intenta obtener la tarea seleccionada
+    const taskSelect = document.getElementById('pomodoro-task');
+    let taskName = "";
+    if (taskSelect && taskSelect.value) {
+        taskName = taskSelect.options[taskSelect.selectedIndex].text.split(') ')[1];
+    }
+    
+    if (currentMode === 'work') {
+        info.textContent = `Sesión ${pomodoroSession} de ${totalPomodoroSessions} - ${taskName || modeText}`;
+    } else {
+        info.textContent = `Modo: ${modeText}`;
+    }
+}
+
+// --- Función de Estadísticas ---
+// (Modificada para usar 'agendaTasks' y campos de PocketBase)
+function updateStats() {
+    
+    // --- 1. CÁLCULO DE ESTADÍSTICAS PERSONALES (MI PROGRESO) ---
+    // Filtra solo las tareas asignadas A MÍ (al usuario logueado)
+    const myTasks = agendaTasks.filter(t => t.user === pb.authStore.model.id);
+
+    // --- Progreso Total (Personal) ---
+    const totalMyTasks = myTasks.length;
+    // CORRECCIÓN: Contamos usando el nuevo status
+    const completedMyTasks = myTasks.filter(t => t.status === 'Completada').length;
+    let totalPercentage = (totalMyTasks > 0) ? Math.round((completedMyTasks / totalMyTasks) * 100) : 0;
+    
+    document.getElementById('stats-total-progress-text').textContent = `${completedMyTasks} / ${totalMyTasks}`;
+    document.getElementById('stats-total-progress-bar').style.width = `${totalPercentage}%`;
+    document.getElementById('productivity').textContent = `${totalPercentage}%`;
+    document.getElementById('productivity-bar').style.width = `${totalPercentage}%`;
+
+    // --- Tareas Completadas Hoy (Personal) ---
+    const today = new Date().toDateString();
+    let totalMinutesToday = 0;
+    let completedTodayCount = 0;
+
+    myTasks.forEach(task => { // Usamos myTasks
+        // CORRECCIÓN: Verificamos el status y completed_at
+        if (task.status === 'Completada' && task.completed_at && new Date(task.completed_at).toDateString() === today) {
+            totalMinutesToday += task.time_estimate || 0;
+            completedTodayCount++;
+        }
+    });
+    document.getElementById('completed-tasks').textContent = completedTodayCount;
+    const hours = Math.floor(totalMinutesToday / 60);
+    const minutes = totalMinutesToday % 60;
+    document.getElementById('focused-time').textContent = `${hours}h ${minutes}m`;
+
+    // --- Tareas de la Semana (Personal) ---
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    // CORRECCIÓN: Verificamos el status
+    const completedThisWeek = myTasks.filter(t => t.status === 'Completada' && t.completed_at && new Date(t.completed_at) > weekAgo).length;
+    document.getElementById('stats-week-tasks').textContent = completedThisWeek;
+    
+    // --- Racha Diaria (Personal) ---
+    const dayInMillis = 24 * 60 * 60 * 1000;
+    const todayTimestamp = new Date().setHours(0, 0, 0, 0);
+
+    const uniqueDays = [...new Set(myTasks // Usamos myTasks
+        // CORRECCIÓN: Verificamos el status
+        .filter(t => t.status === 'Completada' && t.completed_at)
+        .map(t => new Date(t.completed_at).setHours(0, 0, 0, 0))
+    )].sort((a, b) => b - a);
+
+    let streak = 0;
+    if (uniqueDays.length > 0) {
+        if (uniqueDays[0] === todayTimestamp || uniqueDays[0] === (todayTimestamp - dayInMillis)) {
+            streak = 1;
+            for (let i = 0; i < uniqueDays.length - 1; i++) {
+                const currentDay = uniqueDays[i];
+                const previousDay = uniqueDays[i+1];
+                if (currentDay - previousDay === dayInMillis) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+    document.getElementById('streak').textContent = streak;
+
+    // --- Desglose por Categoría (Personal) ---
+    const categoryBreakdownContainer = document.getElementById('stats-category-breakdown');
+    const categoryCounts = {};
+    const categoryTotals = {};
+    const categories = ['trabajo', 'personal', 'salud', 'estudios', 'hogar'];
+    categories.forEach(cat => { categoryCounts[cat] = 0; categoryTotals[cat] = 0; });
+
+    myTasks.forEach(task => { // Usamos myTasks
+        if (categoryTotals.hasOwnProperty(task.category)) {
+            categoryTotals[task.category]++;
+            // CORRECCIÓN: Verificamos el status
+            if (task.status === 'Completada') {
+                categoryCounts[task.category]++;
+            }
+        }
+    });
+
+    const categoryEmojis = { trabajo: '💼', personal: '👤', salud: '💪', estudios: '📚', hogar: '🏠' };
+    let categoryHtml = '';
+    categories.forEach(cat => {
+        const total = categoryTotals[cat];
+        if (total > 0) {
+            const completed = categoryCounts[cat];
+            const percentage = Math.round((completed / total) * 100);
+            categoryHtml += `
+                <div class="text-sm">
+                    <div class="flex justify-between mb-1">
+                        <span class="font-medium">${categoryEmojis[cat] || '📋'} ${cat.charAt(0).toUpperCase() + cat.slice(1)}</span>
+                        <span class="text-gray-500">${completed} / ${total}</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-orange-custom h-2 rounded-full" style="width: ${percentage}%"></div></div>
+                </div>`;
+        }
+    });
+    categoryBreakdownContainer.innerHTML = categoryHtml || '<p class="text-sm text-gray-500 text-center">No hay tareas con categoría.</p>';
+
+
+    // --- 2. CÁLCULO DE ESTADÍSTICAS DE EQUIPO (SOLO ADMIN) ---
+    const teamBreakdownContainer = document.getElementById('stats-team-breakdown');
+    const isAdmin = pb.authStore.model.expand.role.name === 'admin';
+    
+    if (isAdmin && teamBreakdownContainer) {
+        teamBreakdownContainer.innerHTML = '';
+        let teamHtml = '';
+
+        users.forEach(user => {
+            if (user.id === pb.authStore.model.id) return; 
+
+            const userTasks = agendaTasks.filter(task => task.user === user.id);
+            const total = userTasks.length;
+
+            if (total > 0) {
+                // 1. Contar tareas por cada estado
+                const pending = userTasks.filter(t => t.status === 'Pendiente').length;
+                const inProgress = userTasks.filter(t => t.status === 'En Curso').length;
+                const inReview = userTasks.filter(t => t.status === 'En Revisión').length;
+                const completed = userTasks.filter(t => t.status === 'Completada').length;
+                
+                const avatarUrl = user.avatar ? pb.files.getURL(user, user.avatar, {'thumb':'50x50'}) : 'data:image/svg+xml;base64,...'; // (SVG omitido por brevedad)
+
+                // 2. Generar el nuevo HTML con el desglose
+                teamHtml += `
+                    <div class="text-sm mt-4 pt-3 border-t">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center gap-2">
+                                <img src="${avatarUrl}" class="w-6 h-6 rounded-full object-cover bg-gray-200">
+                                <span class="font-medium">${escapeHtml(user.name)}</span>
+                            </div>
+                            <span class="font-semibold text-gray-500">Completadas: ${completed} / ${total}</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                            <div class="p-1 bg-gray-100 rounded">
+                                <span class="block font-semibold text-gray-700">${pending}</span>
+                                <span class="text-gray-500">Pendiente</span>
+                            </div>
+                            <div class="p-1 bg-blue-100 rounded">
+                                <span class="block font-semibold text-blue-800">${inProgress}</span>
+                                <span class="text-blue-600">En Curso</span>
+                            </div>
+                            <div class="p-1 bg-yellow-100 rounded">
+                                <span class="block font-semibold text-yellow-800">${inReview}</span>
+                                <span class="text-yellow-600">Revisión</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        if (teamHtml === '') {
+            teamBreakdownContainer.innerHTML = '<p class="text-sm text-gray-500 text-center">No hay tareas asignadas a otros usuarios.</p>';
+        } else {
+            teamBreakdownContainer.innerHTML = teamHtml;
+        }
+    }
+}
+
+// --- Analisis de Morosidad ---
+
+function showMorosidadReport() {
+    // 1. Prepara el filtro de empresa ANTES de mostrar
+    updateMorosidadCompanyFilter(); 
+    
+    // 2. Genera el reporte (ahora usará el filtro)
+    generateAndDisplayMorosidad();
+    
+    // 3. Muestra la sección
+    showSection('morosidadSection');
+}
+
+/**
+ * Función principal que calcula y muestra el reporte de morosidad.
+ */
+function generateAndDisplayMorosidad() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Estandarizar 'hoy' a medianoche
+    
+    let totales = { '0-30': 0, '31-60': 0, '61-90': 0, '90+': 0, total: 0 };
+    const tbody = document.getElementById('morosidadTableBody');
+    tbody.innerHTML = '';
+
+    // 1. Filtra por tipo de documento (Factura/Recibo) y estado (Pendiente)
+    let documentosPendientes = documents.filter(doc => 
+        (doc.type?.toLowerCase() === 'factura' || doc.type?.toLowerCase() === 'recibo') && 
+        doc.payment_status?.toLowerCase() === 'pendiente'
+    );
+
+    // 2. Filtra por la empresa seleccionada
+    if (morosidadCompanyFilter !== 'all') {
+        documentosPendientes = documentosPendientes.filter(doc => doc.company === morosidadCompanyFilter);
+    }
+
+    // 3. Mapea los datos (calculando monto, estado, etc.)
+    let reporteData = documentosPendientes.map(doc => {
+        const fechaVencimiento = doc.due_date ? new Date(doc.due_date) : new Date(doc.date);
+        fechaVencimiento.setHours(0, 0, 0, 0);
+        const diffTime = today - fechaVencimiento;
+        const diasVencido = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+        const monto = doc.total || doc.amount || 0;
+        
+        // Calcula el estado aquí mismo para usarlo en el sort y export
+        let estadoInfo;
+        if (diasVencido <= 0) { estadoInfo = { texto: 'Al Día', clase: 'bg-green-100 text-green-800' }; }
+        else if (diasVencido <= 30) { estadoInfo = { texto: '1-30 días', clase: 'bg-green-100 text-green-800' }; }
+        else if (diasVencido <= 60) { estadoInfo = { texto: '31-60 días', clase: 'bg-yellow-100 text-yellow-800' }; }
+        else if (diasVencido <= 90) { estadoInfo = { texto: '61-90 días', clase: 'bg-orange-100 text-orange-800' }; }
+        else { estadoInfo = { texto: 'Más de 90 días', clase: 'bg-red-100 text-red-800' }; }
+        
+        return { doc, fechaVencimiento, diasVencido, monto, estadoInfo };
+    });
+
+    // 4. Ordena los datos
+    reporteData.sort((a, b) => {
+        let comparison = 0;
+        
+        switch (morosidadSortBy) {
+            case 'cliente':
+                const clienteA = a.doc.clientName?.toLowerCase() || '';
+                const clienteB = b.doc.clientName?.toLowerCase() || '';
+                if (clienteA > clienteB) comparison = 1;
+                if (clienteA < clienteB) comparison = -1;
+                if (comparison === 0) {
+                    comparison = b.diasVencido - a.diasVencido;
+                }
+                break;
+            
+            case 'monto':
+                comparison = (a.monto || 0) - (b.monto || 0); 
+                if (comparison === 0) {
+                    const clienteA = a.doc.clientName?.toLowerCase() || '';
+                    const clienteB = b.doc.clientName?.toLowerCase() || '';
+                    if (clienteA > clienteB) comparison = 1;
+                    if (clienteA < clienteB) comparison = -1;
+                }
+                break;
+
+            case 'dias':
+                comparison = (a.diasVencido || 0) - (b.diasVencido || 0);
+                if (comparison === 0) {
+                    comparison = (a.monto || 0) - (b.monto || 0);
+                }
+                break;
+        }
+        
+        return (morosidadSortOrder === 'asc') ? comparison : (comparison * -1);
+    });
+    
+    // 5. Guarda los datos filtrados y ordenados en la variable global para exportar
+    morosidadReportData = reporteData;
+
+    // 6. Renderiza la tabla
+    if (reporteData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-4 text-center text-gray-500">No hay documentos pendientes que coincidan con los filtros.</td></tr>`;
+    } else {
+        reporteData.forEach(data => {
+            const { doc, fechaVencimiento, diasVencido, monto, estadoInfo } = data;
+            
+            // Suma a los totales
+            if (diasVencido <= 30) { totales['0-30'] += monto; }
+            else if (diasVencido <= 60) { totales['31-60'] += monto; }
+            else if (diasVencido <= 90) { totales['61-90'] += monto; }
+            else { totales['90+'] += monto; }
+            totales.total += monto;
+
+            const fila = document.createElement('tr');
+            const docColor = (doc.type?.toLowerCase() === 'recibo') ? 'text-orange-custom' : 'text-blue-custom';
+
+            fila.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${escapeHtml(doc.clientName)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold ${docColor}">${escapeHtml(doc.number)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(doc.date).toLocaleDateString()}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${fechaVencimiento.toLocaleDateString()}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">L ${formatNumber(monto)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold ${diasVencido > 0 ? 'text-red-600' : 'text-green-600'}">${diasVencido} días</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${estadoInfo.clase}">
+                        ${estadoInfo.texto}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button onclick="marcarDocumentoComoPagado('${doc.id}')" class="text-green-600 hover:text-green-900">
+                        Marcar como Pagado
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(fila);
+        });
+    }
+
+    // 7. Actualiza las tarjetas de resumen
+    document.getElementById('morosidad-rango-30').textContent = `L ${formatNumber(totales['0-30'])}`;
+    document.getElementById('morosidad-rango-60').textContent = `L ${formatNumber(totales['31-60'])}`;
+    document.getElementById('morosidad-rango-90').textContent = `L ${formatNumber(totales['61-90'])}`;
+    document.getElementById('morosidad-rango-90-plus').textContent = `L ${formatNumber(totales['90+'])}`;
+    document.getElementById('morosidad-total').textContent = `L ${formatNumber(totales.total)}`;
+
+    // 8. Actualiza los indicadores de orden 🔼/🔽
+    document.getElementById('sort-cliente').textContent = 'Cliente';
+    document.getElementById('sort-monto').textContent = 'Total Factura';
+    document.getElementById('sort-dias').textContent = 'Días Vencido';
+    
+    const activeHeader = document.getElementById(`sort-${morosidadSortBy}`);
+    if (activeHeader) {
+        activeHeader.textContent += (morosidadSortOrder === 'asc' ? ' 🔼' : ' 🔽');
+    }
+}
+
+/**
+ * Se llama al hacer clic en un encabezado de la tabla de morosidad.
+ * Actualiza las variables globales de ordenamiento y vuelve a dibujar la tabla.
+ */
+function sortMorosidadReport(sortBy) {
+    if (morosidadSortBy === sortBy) {
+        // Invierte el orden
+        morosidadSortOrder = (morosidadSortOrder === 'asc') ? 'desc' : 'asc';
+    } else {
+        // Columna nueva
+        morosidadSortBy = sortBy;
+        
+        // El orden por defecto para 'monto' y 'dias' es DESCENDENTE (más útil)
+        if (sortBy === 'monto' || sortBy === 'dias') {
+            morosidadSortOrder = 'desc';
+        } else {
+            morosidadSortOrder = 'asc';
+        }
+    }
+    
+    // Vuelve a generar el reporte con el nuevo orden
+    generateAndDisplayMorosidad();
+}
+
+/**
+ * Rellena el menú desplegable del filtro de empresas en el reporte de morosidad.
+ */
+function updateMorosidadCompanyFilter() {
+    const filterSelect = document.getElementById('morosidadCompanyFilter');
+    if (!filterSelect) return; 
+
+    let options = '<option value="all">Todas las Empresas</option>';
+    companies.forEach(company => {
+        options += `<option value="${company.id}">${escapeHtml(company.name)}</option>`;
+    });
+    filterSelect.innerHTML = options;
+    filterSelect.value = morosidadCompanyFilter;
+}
+
+/**
+ * Se llama cuando el usuario cambia la empresa en el filtro de morosidad.
+ */
+function filterMorosidadByCompany(companyId) {
+    morosidadCompanyFilter = companyId;
+    generateAndDisplayMorosidad(); // Vuelve a dibujar el reporte
+}
+
+function exportMorosidadToExcel() {
+    if (morosidadReportData.length === 0) {
+        alert('No hay datos en el reporte actual para exportar.');
+        return;
+    }
+
+    // 1. Define los encabezados
+    const headers = [
+        "Cliente", "Documento", "Número", "F. Emisión", "F. Vencimiento",
+        "Monto Total", "Días Vencido", "Estado"
+    ];
+
+    // 2. Mapea los datos desde la variable global
+    const data = morosidadReportData.map(item => {
+        return [
+            item.doc.clientName,
+            item.doc.type,
+            item.doc.number,
+            new Date(item.doc.date).toLocaleDateString(),
+            item.fechaVencimiento.toLocaleDateString(),
+            item.monto,
+            item.diasVencido,
+            item.estadoInfo.texto // El texto del estado (ej: "31-60 días")
+        ];
+    });
+
+    // 3. Crea la hoja y el libro (SheetJS)
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+    
+    // Ajustar anchos de columna
+    const colWidths = [
+        { wch: 30 }, // Cliente
+        { wch: 10 }, // Documento
+        { wch: 20 }, // Número
+        { wch: 12 }, // F. Emisión
+        { wch: 12 }, // F. Vencimiento
+        { wch: 15 }, // Monto Total
+        { wch: 12 }, // Días Vencido
+        { wch: 15 }  // Estado
+    ];
+    ws['!cols'] = colWidths;
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Reporte de Morosidad");
+
+    // 4. Descarga el archivo
+    XLSX.writeFile(wb, `reporte_morosidad_${morosidadCompanyFilter}.xlsx`);
+}
+
+/**
+ * Función para marcar una factura como "Pagada"
+ */
+async function marcarDocumentoComoPagado(documentId) {
+    if (!confirm('¿Estás seguro de que deseas marcar este documento como "Pagado"?')) return;
+
+    try {
+        const updatedRecord = await pb.collection('documents').update(documentId, {
+            'payment_status': 'Pagada'
+        });
+
+        const index = documents.findIndex(doc => doc.id === documentId);
+        if (index !== -1) {
+            documents[index] = updatedRecord;
+        }
+
+        generateAndDisplayMorosidad();
+        alert('¡Documento marcado como pagado!');
+
+    } catch (err) {
+        console.error("Error al marcar como pagado:", err);
+        alert('Error al actualizar el documento.');
+    }
+}
+
+//------------------------------
+
+// --- Función de Utilidad ---
+function escapeHtml(text) {
+    if (typeof text !== 'string') return '';
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+
+//--------------------------------------------------------------------------
 function updateCompanyFilter() {
     const historyCompanyFilter = document.getElementById('historyCompanyFilter');
     // Verificamos si el elemento existe antes de continuar
@@ -2790,7 +4394,7 @@ function showHistory() {
     loadHistory();
     
     // Finalmente, mostramos la sección
-    showSection('history');
+    showSection('historySection');
 }
 
 function exportToExcel() {
@@ -2885,7 +4489,7 @@ function updateReports() {
     totalDocsEl.textContent = totalDocs;
     totalInvoicesEl.textContent = totalInvoices;
     totalReceiptsEl.textContent = totalReceipts;
-    totalRevenueEl.textContent = `L ${totalRevenue.toFixed(2)}`;
+    totalRevenueEl.textContent = `L ${formatNumber(totalRevenue)}`;
     const companyData = {};
     companies.forEach(c => {
         companyData[c.id] = { name: c.name, revenue: 0, docs: 0 };
@@ -2906,7 +4510,7 @@ function updateReports() {
                 const li = document.createElement('li');
                 li.className = 'flex justify-between items-center p-3 bg-white rounded-lg shadow-sm';
                 li.innerHTML = `<span>${escapeHtml(data.name)} (${data.docs} docs)</span>
-                    <span class="font-bold text-green-600">L ${data.revenue.toFixed(2)}</span>`;
+                    <span class="font-bold text-green-600">L ${formatNumber(data.revenue)}</span>`;
                 ul.appendChild(li);
             }
         });
@@ -2915,6 +4519,93 @@ function updateReports() {
         breakdownEl.innerHTML = '<p class="text-center text-gray-500">No hay datos de empresas.</p>';
     }
 }
+
+/**
+ * Formatea un número con comas para miles y 2 decimales.
+ * @param {number} number - El número a formatear.
+ */
+function formatNumber(number) {
+    const numericValue = parseFloat(number) || 0;
+    
+    // 'es-HN' (Español de Honduras) usa coma como separador de miles y punto como decimal.
+    // Ej: 1,234.56
+    return numericValue.toLocaleString('es-HN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+/**
+ * Función de mantenimiento para actualizar todas las facturas antiguas
+ * que no tienen una fecha de vencimiento (due_date).
+ */
+async function batchUpdateOldInvoices() {
+    
+    // 1. Verificación de Rol (Admin)
+    const isAdmin = pb.authStore.model.expand?.role?.name === 'admin';
+    if (!isAdmin) {
+        alert("Acción no permitida. Solo los administradores pueden ejecutar esta función.");
+        return;
+    }
+
+    if (!confirm("Esto revisará TODOS los documentos (Facturas y Recibos) que no tengan fecha de vencimiento.\n\nSe calculará su 'due_date' basado en los días de crédito del cliente y su estado se marcará como 'Pendiente'.\n\n¿Deseas continuar?")) {
+        return;
+    }
+
+    const btn = document.getElementById('batch-update-btn');
+    btn.disabled = true;
+    btn.textContent = 'Actualizando...';
+
+    let updatedCount = 0;
+    
+    // --- ▼▼▼ CORRECCIÓN DEL FILTRO ▼▼▼ ---
+    // Ahora incluye 'factura' O 'recibo'
+    const docsToUpdate = documents.filter(doc => 
+        (doc.type?.toLowerCase() === 'factura' || doc.type?.toLowerCase() === 'recibo') && 
+        !doc.due_date
+    );
+    // --- ▲▲▲ FIN DE LA CORRECCIÓN ▲▲▲ ---
+
+    if (docsToUpdate.length === 0) {
+        alert("¡Buenas noticias! No se encontraron documentos antiguos que necesiten actualización.");
+        btn.disabled = false;
+        btn.textContent = '🔧 Actualizar Facturas Antiguas';
+        return;
+    }
+
+    try {
+        // El resto de la lógica funciona para ambos tipos de documentos
+        for (const doc of docsToUpdate) {
+            const client = clients.find(c => c.name === doc.clientName);
+            const creditDays = client ? (client.credit_days || 0) : 0;
+            
+            const parts = doc.date.split(' ')[0].split('-'); // Formato YYYY-MM-DD
+            const emisionDate = new Date(parts[0], parts[1] - 1, parts[2]);
+            
+            emisionDate.setDate(emisionDate.getDate() + creditDays);
+            const newDueDate = emisionDate.toISOString().split('T')[0];
+
+            await pb.collection('documents').update(doc.id, {
+                due_date: newDueDate,
+                payment_status: 'Pendiente'
+            });
+            updatedCount++;
+        }
+
+        alert(`¡Éxito! ${updatedCount} documentos han sido actualizados.`);
+        
+        await loadData();
+        loadHistory(); 
+
+    } catch (err) {
+        console.error("Error en la actualización por lotes:", err);
+        alert("Ocurrió un error durante la actualización. Revisa la consola.");
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '🔧 Actualizar Facturas Antiguas';
+    }
+}
+
 </script>
 </body>
 </html>
