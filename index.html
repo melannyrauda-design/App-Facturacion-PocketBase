@@ -1867,7 +1867,7 @@ async function generateInvoice(editingId = null) {
                 clientName, clientRTN, clientAddress,
                 subtotal, discount_amount: discount, taxRate: taxRateValue,
                 taxAmount, total, paymentMethod, observations,
-                created_by: pb.authStore.model.id,
+                created_by: pb.authStore.model.id,                
             };
             
             // Lógica para exonerado
@@ -1922,6 +1922,7 @@ async function generateInvoice(editingId = null) {
                     subtotal, discount_amount: discount, taxRate: taxRateValue,
                     taxAmount, total, paymentMethod, observations,
                     created_by: pb.authStore.model.id,
+                    payment_status: 'Pendiente'
                 };
                  if (taxRateValue === 'exonerado') {
                     documentData.orden_compra_exenta = document.getElementById('ordenCompraExenta').value;
@@ -2341,7 +2342,7 @@ async function generateReceipt(editingId = null) {
                 date: receiptDate, due_date: newDueDate, clientName, clientPhone, clientAddress,
                 amount: receiptAmount, paymentMethod, concept: receiptConcept,
                 observations: receiptObservations,
-                created_by: pb.authStore.model.id,
+                created_by: pb.authStore.model.id,                
             };
 
             const updatedReceipt = await pb.collection('documents').update(editingId, documentData);
@@ -2364,6 +2365,7 @@ async function generateReceipt(editingId = null) {
                     amount: receiptAmount, paymentMethod, concept: receiptConcept,
                     observations: receiptObservations,
                     created_by: pb.authStore.model.id,
+                    payment_status: 'Pendiente'
                 };
                 if (isNaN(documentData.amount)) throw new Error('El monto no es un número válido.');
 
