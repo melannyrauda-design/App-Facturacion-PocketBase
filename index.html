@@ -25,59 +25,96 @@
     </script>
 
     <style>
-      @media print {
-        /* Oculta todo lo que no se debe imprimir (botones, formularios, etc.) */
-        .no-print {
-          display: none !important;
-        }
+        @media print {
+            /* 1. Oculta todo lo que tenga la clase 'no-print' */
+            .no-print {
+                display: none !important;
+            }
 
-        /* Prepara el cuerpo de la página para una impresión limpia */
-        body {
-          background: white !important;
-          margin: 0 !important;
-          padding: 0 !important;
-        }
-        
-        /* 1. Reduce los márgenes de la hoja de papel */
-        @page {
-          size: letter; /* Puedes usar 'A4' si es tu estándar */
-          margin: 1.0cm;
-        }
+            /* 2. Resetea el body para la impresión */
+            body {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            /* 3. Ajusta los márgenes de la hoja de papel */
+            @page {
+                size: letter;
+                margin: 1.0cm;
+            }
 
-        /* --- LA CLAVE DE LA SOLUCIÓN --- */
-        /* Anula todos los estilos visuales del contenedor de la vista previa */
-        #invoicePreview, #receiptPreview {
-          position: static !important;
-          border: none !important;
-          box-shadow: none !important;
-          padding: 0 !important;
-          min-height: 0 !important;
-          font-size: 10pt; /* Un tamaño de letra más compacto */
-        }
+            /* 4. Por defecto, oculta TODAS las secciones y áreas de impresión */
+            #dashboard, #invoiceSection, #receiptSection, #historySection, 
+            #reportsSection, #agendaSection, #morosidadSection, #accountStatementSection,
+            #invoicePreview, #receiptPreview, #statement-preview {
+                display: none !important;
+            }
 
-        /* 3. Reduce el espaciado entre elementos de texto */
-        #invoicePreview h1, #invoicePreview h2, #invoicePreview h3, #invoicePreview h4, #invoicePreview p {
-          margin: 0 0 0.10rem 0; /* Menos margen inferior */
-          padding: 0;
-        }
+            /* --- 5. LÓGICA INTELIGENTE DE IMPRESIÓN --- */
 
-        /* 4. Hace que la tabla de artículos sea más densa */
-        #invoicePreview table th, #invoicePreview table td {
-          padding: 4px 6px; /* Reduce el relleno de las celdas */
-          font-size: 9pt;   /* Letra más pequeña para los artículos */
-        }
+            /* A. CUANDO SE IMPRIME UNA FACTURA O RECIBO (COMPACTO) */
+            body.printing-invoice #invoiceSection,
+            body.printing-invoice #invoicePreview,
+            body.printing-receipt #receiptSection,
+            body.printing-receipt #receiptPreview {
+                display: block !important;
+                position: static !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                min-height: 0 !important;
+                font-size: 10pt;
+            }
 
-        /* 5. Compacta las secciones inferiores */
-        #invoicePreview .border-t, #invoicePreview .text-center {
-            margin-top: 0.10rem; /* Reduce el margen superior */
-        }
-        
-        #invoicePreview .text-right.text-xs {
-            line-height: 1.2; /* Reduce el espacio entre líneas en los totales */
-        }
-        /* --- FIN DE LAS REGLAS DE OPTIMIZACIÓN --- */
+            /* B. Estilos de compactación SOLO para Facturas */
+            body.printing-invoice #invoicePreview h1, 
+            body.printing-invoice #invoicePreview h2, 
+            body.printing-invoice #invoicePreview h3, 
+            body.printing-invoice #invoicePreview h4, 
+            body.printing-invoice #invoicePreview p {
+                margin: 0 0 0.10rem 0; /* Tu estilo compacto */
+                padding: 0;
+            }
+            body.printing-invoice #invoicePreview table th, 
+            body.printing-invoice #invoicePreview table td {
+                padding: 4px 6px; /* Tu estilo compacto */
+                font-size: 9pt;
+            }
+            body.printing-invoice #invoicePreview .text-right.text-xs {
+                line-height: 1.2; /* Tu estilo compacto */
+            }
 
-      }
+            /* ▼▼▼ REGLA RESTAURADA ▼▼▼ */
+            body.printing-invoice #invoicePreview .border-t, 
+            body.printing-invoice #invoicePreview .text-center {
+                margin-top: 0.10rem; /* Tu estilo compacto */
+            }
+            /* ▲▲▲ FIN DE LA REGLA ▲▲▲ */
+
+
+            /* C. CUANDO SE IMPRIME UN ESTADO DE CUENTA (ANCHO) */
+            body.printing-statement #accountStatementSection,
+            body.printing-statement #statement-preview {
+                display: block !important;
+                width: 100% !important;
+                max-width: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                font-size: 10pt;
+            }
+            
+            /* D. Estilos de compactación (para TODOS los documentos) */
+            body.printing-invoice table th, 
+            body.printing-invoice table td,
+            body.printing-receipt table th, 
+            body.printing-receipt table td,
+            body.printing-statement table th, 
+            body.printing-statement table td {
+                padding: 4px 6px;
+                font-size: 9pt;
+            }
+        }
     </style>
 </head>
 <body class="bg-white min-h-screen text-gray-800">
@@ -603,7 +640,7 @@
             <div class="bg-white rounded-lg shadow-lg p-6">
             <div class="flex justify-between items-center mb-4 no-print">
                 <h3 class="text-xl font-bold">Vista Previa</h3>
-                <button onclick="printDocument()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">🖨️ Imprimir</button>
+                <button onclick="printCurrentDocument()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">🖨️ Imprimir</button>
             </div>
             <div id="invoicePreview" class="border rounded-lg p-4 min-h-96">
                 <p class="text-gray-500 text-center mt-20">La vista previa aparecerá aquí</p>
@@ -662,7 +699,7 @@
             <div class="bg-white rounded-lg shadow-lg p-6">
             <div class="flex justify-between items-center mb-4 no-print">
                 <h3 class="text-xl font-bold">Vista Previa</h3>
-                <button onclick="printDocument()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">🖨️ Imprimir</button>
+                <button onclick="printCurrentDocument()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">🖨️ Imprimir</button>
             </div>
             <div id="receiptPreview" class="border rounded-lg p-4 min-h-96">
                 <p class="text-gray-500 text-center mt-20">La vista previa aparecerá aquí</p>
@@ -723,6 +760,14 @@
         <div id="reportsSection" class="section hidden">
         <div class="bg-white rounded-lg shadow-lg p-6">
             <h2 class="text-2xl font-bold mb-6 flex items-center"><span class="bg-gray-600 text-white p-2 rounded-lg mr-3">📊</span> Panel de Reportes</h2>
+            <div class="mt-6 bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Reportes Personalizados</h3>
+                <div class="flex gap-4">
+                    <button onclick="showAccountStatement()" class="bg-blue-custom hover:bg-blue-600 text-white px-5 py-3 rounded-lg font-semibold">
+                        Generar Estado de Cuenta por Cliente
+                    </button>
+                </div>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-custom"><h3 class="text-lg font-semibold">Total Documentos</h3><p id="totalDocs" class="text-3xl font-bold text-blue-custom">0</p></div>
             <div class="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-custom"><h3 class="text-lg font-semibold">Facturas</h3><p id="totalInvoices" class="text-3xl font-bold text-orange-custom">0</p></div>
@@ -1035,6 +1080,39 @@
                 </div>
             </div>
         </div>
+
+        <div id="accountStatementSection" class="hidden p-4 md:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">    
+            <div class="no-print bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold mb-4">Generar Estado de Cuenta</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div>
+                        <label for="statementCompanyFilter" class="block text-sm font-medium text-gray-700">1. Seleccionar Empresa</label>
+                        <select id="statementCompanyFilter" class="w-full mt-1 border rounded-lg px-3 py-2"></select>
+                    </div>
+                    <div>
+                        <label for="statementClientFilter" class="block text-sm font-medium text-gray-700">2. Seleccionar Cliente</label>
+                        <select id="statementClientFilter" class="w-full mt-1 border rounded-lg px-3 py-2"></select>
+                    </div>
+                    <button onclick="generateAccountStatement()" class="w-full md:w-auto bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 font-medium">
+                        Generar Reporte
+                    </button>
+                </div>
+            </div>
+            
+            <div id="statement-print-area">
+                <div id="statement-preview" class="bg-white rounded-lg shadow-md overflow-hidden p-8">
+                    <p class="text-center text-gray-500">Seleccione una empresa y un cliente para generar el estado de cuenta.</p>
+                </div>
+            </div>
+
+            <div id="statement-print-btn-container" class="no-print hidden text-right">
+                <button onclick="printStatement()" class="bg-blue-custom hover:bg-blue-600 text-white px-5 py-3 rounded-lg font-semibold">
+                    🖨️ Imprimir Estado de Cuenta
+                </button>
+            </div>
+        </div>
+
+
     </div>
 </div>
 
@@ -1696,22 +1774,75 @@ function showSection(sectionId) {
     }
 }
 
-//function printDocument() { window.print(); }
+async function printDocument(id) {
+    const doc = documents.find(d => d.id === id);
+    if (!doc) {
+        alert('Documento no encontrado.');
+        return;
+    }
+
+    // 1. Oculta todas las secciones (para preparar la vista de impresión)
+    showSection(null); 
+
+    try {
+        if (doc.type.toLowerCase() === 'factura') {
+            // Prepara la vista previa de la factura
+            const items = await pb.collection('invoice_items').getFullList({ filter: `invoice = "${doc.id}"` });
+            const auth = authorizations.find(a => a.id === doc.autorizacion);
+            updateInvoicePreview(doc, items, auth);
+            
+            // 2. Muestra la sección de factura y añade la clase de impresión
+            document.getElementById('invoiceSection').classList.remove('hidden');
+            document.body.classList.add('printing-invoice');
+            
+        } else if (doc.type.toLowerCase() === 'recibo') {
+            // Prepara la vista previa del recibo
+            updateReceiptPreview(doc);
+            
+            // 2. Muestra la sección de recibo y añade la clase de impresión
+            document.getElementById('receiptSection').classList.remove('hidden');
+            document.body.classList.add('printing-receipt');
+        }
+
+        // 3. Llama a la impresión
+        window.print();
+
+    } catch (err) {
+        console.error("Error al preparar la impresión:", err);
+        alert("Error al preparar la impresión. Revisa la consola.");
+    } finally {
+        // 4. Limpia las clases del body después de imprimir
+        document.body.classList.remove('printing-invoice', 'printing-receipt');
+        
+        // 5. Vuelve a mostrar el historial (o el dashboard)
+        showHistory();
+    }
+}
+
+function printCurrentDocument() {
+    let sectionClass = '';
+
+    // Revisa qué sección está visible (Factura o Recibo)
+    if (!document.getElementById('invoiceSection').classList.contains('hidden')) {
+        sectionClass = 'printing-invoice';
+    } else if (!document.getElementById('receiptSection').classList.contains('hidden')) {
+        sectionClass = 'printing-receipt';
+    }
+
+    if (sectionClass) {
+        document.body.classList.add(sectionClass);
+        window.print();
+        document.body.classList.remove(sectionClass);
+    } else {
+        alert('No hay una factura o recibo activo para imprimir.');
+    }
+}
 
 function escapeHtml(unsafe) {
   if (unsafe === undefined || unsafe === null) return '';
   return String(unsafe).replace(/[&<>\"'`=\\/]/g, s => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', "'": '&#39;', '/': '&#x2F;', '`': '&#x60;', '=': '&#x3D;'
   })[s]);
-}
-
-function escapeCsv(val) {
-  if (val === undefined || val === null) return '';
-  let str = String(val);
-  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-    str = '"' + str.replace(/"/g, '""') + '"';
-  }
-  return str;
 }
 
 function handleInvoiceSubmit() {
@@ -2117,7 +2248,7 @@ function updateInvoicePreview(docData, items, authData) {
 
     const itemsHtml = items.map(item => `
         <tr>
-            <td class="border px-4 py-2 text-center">${escapeHtml(item.quantity)}</td>
+            <td class="border px-4 py-2 text-center">${formatNumber(item.quantity)}</td>
             <td class="border px-4 py-2">${escapeHtml(item.description)}</td>
             <td class="border px-4 py-2 text-right">L ${formatNumber(item.price)}</td>
             <td class="border px-4 py-2 text-right">L ${formatNumber(item.quantity * item.price)}</td>
@@ -2515,7 +2646,7 @@ function loadHistory() {
     // 1. Empieza con la lista completa de documentos.
     let filteredDocs = documents;
 
-    // --- LÓGICA DE FILTRADO POR RANGO DE FECHAS ---
+    // 2. Aplica el filtro por rango de fechas
     if (currentHistoryDateStart || currentHistoryDateEnd) {
         filteredDocs = filteredDocs.filter(doc => {
             const docDate = doc.date.substring(0, 10); // Extrae solo la parte 'YYYY-MM-DD'
@@ -2528,25 +2659,24 @@ function loadHistory() {
             if (currentHistoryDateEnd && docDate > currentHistoryDateEnd) {
                 return false;
             }
-            // Si pasa ambas validaciones, se incluye.
             return true;
         });
     }
 
-    // 2. Aplica el filtro por tipo (Factura, Recibo, Todos).
+    // 3. Aplica el filtro por tipo (Factura, Recibo, Todos).
     if (currentHistoryFilter !== 'all') {
         filteredDocs = filteredDocs.filter(doc => doc.type?.toLowerCase() === currentHistoryFilter);
     }
 
-    // 3. Aplica el filtro por empresa.
+    // 4. Aplica el filtro por empresa.
     if (currentHistoryCompany !== 'all') {
         filteredDocs = filteredDocs.filter(doc => doc.company === currentHistoryCompany);
     }
     
-    // 4. Guarda la lista ya filtrada en una variable global para que la función de exportar a Excel la pueda usar.
+    // 5. Guarda la lista ya filtrada en la variable global.
     currentlyDisplayedDocs = filteredDocs;
 
-    // 5. Muestra los resultados en la pantalla.
+    // 6. Muestra los resultados en la pantalla.
     historyList.innerHTML = '';
     if (currentlyDisplayedDocs.length === 0) {
         historyList.innerHTML = '<p class="text-center text-gray-500">No hay documentos que coincidan con los filtros.</p>';
@@ -2555,27 +2685,26 @@ function loadHistory() {
 
     currentlyDisplayedDocs.forEach(doc => {
         const docDiv = document.createElement('div');
-
+        // Usa 'items-start' para alinear todo en la parte superior
         docDiv.className = 'flex justify-between items-start bg-gray-100 p-3 rounded-lg shadow-sm';
-
+        
         const companyName = doc.expand?.company?.name || 'N/A';
         const total = doc.total || doc.amount || 0;
         const docColor = (doc.type?.toLowerCase() === 'factura') ? 'text-blue-custom' : 'text-orange-custom';
 
-        // 2. Estructura interna: separamos la parte izquierda y derecha
         docDiv.innerHTML = `
             <div class="flex-grow pr-4">
                 <p class="font-bold ${docColor}">${escapeHtml(doc.type)} #${escapeHtml(doc.number)}</p>
                 <p class="text-sm text-gray-600">Cliente: ${escapeHtml(doc.clientName)}</p>
                 <p class="text-xs text-gray-500">Emitido por: ${escapeHtml(companyName)}</p>
-                <p class="text-xs text-gray-500">Fecha Emisión: ${new Date(doc.date).toLocaleDateString()}</p>
             </div>
 
             <div class="flex flex-col items-end w-40 flex-shrink-0">
-                <p class="font-bold text-lg">L ${formatNumber(total)}</p>                
-                <p class="text-xs text-gray-500">Fecha Vence: ${new Date(doc.due_date).toLocaleDateString()}</p>
-                <div class="mt-1">
+                <p class="font-bold text-lg">L ${formatNumber(total)}</p>
+                <p class="text-xs text-gray-500">${new Date(doc.date).toLocaleDateString()}</p>
+                <div class="flex gap-2 mt-1">
                     <button onclick="editDocument('${doc.id}')" class="text-sm bg-blue-500 text-white px-3 py-1 rounded">Editar</button>
+                    <button onclick="printDocument('${doc.id}')" class="text-sm bg-gray-500 text-white px-3 py-1 rounded">Imprimir</button>
                 </div>
             </div>
         `;
@@ -4424,8 +4553,146 @@ async function marcarDocumentoComoPagado(documentId) {
     }
 }
 
-//------------------------------
+// --- Estado de Cuenta Inicio ---
+// PEGA ESTAS TRES NUEVAS FUNCIONES EN TU SCRIPT
 
+/**
+ * Muestra la pantalla de Estado de Cuenta y rellena los filtros.
+ */
+function showAccountStatement() {
+    // 1. Rellena el filtro de empresas
+    const companySelect = document.getElementById('statementCompanyFilter');
+    let companyOptions = '<option value="all">Todas las Empresas</option>';
+    companies.forEach(company => {
+        companyOptions += `<option value="${company.id}">${escapeHtml(company.name)}</option>`;
+    });
+    companySelect.innerHTML = companyOptions;
+
+    // 2. Rellena el filtro de clientes (usando los nombres)
+    const clientSelect = document.getElementById('statementClientFilter');
+    let clientOptions = '<option value="">Seleccione un Cliente...</option>';
+    // Usamos 'clients' (tu maestro de clientes) para rellenar el filtro
+    clients.forEach(client => {
+        clientOptions += `<option value="${escapeHtml(client.name)}">${escapeHtml(client.name)}</option>`;
+    });
+    clientSelect.innerHTML = clientOptions;
+
+    // 3. Resetea la vista previa y oculta el botón de imprimir
+    document.getElementById('statement-preview').innerHTML = '<p class="text-center text-gray-500">Seleccione una empresa y un cliente para generar el estado de cuenta.</p>';
+    document.getElementById('statement-print-btn-container').classList.add('hidden');
+    
+    // 4. Muestra la sección
+    showSection('accountStatementSection');
+}
+
+/**
+ * Genera el reporte en la pantalla basado en los filtros.
+ */
+function generateAccountStatement() {
+    const companyId = document.getElementById('statementCompanyFilter').value;
+    const clientName = document.getElementById('statementClientFilter').value;
+    const preview = document.getElementById('statement-preview');
+    
+    if (!clientName) {
+        alert("Por favor, seleccione un cliente.");
+        return;
+    }
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // 1. Filtra los documentos pendientes para ESE cliente
+    let filteredDocs = documents.filter(doc => 
+        doc.clientName === clientName &&
+        (doc.type?.toLowerCase() === 'factura' || doc.type?.toLowerCase() === 'recibo') && 
+        doc.payment_status?.toLowerCase() === 'pendiente'
+    );
+    
+    // 2. Filtra por empresa (si se seleccionó una)
+    if (companyId !== 'all') {
+        filteredDocs = filteredDocs.filter(doc => doc.company === companyId);
+    }
+
+    // 3. Mapea y ordena los datos
+    const reporteData = filteredDocs.map(doc => {
+        const fechaVencimiento = doc.due_date ? new Date(doc.due_date) : new Date(doc.date);
+        fechaVencimiento.setHours(0, 0, 0, 0);
+        const diffTime = today - fechaVencimiento;
+        const diasVencido = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+        const monto = doc.total || doc.amount || 0;
+        return { doc, fechaVencimiento, diasVencido, monto };
+    }).sort((a, b) => a.fechaVencimiento - b.fechaVencimiento); // Ordena por fecha de vencimiento
+
+    // 4. Construye el HTML del reporte
+    const companyName = (companyId === 'all') ? "Todas las Empresas" : companies.find(c => c.id === companyId)?.name;
+    let totalPendiente = 0;
+    let tableRows = '';
+
+    if (reporteData.length === 0) {
+        tableRows = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Este cliente no tiene documentos pendientes.</td></tr>';
+    } else {
+        reporteData.forEach(data => {
+            totalPendiente += data.monto;
+            tableRows += `
+                <tr class="border-b">
+                    <td class="px-6 py-4">${escapeHtml(data.doc.number)}</td>
+                    <td class="px-6 py-4">${new Date(data.doc.date).toLocaleDateString()}</td>
+                    <td class="px-6 py-4">${data.fechaVencimiento.toLocaleDateString()}</td>
+                    <td class="px-6 py-4 font-medium ${data.diasVencido > 0 ? 'text-red-600' : ''}">${data.diasVencido} días</td>
+                    <td class="px-6 py-4 text-right font-semibold">L ${formatNumber(data.monto)}</td>
+                </tr>
+            `;
+        });
+    }
+
+    preview.innerHTML = `
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Estado de Cuenta por Cliente</h2>
+        <p class="text-lg font-semibold text-gray-700">Cliente: ${escapeHtml(clientName)}</p>
+        <p class="text-sm text-gray-500 mb-6">${escapeHtml(companyName)}</p>
+        
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase">Documento #</th>
+                    <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase">F. Emisión</th>
+                    <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase">F. Vence</th>
+                    <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase">Días Vence</th>
+                    <th class="px-6 py-3 text-right font-medium text-gray-500 uppercase">Monto Pendiente</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                ${tableRows}
+            </tbody>
+            <tfoot>
+                <tr class="bg-gray-50 font-bold">
+                    <td colspan="4" class="px-6 py-4 text-right text-lg">Total Pendiente:</td>
+                    <td class="px-6 py-4 text-right text-lg">L ${formatNumber(totalPendiente)}</td>
+                </tr>
+            </tfoot>
+        </table>
+    `;
+    
+    // Muestra el botón de imprimir
+    document.getElementById('statement-print-btn-container').classList.remove('hidden');
+}
+
+/**
+ * Imprime el área del estado de cuenta.
+ */
+function printStatement() {
+    // 1. Añade la clase de impresión al <body>
+    document.body.classList.add('printing-statement');
+    
+    // 2. Llama a la impresión
+    window.print();
+    
+    // 3. Limpia la clase después de imprimir (o al cerrar la ventana de impresión)
+    document.body.classList.remove('printing-statement');
+}
+
+// --- Estado de Cuenta Fin ---
+
+//------------------------------
 // --- Función de Utilidad ---
 function escapeHtml(text) {
     if (typeof text !== 'string') return '';
