@@ -1307,12 +1307,53 @@ function toggleNotificationPanel() {
     panel.classList.toggle('hidden');
 }
 
+/**
+ * Revisa todas las tareas y actualiza la lista de notificaciones activas.
+ * - Operadores: Ven solo sus tareas vencidas.
+ * - Admins: Ven sus tareas vencidas + las tareas de todos los operadores.
+ * (Los Admins NO ven las tareas de otros Admins).
+ */
 function checkAppNotifications() {
     activeNotifications = []; // Limpia la lista
     const today = new Date().setHours(0, 0, 0, 0); // Timestamp de hoy a medianoche
+    
+    const myId = pb.authStore.model.id;
+    const isAdmin = pb.authStore.model.expand.role.name === 'admin';
 
-    agendaTasks.forEach(task => {
-        // La tarea no está completada
+    let tasksToScan;
+
+    if (isAdmin) {
+        // --- LÓGICA DE FILTRO PARA ADMIN ---
+        // El admin tiene 'agendaTasks' (global) y la lista 'users' (global).
+        tasksToScan = agendaTasks.filter(task => {
+            const taskOwnerId = task.user;
+            
+            // 1. Incluir si la tarea es MÍA
+            if (taskOwnerId === myId) {
+                return true;
+            }
+            
+            // 2. Revisar el rol del dueño de la tarea
+            const taskOwner = users.find(u => u.id === taskOwnerId);
+            
+            // 3. Incluir si el dueño es un 'operador'
+            if (taskOwner && taskOwner.expand.role.name === 'operador') {
+                return true;
+            }
+            
+            // 4. Excluir. (Si llega aquí, es una tarea de OTRO admin)
+            return false;
+        });
+        
+    } else {
+        // --- LÓGICA DE FILTRO PARA OPERADOR ---
+        // El operador solo tiene sus propias tareas en 'agendaTasks'. No necesita filtro.
+        tasksToScan = agendaTasks;
+    }
+
+    // --- REVISIÓN DE TAREAS (Lógica sin cambios) ---
+    // Ahora 'tasksToScan' es la lista correcta para este usuario.
+    tasksToScan.forEach(task => {
         const isPending = task.status !== 'Completada';
         
         if (isPending && task.due_date) {
@@ -1332,9 +1373,17 @@ function checkAppNotifications() {
     renderNotifications();
 }
 
+/**
+ * Dibuja las notificaciones en el panel y actualiza el contador.
+ * Muestra a qué operador pertenece la tarea si el usuario es Admin.
+ */
 function renderNotifications() {
     const list = document.getElementById('notification-list');
     const badge = document.getElementById('notification-count-badge');
+    
+    // Datos del usuario actual
+    const myId = pb.authStore.model.id;
+    const isAdmin = pb.authStore.model.expand.role.name === 'admin';
     
     if (activeNotifications.length === 0) {
         list.innerHTML = '<p class="text-center text-gray-500 p-4">No tienes notificaciones nuevas.</p>';
@@ -1347,24 +1396,31 @@ function renderNotifications() {
 
         activeNotifications.forEach(task => {
             const li = document.createElement('a');
-            li.href = "#"; // Para que parezca un enlace
+            li.href = "#";
             li.className = "block p-3 hover:bg-gray-100";
             
-            // Hacer que al hacer clic te lleve a la agenda y resalte la tarea
             li.onclick = (e) => {
                 e.preventDefault();
                 showAgenda();
-                // Opcional: añadir una clase para resaltar la tarea
-                // document.getElementById('task-' + task.id).classList.add('highlight'); 
                 toggleNotificationPanel();
             };
 
             const isOverdue = new Date(task.due_date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0);
             const dateText = isOverdue ? 'Venció' : 'Vence hoy';
 
+            // --- ▼▼▼ LÓGICA PARA MOSTRAR EL NOMBRE ▼▼▼ ---
+            let userNameHtml = '';
+            // Si soy Admin Y la tarea NO es mía, muestra el nombre del operador
+            if (isAdmin && task.user !== myId) {
+                // Usamos 'expand' para obtener el nombre del usuario
+                const userName = task.expand?.user?.name || 'Usuario Desconocido';
+                userNameHtml = `<div class="text-xs font-semibold text-blue-custom">De: ${escapeHtml(userName)}</div>`;
+            }
+            // --- ▲▲▲ FIN DE LA LÓGICA ▲▲▲ ---
+
             li.innerHTML = `
                 <div class="font-semibold text-sm text-gray-800">${escapeHtml(task.title)}</div>
-                <div class="text-xs text-gray-600">
+                ${userNameHtml} <div class="text-xs text-gray-600">
                     <span class="font-medium ${isOverdue ? 'text-red-500' : 'text-orange-500'}">${dateText}</span>
                     - ${new Date(task.due_date).toLocaleDateString()}
                 </div>
@@ -3385,89 +3441,99 @@ async function addQuickTask() {
     }
 }
 
+/**
+ * Guarda o actualiza una tarea detallada.
+ * Lee el formulario, determina si es una creación o una actualización,
+ * y envía los datos a PocketBase.
+ */
 async function addDetailedTask() {
-    // 1. Revisa si estamos en modo "Edición" (si hay un ID en el campo oculto)
+    // 1. Lee el ID. Si está vacío, es una tarea nueva.
     const taskId = document.getElementById('detailed-task-id').value;
-
+    
     const title = document.getElementById('detailed-title').value.trim();
-    if (!title) return;
+    if (!title) {
+        alert("El título de la tarea no puede estar vacío.");
+        return;
+    }
 
-    // 2. Combina fecha y hora
+    // 2. Procesa la fecha y hora
     const dateVal = document.getElementById('due-date').value;
     const timeVal = document.getElementById('due-time').value;
     let fullDueDate = null;
+
     if (dateVal && timeVal) {
         fullDueDate = new Date(`${dateVal}T${timeVal}`).toISOString();
     } else if (dateVal) {
         fullDueDate = new Date(dateVal).toISOString();
     }
 
-    // 3. Obtiene el tiempo estimado (con valor por defecto)
+    // 3. Procesa el tiempo estimado (con valor por defecto)
     const timeValueString = document.getElementById('time-estimate').value;
     const parsedTime = parseInt(timeValueString);
     const timeEstimateValue = !isNaN(parsedTime) ? parsedTime : 30;
 
-    // --- LÓGICA DE ASIGNACIÓN ---
-    let assignedToUserId = pb.authStore.model.id; 
+    // 4. Procesa la asignación de usuario (Admin vs Operador)
+    let assignedToUserId = pb.authStore.model.id; // Por defecto, es para mí
     let assignedByUserId = null;
     
     if (pb.authStore.model.expand.role.name === 'admin') {
         assignedToUserId = document.getElementById('assign-to-user').value;
         if (assignedToUserId !== pb.authStore.model.id) {
             assignedByUserId = pb.authStore.model.id;
-        } else {
-            // Si el admin se la asigna a sí mismo, 'assigned_by' debe ser nulo
-            assignedByUserId = null; 
         }
     }
-    // --- FIN DE LÓGICA ---
 
-    // 4. Prepara los datos
+    // 5. Prepara el objeto de datos común
     const taskData = {
-        // 'user' no se actualiza, ya está asignado
         title: title,
         category: document.getElementById('category').value,
         priority: document.getElementById('priority').value,
         time_estimate: timeEstimateValue,
         due_date: fullDueDate,
         notes: document.getElementById('notes').value.trim(),
+        user: assignedToUserId,
+        assigned_by: assignedByUserId
     };
 
     try {
         if (taskId) {
             // --- MODO ACTUALIZAR ---
-            // Añadimos los campos de asignación a los datos de actualización
-            Object.assign(taskData, {
-                user: assignedToUserId, // El nuevo usuario asignado
-                assigned_by: assignedByUserId // Quién lo asignó
+            // Pide el registro actualizado CON los nombres expandidos
+            const updatedTask = await pb.collection('agenda_tasks').update(taskId, taskData, {
+                expand: 'user,assigned_by'
             });
-
-            // No actualizamos 'is_completed' ni 'completed_at' desde aquí
-            const updatedTask = await pb.collection('agenda_tasks').update(taskId, taskData);
             
-            // Reemplaza la tarea vieja con la actualizada en la lista local
+            // Reemplaza la tarea vieja en la lista local
             const index = agendaTasks.findIndex(t => t.id === taskId);
             agendaTasks[index] = updatedTask;
-            
             alert('¡Tarea actualizada!');
+
         } else {
             // --- MODO CREAR ---
+            // Añade los campos que solo se definen al crear
             Object.assign(taskData, {
-                user: assignedToUserId, // Asigna al usuario seleccionado
-                assigned_by: assignedByUserId, // Registra quién la asignó
                 status: 'Pendiente',
                 completed_at: null
             });
             
-            const newTask = await pb.collection('agenda_tasks').create(taskData);
+            // 1. Crea el registro
+            const createdRecord = await pb.collection('agenda_tasks').create(taskData);
+            
+            // 2. Vuelve a pedir el registro, pero CON los nombres expandidos
+            // (Esto soluciona el error "Para: N/A")
+            const newTask = await pb.collection('agenda_tasks').getOne(createdRecord.id, {
+                expand: 'user,assigned_by'
+            });
+
+            // 3. Añade la tarea completa a la lista local
             agendaTasks.unshift(newTask);
-            alert('¡Tarea creada!');
+            alert('¡Tarea creada y asignada!');
         }
         
         resetDetailedTaskForm(); // Limpia y resetea el formulario
         renderTasks(); // Actualiza la lista
         updateStats(); // Actualiza las estadísticas
-        checkAppNotifications(); // Actualiza las notifaciones
+        checkAppNotifications(); // Vuelve a revisar las notificaciones después de cualquier cambio.
 
     } catch (err) {
         console.error('Error al guardar tarea detallada:', err);
