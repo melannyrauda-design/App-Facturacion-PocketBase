@@ -191,18 +191,18 @@
                 </div>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-4 mt-4">
-                <button onclick="showSection('invoiceSection')" class="flex items-center justify-center gap-2 p-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Facturación</span></button>
-                <button onclick="showSection('receiptSection')" class="flex items-center justify-center gap-2 p-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Recibos</span></button>
-                <button onclick="showHistory()" class="flex items-center justify-center gap-2 p-3 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Historial</span></button>
-                <button onclick="showSection('reportsSection')" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Reportes</span></button>
-                <button onclick="showCompanyManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Empresas</span></button>
-                <button onclick="showAuthManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Autorizaciones</span></button>
-                <button onclick="showProductManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Productos</span></button>
-                <button onclick="showClientManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Clientes</span></button>
-                <button onclick="showUserManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-slate-600 hover:bg-slate-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Usuarios</button>
-                <button onclick="showBankAccountManager()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Cuentas Bancarias</button>
-                <button onclick="showAgenda()" class="flex items-center justify-center gap-2 p-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Agenda</button>
-                <button onclick="showMorosidadReport()" data-role="admin" class="flex items-center justify-center gap-2 p-3 bg-stone-600 hover:bg-stone-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Morosidad</button>
+                <button onclick="showSection('invoiceSection')" data-permission="create_invoice" class="flex items-center justify-center gap-2 p-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Facturación</span></button>
+                <button onclick="showSection('receiptSection')" data-permission="create_receipt" class="flex items-center justify-center gap-2 p-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Recibos</span></button>
+                <button onclick="showHistory()" data-permission="view_history" class="flex items-center justify-center gap-2 p-3 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Historial</span></button>
+                <button onclick="showSection('reportsSection')" data-permission="view_reports" class="flex items-center justify-center gap-2 p-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Reportes</span></button>
+                <button onclick="showCompanyManager()"  data-permission="manage_company" class="flex items-center justify-center gap-2 p-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Empresas</span></button>
+                <button onclick="showAuthManager()" data-permission="manage_auths" class="flex items-center justify-center gap-2 p-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Autorizaciones</span></button>
+                <button onclick="showProductManager()" data-permission="manage_products" class="flex items-center justify-center gap-2 p-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Productos</span></button>
+                <button onclick="showClientManager()" data-permission="manage_clients" class="flex items-center justify-center gap-2 p-3 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105"><span>Clientes</span></button>
+                <button onclick="showUserManager()" data-permission="manage_users" class="flex items-center justify-center gap-2 p-3 bg-slate-600 hover:bg-slate-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Usuarios</button>
+                <button onclick="showBankAccountManager()" data-permission="manage_banks" class="flex items-center justify-center gap-2 p-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Cuentas Bancarias</button>
+                <button onclick="showAgenda()" data-permission="view_agenda" class="flex items-center justify-center gap-2 p-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Agenda</button>
+                <button onclick="showMorosidadReport()" data-permission="view_morosidad" class="flex items-center justify-center gap-2 p-3 bg-stone-600 hover:bg-stone-700 text-white font-semibold rounded-lg shadow-sm transition-transform transform hover:scale-105">Morosidad</button>
             </div>
         </div>
 
@@ -743,7 +743,7 @@
                                 Exportar a Excel
                             </button>
                         </div>
-                        <div data-role="admin">                            
+                        <div data-permission="manage_settings">                            
                             <button onclick="batchUpdateOldInvoices()" id="batch-update-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center justify-center">
                                 <span class="mr-2">🔧</span>
                                 Actualizar Facturas Antiguas
@@ -850,7 +850,7 @@
                         
                             <input type="hidden" id="detailed-task-id">
 
-                            <div id="assign-user-container" data-role="admin" class="hidden">
+                            <div id="assign-user-container" data-permission="assign_tasks" class="hidden">
                                 <label for="assign-to-user" class="block text-sm font-medium text-gray-700">Asignar Tarea A:</label>
                                 <select id="assign-to-user" class="w-full border rounded-lg px-3 py-2 mt-1">
                                 </select>
@@ -990,7 +990,7 @@
                                 <p class="text-sm text-gray-500 text-center">No hay tareas con categoría.</p>
                             </div>
 
-                            <div data-role="admin" class="hidden">
+                            <div data-permission="assign_tasks" class="hidden">
                                 <hr class="my-4 border-gray-300">
                                 <h4 class="text-md font-semibold text-gray-700">Progreso del Equipo</h4>
                                 <div id="stats-team-breakdown" class="space-y-3 mt-3">
@@ -1153,7 +1153,7 @@ async function login() {
     try {
         // --- CAMBIO AQUÍ: Añadimos 'expand' para traer los datos del rol ---
         await pb.collection('users').authWithPassword(email, password, {
-            expand: 'role' 
+            expand: 'role.permissions' // <-- Esto es vital para que funcione
         });
 
         // PASO 1: Cargar todos los datos primero, incluyendo los productos.
@@ -1221,118 +1221,100 @@ function setDefaultDates() {
     if (rDate && !rDate.value) rDate.value = today;
 }
 
+// REEMPLAZA tu función loadData con esta versión corregida
 async function loadData() {
     try {
-        console.log("Iniciando carga de datos...");
-
-        // Cargar las otras colecciones
-        const companiesList = await pb.collection('companies').getFullList({ sort: '-created' });
-        companies = companiesList || [];
-        //Carga la lista de documentos
-        const documentsList = await pb.collection('documents').getFullList({ sort: '-created', expand: 'company' });
-        documents = documentsList || [];
-        //Carga la lista de autorizaciones
-        const authList = await pb.collection('autorizaciones_factura').getFullList({ sort: '-created', expand: 'empresa' });
-        authorizations = authList || [];
-        //Cargar la lista de clientes
-        const clientsList = await pb.collection('clients').getFullList({ sort: 'name' });
-        clients = clientsList || [];
+        console.log("Cargando todos los datos...");
         
-        // Para simplificar, las guardamos en un solo objeto
-        window.catalogs = {};
-        const [groups, prices, terms] = await Promise.all([   
-            pb.collection('client_groups').getFullList({ sort: 'name' }),
-            pb.collection('price_lists').getFullList({ sort: 'name' }),
-            pb.collection('payment_terms').getFullList({ sort: 'name' })
-        ]);
-        window.catalogs.client_groups = groups;
-        window.catalogs.price_lists = prices;
-        window.catalogs.payment_terms = terms;
-        
-        // Solo intentamos cargar la lista de usuarios y roles si el usuario es admin
-        const currentUserRole = pb.authStore.model?.expand?.role?.name;
-        if (currentUserRole === 'admin') {
-            const [usersList, rolesList] = await Promise.all([
-                pb.collection('users').getFullList({ expand: 'role' }),
-                pb.collection('roles').getFullList()
-            ]);
-            users = usersList || [];
-            roles = rolesList || [];
+        // 1. Verificación de seguridad inicial
+        if (!pb.authStore.isValid || !pb.authStore.model) {
+            console.warn("No hay sesión válida. Redirigiendo al login.");
+            showSection('loginScreen');
+            return;
         }
-        // Solo intentamos cargar si el usuario es admin
-        if (currentUserRole === 'admin') {
-            // ... (carga de users y roles)
+
+        // 2. Carga paralela de datos básicos
+        const [
+            companiesList,
+            documentsList,
+            authList,
+            productsList,
+            clientsList,
+            invoiceItemsList, // Asegúrate de cargar esto
+            rolesList
+        ] = await Promise.all([
+            pb.collection('companies').getFullList({ sort: '-created' }),
+            pb.collection('documents').getFullList({ sort: '-created', expand: 'company' }),
+            pb.collection('autorizaciones_factura').getFullList({ sort: '-created', expand: 'empresa' }),
+            pb.collection('products').getFullList({ sort: 'name' }),
+            pb.collection('clients').getFullList({ sort: 'name' }),
+            pb.collection('invoice_items').getFullList(),
+            pb.collection('roles').getFullList()
+        ]);
+
+        // 3. Asignación a variables globales
+        companies = companiesList || [];
+        documents = documentsList || [];
+        authorizations = authList || [];
+        products = productsList || [];
+        clients = clientsList || [];
+        invoice_items = invoiceItemsList || [];
+        roles = rolesList || [];
+
+        // 4. Lógica de Roles (CON PROTECCIÓN)
+        // Usamos '?.' (optional chaining) para que no falle si algo es null
+        const userRoleName = pb.authStore.model?.expand?.role?.name;
+
+        if (userRoleName === 'admin') {
+            console.log("Cargando datos de administrador...");
+            const usersList = await pb.collection('users').getFullList({ expand: 'role' });
+            users = usersList || [];
+            
             const accountsList = await pb.collection('bank_accounts').getFullList({ sort: '-created', expand: 'company' });
             bankAccounts = accountsList || [];
+            
+            // Cargar TODAS las tareas de agenda para el admin
+            const tasksList = await pb.collection('agenda_tasks').getFullList({ 
+                sort: '-created',
+                expand: 'user,assigned_by' 
+            });
+            agendaTasks = tasksList || [];
+        } else {
+            // Cargar SOLO las tareas del operador
+            const tasksList = await pb.collection('agenda_tasks').getFullList({ 
+                filter: `user = "${pb.authStore.model.id}"`, 
+                sort: '-created',
+                expand: 'user,assigned_by'
+            });
+            agendaTasks = tasksList || [];
         }
 
-        // --- BLOQUE DE DIAGNÓSTICO PARA PRODUCTOS ---
-        console.log("Paso 1: Intentando cargar la colección 'products'...");
+        // 5. Cargar Notas de Agenda (con manejo de errores)
         try {
-            const productsList = await pb.collection('products').getFullList({ sort: '-created' });
-            products = productsList || [];
-
-            // Cargar Tareas de Agenda
-            let taskFilter = `user = "${pb.authStore.model.id}"`; // Operador solo ve lo suyo
-            if (pb.authStore.model.expand.role.name === 'admin') {
-                taskFilter = ''; // Admin ve TODAS las tareas
+            const note = await pb.collection('agenda_notes').getFirstListItem(`user = "${pb.authStore.model.id}"`);
+            agendaNote = note;
+        } catch (err) {
+            // Si no existe nota, la creamos silenciosamente
+            if (pb.authStore.isValid) {
+                agendaNote = await pb.collection('agenda_notes').create({ 
+                    user: pb.authStore.model.id, 
+                    content: '' 
+                });
             }
-
-            try {
-                // Carga las tareas del usuario logueado
-                const tasksList = await pb.collection('agenda_tasks').getFullList({ 
-                        filter: taskFilter, 
-                        sort: '-created',
-                        expand: 'user,assigned_by' // Expandimos para ver los nombres
-                    });
-                agendaTasks = tasksList || [];
-                checkAppNotifications();
-
-                // Carga la nota rápida del usuario
-                try {
-                    const note = await pb.collection('agenda_notes').getFirstListItem(`user = "${pb.authStore.model.id}"`);
-                    agendaNote = note;
-                } catch (err) {
-                    // Si no tiene nota, le crea una vacía
-                    console.log("Creando registro de nota para el usuario.");
-                    agendaNote = await pb.collection('agenda_notes').create({
-                        user: pb.authStore.model.id,
-                        content: ''
-                    });
-                }
-
-            } catch (err) {
-                console.error("Error al cargar datos de la agenda:", err);
-                // Podrías mostrar un error, pero por ahora solo lo logueamos
-            }
-            
-            // Este console.log es la prueba definitiva.
-            console.log("Paso 2: ¡ÉXITO AL CARGAR PRODUCTOS! La lista de productos contiene:", products);
-            
-            if (products.length === 0) {
-                alert("Diagnóstico: La lista de productos se cargó correctamente desde la base de datos, pero está vacía. Por favor, asegúrate de haber creado al menos un producto en el panel de PocketBase.");
-            }
-        } catch (productError) {
-            console.error("--- ¡ERROR CRÍTICO AL CARGAR PRODUCTOS! ---");
-            console.error("La llamada a pb.collection('products').getFullList() ha fallado. Razón:", productError);
-            alert("ERROR DE DIAGNÓSTICO: No se pudo cargar la lista de productos. Revisa la consola (F12) para ver el error específico. Es muy probable que sea un error de permisos (403 Forbidden).");
         }
-        // --- FIN DEL BLOQUE DE DIAGNÓSTICO ---
+        
+        console.log("Datos cargados con éxito.");
 
-    } catch (generalError) {
-        console.error("Error en la carga general de datos (compañías, documentos, etc.):", generalError);
-        alert("Ocurrió un error al cargar los datos iniciales. Revisa la consola.");
+        // 6. Actualizar la interfaz
+        updateCompanySelects();
+        populateClientSelects();
+        updateReports();
+        checkAppNotifications(); // Actualizar notificaciones
+
+    } catch (err) {
+        console.error("Error crítico al cargar datos:", err);
+        // No mostramos alerta al usuario si es un error de cancelación, solo en consola
     }
-
-    // Actualizar la interfaz de usuario
-    console.log("Paso 3: Actualizando la interfaz de usuario con los datos cargados...");
-    updateCompanySelects();
-    //updateCompanyFilter();
-    updateReports();
-    loadHistory();
-    populateClientSelects();
-    populateDatalists();
-    console.log("Carga de datos y actualización de UI completada.");
 }
 
 function updateUserInfo() {
@@ -1360,22 +1342,52 @@ function updateUserInfo() {
 function applyPermissions() {
     const user = pb.authStore.model;
     
-    // El 'expand' nos da el objeto completo del rol, incluyendo su nombre.
-    const userRole = user?.expand?.role?.name; 
+    // Si no hay usuario o rol cargado, ocultamos todo lo protegido por seguridad
+    if (!user || !user.expand || !user.expand.role) return;
+
+    // 1. Obtener los permisos desde la relación expandida
+    // IMPORTANTE: PocketBase devuelve la relación expandida en 'expand.permissions'
+    // 'permissions' es el nombre del campo de relación en tu colección 'roles'
+    const rolePermissionsObjects = user.expand.role.expand?.permissions || [];
     
-    console.log(`Aplicando permisos para el rol: ${userRole}`);
+    // 2. Crear una lista simple de los "slugs" (códigos) de los permisos
+    // Transformamos la lista de objetos [{slug: "view_morosidad"}, ...] a ["view_morosidad", ...]
+    const userPermissionSlugs = rolePermissionsObjects.map(p => p.slug);
 
-    // Si el usuario es un administrador, no hacemos nada (puede ver todo).
-    if (userRole === 'admin') {
-        // Hacemos visibles todos los elementos restringidos por si estaban ocultos.
-        document.querySelectorAll('[data-role]').forEach(el => el.style.display = 'flex');
-        return; 
-    }
+    // 3. Verificar si es un Super Usuario (tiene el permiso comodín '*')
+    const isSuperUser = userPermissionSlugs.includes('*');
+    
+    console.log(`Aplicando permisos para rol '${user.expand.role.name}':`, userPermissionSlugs);
 
-    // Si no es admin (o no tiene rol), ocultamos los elementos restringidos.
-    document.querySelectorAll('[data-role="admin"]').forEach(el => {
-        el.style.display = 'none';
+    // 4. Buscar y filtrar elementos en el HTML
+    const protectedElements = document.querySelectorAll('[data-permission]');
+
+    protectedElements.forEach(element => {
+        const requiredPermission = element.getAttribute('data-permission');
+
+        // Si es SuperUser O si su lista de permisos incluye el requerido...
+        if (isSuperUser || userPermissionSlugs.includes(requiredPermission)) {
+            element.classList.remove('hidden'); // Mostrar
+        } else {
+            element.classList.add('hidden');    // Ocultar
+        }
     });
+}
+
+/**
+ * Verifica si el usuario actual tiene un permiso específico.
+ * Retorna true o false.
+ */
+function hasPermission(permissionSlug) {
+    const user = pb.authStore.model;
+    if (!user || !user.expand || !user.expand.role) return false;
+
+    // 1. Obtener permisos (Misma lógica que applyPermissions)
+    const rolePermissionsObjects = user.expand.role.expand?.permissions || [];
+    const userPermissionSlugs = rolePermissionsObjects.map(p => p.slug);
+
+    // 2. Verificar (incluyendo Super Usuario '*')
+    return userPermissionSlugs.includes('*') || userPermissionSlugs.includes(permissionSlug);
 }
 
 //---Notifiaciones ----
@@ -1393,9 +1405,13 @@ function toggleNotificationPanel() {
 function checkAppNotifications() {
     activeNotifications = []; // Limpia la lista
     const today = new Date().setHours(0, 0, 0, 0); // Timestamp de hoy a medianoche
+
+    // 1. Obtenemos el modelo del usuario de forma segura
+    const user = pb.authStore.model;
+    if (!user) return; // Si no hay usuario logueado, salimos
     
     const myId = pb.authStore.model.id;
-    const isAdmin = pb.authStore.model.expand.role.name === 'admin';
+    const isAdmin = user.expand?.role?.name === 'admin';
 
     let tasksToScan;
 
@@ -1458,9 +1474,14 @@ function renderNotifications() {
     const list = document.getElementById('notification-list');
     const badge = document.getElementById('notification-count-badge');
     
-    // Datos del usuario actual
-    const myId = pb.authStore.model.id;
-    const isAdmin = pb.authStore.model.expand.role.name === 'admin';
+    // 1. Verificación de seguridad del usuario
+    const user = pb.authStore.model;
+    if (!user) return; // Si no hay usuario, no hacemos nada
+
+    const myId = user.id;
+        
+    // Usamos '?. (Optional Chaining)' para leer el rol de forma segura
+    const isAdmin = user.expand?.role?.name === 'admin';    
     
     if (activeNotifications.length === 0) {
         list.innerHTML = '<p class="text-center text-gray-500 p-4">No tienes notificaciones nuevas.</p>';
@@ -1485,19 +1506,17 @@ function renderNotifications() {
             const isOverdue = new Date(task.due_date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0);
             const dateText = isOverdue ? 'Venció' : 'Vence hoy';
 
-            // --- ▼▼▼ LÓGICA PARA MOSTRAR EL NOMBRE ▼▼▼ ---
             let userNameHtml = '';
             // Si soy Admin Y la tarea NO es mía, muestra el nombre del operador
             if (isAdmin && task.user !== myId) {
-                // Usamos 'expand' para obtener el nombre del usuario
                 const userName = task.expand?.user?.name || 'Usuario Desconocido';
-                userNameHtml = `<div class="text-xs font-semibold text-blue-custom">De: ${escapeHtml(userName)}</div>`;
+                userNameHtml = `<div class="text-xs font-semibold text-blue-custom">Para: ${escapeHtml(userName)}</div>`;
             }
-            // --- ▲▲▲ FIN DE LA LÓGICA ▲▲▲ ---
 
             li.innerHTML = `
                 <div class="font-semibold text-sm text-gray-800">${escapeHtml(task.title)}</div>
-                ${userNameHtml} <div class="text-xs text-gray-600">
+                ${userNameHtml}
+                <div class="text-xs text-gray-600">
                     <span class="font-medium ${isOverdue ? 'text-red-500' : 'text-orange-500'}">${dateText}</span>
                     - ${new Date(task.due_date).toLocaleDateString()}
                 </div>
@@ -1506,6 +1525,7 @@ function renderNotifications() {
         });
     }
 }
+
 //--- Final Notifiaciones ----
 
 // --- Gestión de Empresas ---
@@ -3510,19 +3530,20 @@ function showAgenda() {
 
     // Poblar el menú de asignación de usuarios (si es admin)
     const userSelect = document.getElementById('assign-to-user');
-    if (userSelect && pb.authStore.model.expand.role.name === 'admin') {
-        userSelect.innerHTML = ''; // Limpiar opciones
+    // Usamos la nueva función hasPermission
+    if (userSelect && hasPermission('assign_tasks')) {
+        userSelect.innerHTML = '';
         
-        // Añadir a todos los usuarios
-        users.forEach(user => {
-            const option = document.createElement('option');
-            option.value = user.id;
-            option.textContent = user.name;
-            userSelect.appendChild(option);
-        });
-        
-        // Poner al propio admin como seleccionado por defecto
-        userSelect.value = pb.authStore.model.id;
+        // (Nota: Asegúrate de que la variable 'users' esté cargada en loadData)
+        if (users.length > 0) {
+             users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = user.name;
+                userSelect.appendChild(option);
+            });
+             userSelect.value = pb.authStore.model.id;
+        }
     }
 
     // 2. Cargar datos iniciales en la vista
@@ -3605,8 +3626,9 @@ async function addDetailedTask() {
     let assignedToUserId = pb.authStore.model.id; // Por defecto, es para mí
     let assignedByUserId = null;
     
-    if (pb.authStore.model.expand.role.name === 'admin') {
+    if (hasPermission('assign_tasks')) {
         assignedToUserId = document.getElementById('assign-to-user').value;
+        
         if (assignedToUserId !== pb.authStore.model.id) {
             assignedByUserId = pb.authStore.model.id;
         }
@@ -3855,9 +3877,9 @@ function renderTasks() {
     sortedTasks.forEach(task => { 
         // Lógica para mostrar asignación (si es admin o si fue asignada)
         let assignmentText = '';
-        const isAdmin = pb.authStore.model.expand.role.name === 'admin';
+        const canAssign = hasPermission('assign_tasks'); // Verificamos permiso
         
-        if (isAdmin && task.user !== pb.authStore.model.id) {
+        if (canAssign && task.user !== pb.authStore.model.id) {
             assignmentText = `<p class="text-xs font-semibold text-blue-custom mt-1">Para: ${escapeHtml(task.expand?.user?.name || 'N/A')}</p>`;
         } else if (task.assigned_by) {
             assignmentText = `<p class="text-xs font-semibold text-orange-custom mt-1">De: ${escapeHtml(task.expand?.assigned_by?.name || 'N/A')}</p>`;
@@ -3935,8 +3957,8 @@ function selectTaskForEdit(taskId) {
 
     // 3. Rellena el menú de "Asignar A" (si es admin)
     const userSelect = document.getElementById('assign-to-user');
-    if (userSelect && pb.authStore.model.expand.role.name === 'admin') {
-        userSelect.value = task.user; // Asigna el ID del usuario que tiene la tarea
+    if (userSelect && hasPermission('assign_tasks')) {
+        userSelect.value = task.user; 
     }
 
     // 4. Cambia la interfaz al modo "Edición"
@@ -4223,9 +4245,9 @@ function updateStats() {
 
     // --- 2. CÁLCULO DE ESTADÍSTICAS DE EQUIPO (SOLO ADMIN) ---
     const teamBreakdownContainer = document.getElementById('stats-team-breakdown');
-    const isAdmin = pb.authStore.model.expand.role.name === 'admin';
+    //const isAdmin = pb.authStore.model.expand.role.name === 'admin';
     
-    if (isAdmin && teamBreakdownContainer) {
+    if (hasPermission('assign_tasks') && teamBreakdownContainer) {
         teamBreakdownContainer.innerHTML = '';
         let teamHtml = '';
 
