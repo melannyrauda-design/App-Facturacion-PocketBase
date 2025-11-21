@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGF - Arquitectura del Sistema</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb', // blue-custom
+                        secondary: '#f97316', // orange-custom
+                        dark: '#1e293b',
+                        light: '#f8fafc',
+                        success: '#22c55e',
+                        danger: '#ef4444'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            height: 300px;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .card { @apply bg-white rounded-xl shadow-lg p-6 border-l-4 border-primary hover:shadow-xl transition-shadow duration-300; }
+        .stat-value { @apply text-4xl font-bold text-gray-800; }
+        .stat-label { @apply text-sm font-semibold text-gray-500 uppercase tracking-wider; }
+        
+        /* CSS Flowchart Connectors */
+        .flow-arrow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 40px;
+            color: #94a3b8;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Header Section -->
+    <header class="bg-gradient-to-r from-blue-700 to-blue-500 text-white p-8 shadow-lg">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div>
+                <h1 class="text-5xl font-extrabold mb-2 tracking-tight">SGF</h1>
+                <h2 class="text-2xl font-light opacity-90">Sistema de Facturación y Gestión</h2>
+                <p class="mt-4 text-blue-100 max-w-lg leading-relaxed">
+                    Una solución SPA (Single Page Application) integral para la gestión de PYMES, combinando facturación, finanzas y productividad en una arquitectura BaaS moderna.
+                </p>
+            </div>
+            <div class="grid grid-cols-2 gap-4 text-center">
+                <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+                    <div class="text-3xl">🚀</div>
+                    <div class="font-bold mt-1">SPA</div>
+                    <div class="text-xs opacity-75">Arquitectura</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+                    <div class="text-3xl">🔥</div>
+                    <div class="font-bold mt-1">PocketBase</div>
+                    <div class="text-xs opacity-75">Backend</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+                    <div class="text-3xl">🎨</div>
+                    <div class="font-bold mt-1">Tailwind</div>
+                    <div class="text-xs opacity-75">Diseño</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+                    <div class="text-3xl">📊</div>
+                    <div class="font-bold mt-1">SheetJS</div>
+                    <div class="text-xs opacity-75">Reportes</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-6 space-y-12">
+
+        <!-- Section 1: Core Modules Overview -->
+        <section>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-2 h-8 bg-secondary rounded-full"></div>
+                <h3 class="text-2xl font-bold text-gray-800">Módulos Principales</h3>
+            </div>
+            <p class="text-gray-600 mb-8 max-w-3xl">
+                El sistema SGF integra cuatro pilares fundamentales para la operación del negocio, centralizando datos que normalmente estarían dispersos en múltiples herramientas.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="card border-l-blue-500">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="stat-value text-blue-600">Ventas</div>
+                            <div class="stat-label mt-2">Facturación y Recibos</div>
+                        </div>
+                        <span class="text-3xl">📄</span>
+                    </div>
+                    <ul class="mt-4 space-y-2 text-sm text-gray-600">
+                        <li>• Control de Correlativos CAI</li>
+                        <li>• Cálculo automático de ISV</li>
+                        <li>• Manejo de Exentos</li>
+                    </ul>
+                </div>
+
+                <div class="card border-l-green-500">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="stat-value text-green-600">Finanzas</div>
+                            <div class="stat-label mt-2">Cobros y Reportes</div>
+                        </div>
+                        <span class="text-3xl">💰</span>
+                    </div>
+                    <ul class="mt-4 space-y-2 text-sm text-gray-600">
+                        <li>• Análisis de Morosidad</li>
+                        <li>• Estados de Cuenta</li>
+                        <li>• Dashboard en tiempo real</li>
+                    </ul>
+                </div>
+
+                <div class="card border-l-orange-500">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="stat-value text-orange-600">Gestión</div>
+                            <div class="stat-label mt-2">Productividad</div>
+                        </div>
+                        <span class="text-3xl">📅</span>
+                    </div>
+                    <ul class="mt-4 space-y-2 text-sm text-gray-600">
+                        <li>• Agenda Kanban</li>
+                        <li>• Asignación de Tareas</li>
+                        <li>• Notificaciones</li>
+                    </ul>
+                </div>
+
+                <div class="card border-l-purple-500">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="stat-value text-purple-600">Admin</div>
+                            <div class="stat-label mt-2">Seguridad y Control</div>
+                        </div>
+                        <span class="text-3xl">🛡️</span>
+                    </div>
+                    <ul class="mt-4 space-y-2 text-sm text-gray-600">
+                        <li>• Roles (Admin/Operador)</li>
+                        <li>• Permisos Granulares</li>
+                        <li>• Gestión de Usuarios</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Data Model Visualization -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-2 h-8 bg-secondary rounded-full"></div>
+                    <h3 class="text-2xl font-bold text-gray-800">Modelo de Datos (PocketBase)</h3>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <p class="text-gray-600 mb-4 text-sm">
+                        Distribución de la complejidad del sistema basada en las colecciones de la base de datos y sus interrelaciones.
+                    </p>
+                    <div class="chart-container">
+                        <canvas id="dataModelChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="lg:col-span-1">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-2 h-8 bg-secondary rounded-full"></div>
+                    <h3 class="text-2xl font-bold text-gray-800">Seguridad (RBAC)</h3>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 h-full">
+                    <p class="text-gray-600 mb-4 text-sm">
+                        El sistema implementa un control de acceso basado en roles (RBAC) con permisos granulares almacenados en relaciones.
+                    </p>
+                    
+                    <div class="space-y-4 mt-6">
+                        <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                            <div class="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-700 font-bold mr-4">1</div>
+                            <div>
+                                <h4 class="font-bold text-blue-900">Usuario</h4>
+                                <p class="text-xs text-blue-700">Se autentica y obtiene su Rol.</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-center text-gray-400 text-xl">⬇</div>
+                        <div class="flex items-center p-3 bg-purple-50 rounded-lg">
+                            <div class="w-10 h-10 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 font-bold mr-4">2</div>
+                            <div>
+                                <h4 class="font-bold text-purple-900">Rol</h4>
+                                <p class="text-xs text-purple-700">Contiene relaciones a Permisos.</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-center text-gray-400 text-xl">⬇</div>
+                        <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                            <div class="w-10 h-10 rounded-full bg-green-200 flex items-center justify-center text-green-700 font-bold mr-4">3</div>
+                            <div>
+                                <h4 class="font-bold text-green-900">Permisos</h4>
+                                <p class="text-xs text-green-700">Slugs (ej: 'create_invoice') validan la UI.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Logic Flow (Morosity) -->
+        <section>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-2 h-8 bg-secondary rounded-full"></div>
+                <h3 class="text-2xl font-bold text-gray-800">Lógica de Negocio: Análisis de Morosidad</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h4 class="font-bold text-gray-700 mb-4">Algoritmo de Clasificación</h4>
+                    <p class="text-gray-600 text-sm mb-6">
+                        El sistema clasifica automáticamente las facturas pendientes basándose en la diferencia entre la fecha actual y la fecha de vencimiento pre-calculada.
+                    </p>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="morosityChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col justify-center">
+                    <h4 class="font-bold text-gray-700 mb-4">Flujo de Datos</h4>
+                    
+                    <div class="space-y-2">
+                        <!-- Step 1 -->
+                        <div class="flex items-center">
+                            <div class="bg-gray-100 p-3 rounded-lg border border-gray-300 w-full">
+                                <span class="font-mono text-xs text-blue-600">INPUT:</span>
+                                <span class="text-sm font-medium">Lista de Documentos (PocketBase)</span>
+                            </div>
+                        </div>
+                        <!-- Arrow -->
+                        <div class="flow-arrow">↓</div>
+                        <!-- Step 2 -->
+                        <div class="flex items-center">
+                            <div class="bg-orange-50 p-3 rounded-lg border border-orange-200 w-full">
+                                <span class="font-mono text-xs text-orange-600">PROCESS:</span>
+                                <span class="text-sm font-medium">Filtro: Tipo (Factura/Recibo) && Estado (Pendiente)</span>
+                            </div>
+                        </div>
+                        <!-- Arrow -->
+                        <div class="flow-arrow">↓</div>
+                        <!-- Step 3 -->
+                        <div class="flex items-center">
+                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 w-full">
+                                <span class="font-mono text-xs text-blue-600">CALC:</span>
+                                <span class="text-sm font-medium">Días Vencido = Hoy - Fecha Vencimiento</span>
+                            </div>
+                        </div>
+                        <!-- Arrow -->
+                        <div class="flow-arrow">↓</div>
+                        <!-- Step 4 -->
+                        <div class="flex items-center">
+                            <div class="bg-green-50 p-3 rounded-lg border border-green-200 w-full">
+                                <span class="font-mono text-xs text-green-600">OUTPUT:</span>
+                                <span class="text-sm font-medium">Reporte Interactivo & Exportación Excel</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Technical Specs -->
+        <section>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-2 h-8 bg-secondary rounded-full"></div>
+                <h3 class="text-2xl font-bold text-gray-800">Especificaciones Técnicas</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-slate-800 text-white p-6 rounded-xl shadow-lg">
+                    <h4 class="text-lg font-bold text-blue-400 mb-2">Frontend Stack</h4>
+                    <ul class="space-y-2 text-sm opacity-80">
+                        <li>• HTML5 Semántico</li>
+                        <li>• Vanilla JavaScript (ES6+)</li>
+                        <li>• Tailwind CSS (Utility First)</li>
+                        <li>• Chart.js (Visualización)</li>
+                        <li>• SheetJS (XLSX Export)</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-slate-800 text-white p-6 rounded-xl shadow-lg">
+                    <h4 class="text-lg font-bold text-orange-400 mb-2">Backend Stack</h4>
+                    <ul class="space-y-2 text-sm opacity-80">
+                        <li>• PocketBase (Go Framework)</li>
+                        <li>• SQLite (Embedded DB)</li>
+                        <li>• Real-time Subscriptions</li>
+                        <li>• REST API automática</li>
+                        <li>• File Storage Local</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-800 text-white p-6 rounded-xl shadow-lg">
+                    <h4 class="text-lg font-bold text-green-400 mb-2">Características Clave</h4>
+                    <ul class="space-y-2 text-sm opacity-80">
+                        <li>• Single Page Application (SPA)</li>
+                        <li>• Diseño Responsivo</li>
+                        <li>• Impresión "Inteligente" (CSS)</li>
+                        <li>• Validación de Datos en Cliente</li>
+                        <li>• Manejo de Errores Robusto</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-6 text-center text-gray-500 text-sm">
+            <p>SGF - Sistema de Facturación y Gestión</p>
+            <p class="mt-2">Generado por Ing. Kevin Avelar.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Configuration for Chart.js Tooltips (Handling Long Labels) ---
+        const tooltipConfig = {
+            callbacks: {
+                title: function(tooltipItems) {
+                    const item = tooltipItems[0];
+                    let label = item.chart.data.labels[item.dataIndex];
+                    if (Array.isArray(label)) {
+                        return label.join(' ');
+                    } else {
+                        return label;
+                    }
+                }
+            }
+        };
+
+        // --- Chart 1: Data Model Complexity (Bar Chart) ---
+        const ctxModel = document.getElementById('dataModelChart').getContext('2d');
+        new Chart(ctxModel, {
+            type: 'bar',
+            data: {
+                // Wrapping labels > 16 chars
+                labels: ['Documents', 'Invoice Items', 'Clients', 'Products', 'Agenda Tasks', 'Users & Roles'],
+                datasets: [{
+                    label: 'Campos y Relaciones',
+                    data: [15, 5, 6, 5, 9, 6], // Based on the manual fields count
+                    backgroundColor: [
+                        'rgba(37, 99, 235, 0.8)', // Blue
+                        'rgba(37, 99, 235, 0.6)',
+                        'rgba(249, 115, 22, 0.8)', // Orange
+                        'rgba(249, 115, 22, 0.6)',
+                        'rgba(147, 51, 234, 0.8)', // Purple
+                        'rgba(107, 114, 128, 0.8)'  // Gray
+                    ],
+                    borderRadius: 6,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: tooltipConfig
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Número de Campos' }
+                    }
+                }
+            }
+        });
+
+        // --- Chart 2: Morosity Buckets (Doughnut Chart) ---
+        const ctxMorosity = document.getElementById('morosityChart').getContext('2d');
+        new Chart(ctxMorosity, {
+            type: 'doughnut',
+            data: {
+                labels: ['Al Día', '1-30 Días', '31-60 Días', '61-90 Días', '+90 Días'],
+                datasets: [{
+                    data: [45, 25, 15, 10, 5], // Example distribution
+                    backgroundColor: [
+                        '#22c55e', // Green (Safe)
+                        '#84cc16', // Light Green
+                        '#eab308', // Yellow
+                        '#f97316', // Orange
+                        '#ef4444'  // Red (Danger)
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right' },
+                    tooltip: tooltipConfig
+                }
+            }
+        });
+    </script>
+</body>
+</html>
