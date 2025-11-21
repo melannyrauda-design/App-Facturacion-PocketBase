@@ -551,10 +551,11 @@
                 <select id="invoiceClientSelect" onchange="clientSelected('invoice')" class="w-full border rounded px-3 py-2 mb-3"></select>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" id="clientName" placeholder="Nombre del cliente" class="border rounded px-3 py-2">
-                    <input type="text" id="clientRTN" placeholder="RTN del cliente" class="border rounded px-3 py-2">
-                    <input type="text" id="clientAddress" placeholder="Dirección" class="md:col-span-2 border rounded px-3 py-2">
+                    <input type="text" id="invoiceClientName" placeholder="Nombre del cliente" class="border rounded px-3 py-2">
+                    <input type="text" id="invoiceClientRTN" placeholder="RTN del cliente" class="border rounded px-3 py-2">
+                    <input type="text" id="invoiceClientAddress" placeholder="Dirección" class="md:col-span-2 border rounded px-3 py-2">
                 </div>
+
                 </div>
                 <div class="bg-yellow-50 p-4 rounded-lg">
                 <h3 class="text-lg font-semibold text-gray-800 mb-3">Productos/Servicios</h3>
@@ -1988,9 +1989,9 @@ async function generateInvoice(editingId = null) {
 
     // --- RECOLECCIÓN DE DATOS COMÚN PARA AMBOS CASOS ---
     const invoiceDate = document.getElementById('invoiceDate').value;
-    const clientName = document.getElementById('clientName').value;
-    const clientRTN = document.getElementById('clientRTN').value;
-    const clientAddress = document.getElementById('clientAddress').value;
+    const clientName = document.getElementById('invoiceClientName').value;
+    const clientRTN = document.getElementById('invoiceClientRTN').value;
+    const clientAddress = document.getElementById('invoiceClientAddress').value;
     const paymentMethod = document.getElementById('paymentMethod').value;
     const taxRateSelect = document.getElementById('taxRate');
     const taxRateValue = taxRateSelect.value;
@@ -3212,23 +3213,57 @@ function populateDatalists() {
 }
 
 function clientSelected(formType) {
+    // 1. Determinar qué formulario es (Factura o Recibo)
     const selectId = formType === 'invoice' ? 'invoiceClientSelect' : 'receiptClientSelect';
-    const clientId = document.getElementById(selectId).value;
+    const selectElement = document.getElementById(selectId);
     
+    if (!selectElement) return;
+
+    const clientId = selectElement.value;
     const selectedClient = clients.find(c => c.id === clientId);
 
+    // Definimos los IDs de los campos según el tipo
+    const fields = formType === 'invoice' 
+        ? ['invoiceClientName', 'invoiceClientRTN', 'invoiceClientAddress']
+        : ['receiptClientName', 'receiptClientPhone', 'receiptClientAddress'];
+
     if (selectedClient) {
+        // --- CASO 1: CLIENTE ENCONTRADO (BLOQUEAR) ---
+        
+        // A. Rellenar datos
         if (formType === 'invoice') {
-            document.getElementById('clientName').value = selectedClient.name;
-            document.getElementById('clientRTN').value = selectedClient.rtn || '';
-            document.getElementById('clientAddress').value = selectedClient.address || '';
+            document.getElementById(fields[0]).value = selectedClient.name;
+            document.getElementById(fields[1]).value = selectedClient.rtn || '';
+            document.getElementById(fields[2]).value = selectedClient.address || '';
         } else {
-            document.getElementById('receiptClientName').value = selectedClient.name;
-            document.getElementById('receiptClientPhone').value = selectedClient.phone_number || '';
-            document.getElementById('receiptClientAddress').value = selectedClient.address || '';
+            document.getElementById(fields[0]).value = selectedClient.name;
+            document.getElementById(fields[1]).value = selectedClient.phone || '';
+            document.getElementById(fields[2]).value = selectedClient.address || '';
         }
+
+        // B. Bloquear campos y ponerlos grises
+        fields.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.setAttribute('readonly', true); // Bloquea la escritura
+                el.classList.add('bg-gray-100', 'cursor-not-allowed'); // Visualmente bloqueado
+            }
+        });
+
+    } else {
+        // --- CASO 2: DESELECCIONAR / NUEVO (DESBLOQUEAR) ---
+        
+        // A. Limpiar datos
+        fields.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.value = ''; // Limpia el texto
+                el.removeAttribute('readonly'); // Permite escribir de nuevo
+                el.classList.remove('bg-gray-100', 'cursor-not-allowed'); // Vuelve al color blanco
+            }
+        });
     }
-}
+}   
 
 // --- Gestión de Usuarios (Solo Admin) ---
 function showUserManager() {
