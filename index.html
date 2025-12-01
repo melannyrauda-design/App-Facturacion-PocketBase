@@ -2216,7 +2216,7 @@ function updateInvoicePreview(docData, items, authData) {
     const preview = document.getElementById('invoicePreview');
     const company = findCompanyById(docData.company);
     const logoUrl = company && company.logo ? pb.files.getURL(company, company.logo) : '';
-    const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="Logo" class="h-24 mb-6 object-contain">` : '';
+    const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="Logo" class="h-48 mb-6 object-contain">` : '';
 
 // 1. Separar subtotales en gravables y exentos a partir de los artículos ('items')
     let taxableSubtotal = 0;
@@ -2624,7 +2624,7 @@ function updateReceiptPreview(docData) {
     const preview = document.getElementById('receiptPreview');
     const company = findCompanyById(docData.company);
     const logoUrl = company && company.logo ? pb.files.getURL(company, company.logo) : '';
-    const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="Logo" class="h-24 mb-6 object-contain">` : '';
+    const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="Logo" class="h-48 mb-6 object-contain">` : '';
 
     let bankAccountsHtml = '';
     if (company && bankAccounts.length > 0) {
