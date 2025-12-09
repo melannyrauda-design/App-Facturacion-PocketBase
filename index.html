@@ -2306,13 +2306,13 @@
             generateReceipt(editingId || null);
         }
 
-        //función generateReceipt
+        //función generateReceipt versión "Inteligente"        
         async function generateReceipt(editingId = null) {
             const saveBtn = document.getElementById('saveReceiptBtn');
             saveBtn.disabled = true;
             saveBtn.textContent = 'Guardando...';
 
-            // Recolectar datos del formulario
+            // Recolectar datos
             const receiptDate = document.getElementById('receiptDate').value;
             const clientName = document.getElementById('receiptClientName').value;
             const clientPhone = document.getElementById('receiptClientPhone').value;
@@ -2322,7 +2322,7 @@
             const receiptConcept = document.getElementById('receiptConcept').value;
             const receiptObservations = document.getElementById('receiptObservations').value;
 
-            // --- ▼▼▼ INICIO DE LÓGICA DE VENCIMIENTO AÑADIDA ▼▼▼ ---
+            // Lógica de Vencimiento
             const clienteSeleccionado = clients.find(c => c.name === clientName);
             const creditDays = clienteSeleccionado ? (clienteSeleccionado.credit_days || 0) : 0;
             
@@ -2330,74 +2330,86 @@
             const emisionDate = new Date(parts[0], parts[1] - 1, parts[2]);
             emisionDate.setDate(emisionDate.getDate() + creditDays);
             const newDueDate = emisionDate.toISOString().split('T')[0];
-            // --- ▲▲▲ FIN DE LÓGICA AÑADIDA ▲▲▲ ---
 
             try {
                 if (editingId) {
-                    // --- LÓGICA PARA ACTUALIZAR UN RECIBO EXISTENTE ---
+                    // --- ACTUALIZAR (Sin cambios de lógica) ---
                     const receiptNumber = document.getElementById('receiptNumber').value;
                     const documentData = {
-                        number: receiptNumber, // Mantenemos el número original
+                        number: receiptNumber,
                         type: 'Recibo',
                         company: currentCompany.id,
                         date: receiptDate, due_date: newDueDate, clientName, clientPhone, clientAddress,
                         amount: receiptAmount, paymentMethod, concept: receiptConcept,
                         observations: receiptObservations,
-                        created_by: pb.authStore.model.id,                
+                        // No tocamos status ni balance al editar
                     };
-
                     const updatedReceipt = await pb.collection('documents').update(editingId, documentData);
                     alert('¡Recibo actualizado con éxito!');
                     updateReceiptPreview(updatedReceipt);
                     await loadData();
-                    // El botón permanece deshabilitado hasta hacer clic en 'Nuevo' o editar otro.
 
                 } else {
-                    // --- LÓGICA PARA CREAR UN NUEVO RECIBO (con reintento) ---
-                    const createReceiptRecord = async () => {
-                        const freshCompany = await pb.collection('companies').getOne(currentCompany.id);
-                        const receiptNumber = freshCompany.siguiente_numero_recibo;
+                    // --- CREAR NUEVO RECIBO (Lógica Inteligente) ---
+                    
+                    // 1. Validar monto
+                    if (isNaN(receiptAmount) || receiptAmount <= 0) throw new Error('El monto debe ser un número positivo.');
 
-                        const documentData = {
-                            number: receiptNumber.toString(),
-                            type: 'Recibo',
-                            company: currentCompany.id,
-                            date: receiptDate, due_date: newDueDate, clientName, clientPhone, clientAddress,
-                            amount: receiptAmount, paymentMethod, concept: receiptConcept,
-                            observations: receiptObservations,
-                            created_by: pb.authStore.model.id,
-                            balance: total,
-                            payment_status: 'Pendiente'
-                        };
-                        if (isNaN(documentData.amount)) throw new Error('El monto no es un número válido.');
+                    // 2. BUCLE DE BÚSQUEDA DE NÚMERO DISPONIBLE
+                    // Esto evita colisiones antes de que sucedan
+                    let isNumberUnique = false;
+                    let finalNumber = null;
+                    let freshCompany = null;
 
-                        await pb.collection('documents').create(documentData);
-                        await pb.collection('companies').update(currentCompany.id, { 'siguiente_numero_recibo+': 1 });
-                        return documentData;
-                    };
+                    while (!isNumberUnique) {
+                        // a) Obtenemos el contador actual de la DB
+                        freshCompany = await pb.collection('companies').getOne(currentCompany.id);
+                        let candidateNumber = freshCompany.siguiente_numero_recibo.toString();
 
-                    try {
-                        const docData = await createReceiptRecord();
-                        alert(`¡Recibo #${docData.number} guardado con éxito!`);
-                        updateReceiptPreview(docData);
-                        await loadData();
-                    } catch (err) {
-                        if (err.response?.data?.number?.code === 'validation_not_unique') {
-                            console.warn("Colisión de número de recibo. Reintentando...");
-                            await loadData();
-                            const docData = await createReceiptRecord();
-                            alert(`¡Recibo #${docData.number} guardado con éxito! (en el segundo intento)`);
-                            updateReceiptPreview(docData);
-                            await loadData();
+                        // b) Preguntamos a PocketBase: "¿Existe el Recibo #X para la Empresa Y?"
+                        // Nota: Filtramos por company Y number
+                        const checkExists = await pb.collection('documents').getList(1, 1, {
+                            filter: `company = "${currentCompany.id}" && number = "${candidateNumber}" && type = "Recibo"`,
+                            fields: 'id' // Solo necesitamos saber si existe
+                        });
+
+                        if (checkExists.totalItems > 0) {
+                            // c) Si existe, incrementamos el contador de la empresa y probamos de nuevo
+                            console.warn(`El recibo #${candidateNumber} ya existe para esta empresa. Buscando el siguiente...`);
+                            await pb.collection('companies').update(currentCompany.id, { 'siguiente_numero_recibo+': 1 });
                         } else {
-                            throw err; // Lanza el error para que el catch exterior lo maneje
+                            // d) Si no existe, ¡es válido!
+                            finalNumber = candidateNumber;
+                            isNumberUnique = true;
                         }
                     }
+
+                    // 3. Crear el documento con el número validado
+                    const documentData = {
+                        number: finalNumber,
+                        type: 'Recibo',
+                        company: currentCompany.id,
+                        date: receiptDate, due_date: newDueDate, clientName, clientPhone, clientAddress,
+                        amount: receiptAmount, paymentMethod, concept: receiptConcept,
+                        observations: receiptObservations,
+                        created_by: pb.authStore.model.id,
+                        payment_status: 'Pendiente',
+                        balance: receiptAmount
+                    };
+
+                    const newDoc = await pb.collection('documents').create(documentData);
+                    
+                    // 4. Actualizar contador final
+                    await pb.collection('companies').update(currentCompany.id, { 'siguiente_numero_recibo+': 1 });
+
+                    alert(`¡Recibo #${newDoc.number} guardado con éxito!`);
+                    updateReceiptPreview(newDoc);
+                    await loadData();
                 }
             } catch (err) {
-                alert('Ocurrió un error al guardar el recibo. ' + err.message);
-                console.error("Error en generateReceipt:", err);
-                saveBtn.disabled = false; // Rehabilita el botón solo si hay un error
+                alert('Ocurrió un error al guardar: ' + err.message);
+                console.error("Error detallado:", err);
+                saveBtn.disabled = false;
                 saveBtn.textContent = editingId ? '💾 Guardar Cambios' : '💾 Guardar Recibo';
             }
         }
@@ -2508,6 +2520,24 @@
             if (currentHistoryCompany !== 'all') {
                 filteredDocs = filteredDocs.filter(doc => doc.company === currentHistoryCompany);
             }
+
+            // --- ▼▼▼ NUEVO BLOQUE DE ORDENAMIENTO ▼▼▼ ---
+            // Ordenamos: Primero por FECHA (Descendente), luego por CREACIÓN (Descendente)
+            filteredDocs.sort((a, b) => {
+                // 1. Comparar fechas de emisión
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+                if (dateA > dateB) return -1; // a va antes (más nuevo)
+                if (dateA < dateB) return 1;  // b va antes (más nuevo)
+
+                // 2. Si es la misma fecha, desempatar por fecha de creación (o número)
+                // Usamos created para asegurar que lo último que registraste salga arriba
+                if (a.created > b.created) return -1;
+                if (a.created < b.created) return 1;
+                
+                return 0;
+            });
+            // --- ▲▲▲ FIN DEL BLOQUE ▲▲▲ ---
             
             // 5. Guarda la lista ya filtrada en la variable global.
             currentlyDisplayedDocs = filteredDocs;
