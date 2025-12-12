@@ -1917,7 +1917,7 @@
         function handleInvoiceSubmit() {
             const editingId = document.getElementById('editingInvoiceId').value;
             generateInvoice(editingId || null);
-        }
+        }        
 
         // --- LÓGICA PRINCIPAL DE FACTURAS ---
         async function generateInvoice(editingId = null) {
@@ -2003,6 +2003,9 @@
                     // --- LÓGICA PARA ACTUALIZAR UNA FACTURA EXISTENTE ---
                     const invoiceNumber = document.getElementById('invoiceNumber').value; // Usamos el número existente
 
+                    // Como ya validamos que NO TIENE PAGOS, el Balance debe ser igual al Total
+                    const newBalance = total;
+
                     const documentData = {
                         // No se toca la autorización ni el contador
                         number: invoiceNumber, // Se mantiene el número original
@@ -2013,7 +2016,9 @@
                         clientName, clientRTN, clientAddress,
                         subtotal, discount_amount: discount, taxRate: taxRateValue,
                         taxAmount, total, paymentMethod, observations,
-                        created_by: pb.authStore.model.id,                
+                        created_by: pb.authStore.model.id,
+                        balance: newBalance,
+                        payment_status: 'Pendiente'               
                     };
                     
                     // Lógica para exonerado
@@ -2335,6 +2340,10 @@
                 if (editingId) {
                     // --- ACTUALIZAR (Sin cambios de lógica) ---
                     const receiptNumber = document.getElementById('receiptNumber').value;
+
+                    // Como ya validamos que NO TIENE PAGOS, el Balance es igual al Monto
+                    const newBalance = receiptAmount;
+
                     const documentData = {
                         number: receiptNumber,
                         type: 'Recibo',
@@ -2342,7 +2351,8 @@
                         date: receiptDate, due_date: newDueDate, clientName, clientPhone, clientAddress,
                         amount: receiptAmount, paymentMethod, concept: receiptConcept,
                         observations: receiptObservations,
-                        // No tocamos status ni balance al editar
+                        balance: newBalance,
+                        payment_status: 'Pendiente'
                     };
                     const updatedReceipt = await pb.collection('documents').update(editingId, documentData);
                     alert('¡Recibo actualizado con éxito!');
@@ -2633,18 +2643,36 @@
                 return;
             }
 
-            // --- INICIO DEL BLOQUE DE DIAGNÓSTICO ---
-            console.log("--- Diagnóstico de EditDocument ---");
-            console.log("1. Valor original de doc.type:", `'${doc.type}'`);
-            
-            // 1. Usamos el tipo original, sin convertirlo a minúsculas
-            const docType = doc.type ? doc.type.trim() : ''; 
-            console.log("2. Valor después de trim() y toLowerCase():", `'${docType}'`);
+            // --- VALIDACIÓN ESTRICTA DE PAGOS ---
+            try {
+                // Consultamos si existe AL MENOS UN pago registrado para este documento
+                const paymentsCheck = await pb.collection('payments').getList(1, 1, {
+                    filter: `document = "${doc.id}"`
+                });
 
-            console.log("3. Comparando con 'Factura'. ¿Son iguales?:", docType === 'Factura');
-            console.log("4. Comparando con 'Recibo'. ¿Son iguales?:", docType === 'Recibo');
-            console.log("--- Fin del Diagnóstico ---");
-            // --- FIN DEL BLOQUE DE DIAGNÓSTICO ---
+                // Si hay resultados (totalItems > 0) o si el estado es 'Pagada', bloqueamos.
+                if (paymentsCheck.totalItems > 0 || doc.payment_status === 'Pagada') {
+                    alert('⛔ ACCIÓN DENEGADA\n\nEste documento tiene abonos registrados o ya está pagado.\n\nSolo se permite editar documentos que no tienen ningún pago asociado.');
+                    return;
+                }
+            } catch (err) {
+                console.error("Error al verificar pagos:", err);
+                // Fallback de seguridad por si falla la red: verificamos el balance localmente
+                const total = doc.total || doc.amount || 0;
+                const balance = (doc.balance !== undefined) ? doc.balance : total;
+                
+                // Si el balance es menor al total (con margen de error) asumimos que hay pagos
+                if (doc.payment_status === 'Pagada' || balance < (total - 0.01)) {
+                    alert('⛔ No se puede editar un documento con pagos registrados (Verificación Local).');
+                    return;
+                }
+            }
+            // ------------------------------------
+
+            // Continúa la lógica normal de edición
+            console.log(`Editando documento tipo: ${doc.type}`);
+            
+            const docType = doc.type ? doc.type.trim() : ''; 
 
             if (docType === 'Factura') {
                 try {
