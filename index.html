@@ -1477,11 +1477,7 @@
             sidebar.classList.toggle('-translate-x-full');
             sidebar.classList.toggle('absolute');
             sidebar.classList.toggle('h-full');
-        }
-
-        /* ------------------------------------------------------------- */
-        /* INTEGRACIÓN DE LÓGICA LOGICAAPP.TXT         */
-        /* ------------------------------------------------------------- */
+        }    
         
         // Configuración PocketBase 
         const pb = new PocketBase("https://db-conexion-hn.pockethost.io/");        
@@ -5359,36 +5355,50 @@
 
         async function processPayment(event) {
             event.preventDefault();
-            
-            const docId = document.getElementById('payDocId').value;
-            const amount = parseFloat(document.getElementById('paymentAmount').value);
-            const paymentDate = document.getElementById('paymentDate').value;
-            const paymentMethod = document.getElementById('paymentMethodModal').value;
 
-            if (!amount || amount <= 0) {
-                alert("Por favor ingresa un monto válido.");
-                return;
+            // 1. IDENTIFICAR Y DESHABILITAR EL BOTÓN
+            // Buscamos el botón que envió el formulario para bloquearlo
+            const submitButton = event.submitter || event.target.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton ? submitButton.innerText : 'Pagar';
+
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerText = "Procesando...";
             }
-
-            const doc = documents.find(d => d.id === docId);
-            const currentBalance = (doc.balance !== undefined && doc.balance !== 0) ? doc.balance : (doc.total || doc.amount);
-
-            if (amount > currentBalance) {
-                alert(`El abono (L ${amount}) no puede ser mayor al saldo pendiente.`);
-                return;
-            }
-
-            const newBalance = currentBalance - amount;
-            let newStatus = newBalance <= 0.01 ? 'Pagada' : 'Pendiente';
 
             try {
-                // 1. Actualizar el saldo de la factura (Como antes)
+                const docId = document.getElementById('payDocId').value;
+                const amount = parseFloat(document.getElementById('paymentAmount').value);
+                const paymentDate = document.getElementById('paymentDate').value;
+                const paymentMethod = document.getElementById('paymentMethodModal').value;
+
+                if (!amount || amount <= 0) {
+                    alert("Por favor ingresa un monto válido.");
+                    throw new Error("Monto inválido"); // Lanzar error para ir al catch/finally
+                }
+
+                const doc = documents.find(d => d.id === docId);
+                
+                // Validación de seguridad extra: Asegurarse de que el doc existe
+                if (!doc) throw new Error("Documento no encontrado en memoria");
+
+                const currentBalance = (doc.balance !== undefined && doc.balance !== 0) ? doc.balance : (doc.total || doc.amount);
+
+                if (amount > currentBalance) {
+                    alert(`El abono (L ${amount}) no puede ser mayor al saldo pendiente.`);
+                    throw new Error("Abono mayor al saldo");
+                }
+
+                const newBalance = currentBalance - amount;
+                let newStatus = newBalance <= 0.01 ? 'Pagada' : 'Pendiente';
+
+                // 1. Actualizar el saldo de la factura
                 await pb.collection('documents').update(docId, {
                     balance: newBalance,
                     payment_status: newStatus
                 });
 
-                // --- ▼▼▼ NUEVO: GUARDAR EL REGISTRO DEL PAGO ▼▼▼ ---
+                // 2. Guardar el registro del pago
                 await pb.collection('payments').create({
                     document: docId,
                     amount: amount,
@@ -5396,20 +5406,29 @@
                     method: paymentMethod,
                     created_by: pb.authStore.model.id
                 });
-                // --- ▲▲▲ FIN DE LO NUEVO ▲▲▲ ---
 
                 alert(`¡Abono de L ${formatNumber(amount)} registrado con éxito!`);
                 
                 closePaymentModal();
                 await loadData(); 
-                
+
                 if (!document.getElementById('morosidadSection').classList.contains('hidden')) {
                     generateAndDisplayMorosidad();
                 }
 
             } catch (err) {
-                console.error("Error al registrar pago:", err);
-                alert("Error al procesar el pago.");
+                // Solo mostramos error en consola si no es uno de nuestros errores de validación (que ya mostraron alert)
+                if (err.message !== "Monto inválido" && err.message !== "Abono mayor al saldo") {
+                    console.error("Error al registrar pago:", err);
+                    alert("Error al procesar el pago.");
+                }
+            } finally {
+                // 3. SIEMPRE REACTIVAR EL BOTÓN (Éxito o Error)
+                // El bloque finally se ejecuta pase lo que pase.
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerText = originalButtonText;
+                }
             }
         }
 
@@ -5882,7 +5901,7 @@
 
         //-- Control de Version Inicio--
         // --- CONFIGURACIÓN DE LA APP ---
-        const APP_VERSION = "1.5.0"; // 
+        const APP_VERSION = "1.5.3"; // 
                                   
         function updateConnectionStatus() {
             const statusEl = document.getElementById('connection-status');
